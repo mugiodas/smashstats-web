@@ -1675,7 +1675,7 @@ function settingsHTML(){
       ? '<button type="button" class="danger block" onclick="deleteDemo()">'+esc(t('demo_delete'))+'</button>'
       : '<button type="button" class="block" onclick="loadDemo()">'+esc(t('demo_load'))+'</button>')
     + '</div>';
-  h += '<div class="card"><p class="muted small">SmashStats Web — Phase 2（スプレッドシート同期）<br>DB: smashstats-web（IndexedDB）・ schema v16相当<br>Phase 4: Pro（買い切り）</p></div>';
+  h += '<div class="card"><p class="muted small">SmashStats Web 2.1.0 — Phase 2（スプレッドシート同期）<br>DB: smashstats-web（IndexedDB）・ schema v16相当<br>Phase 4: Pro（買い切り）</p></div>';
   return h;
 }
 function setLang(l){ LANG=l; localStorage.setItem('ss-lang', l); render(); }
