@@ -232,6 +232,7 @@ const I18N = {
     sync_last:'最終同期', sync_conflicts:'競合（シート側が勝った件数）',
     sync_need_config:'ブリッジURL・スプレッドシート・合言葉を入力して保存してください。',
     sync_bad_url:'ブリッジURLは https:// から始まる Apps Script の /exec URL を入力してください。',
+    sync_bad_url_redirect:'ブリッジURLが違います。Safariで開いたときの転送先（googleusercontent.com）のURLではなく、/exec で終わるURLを入力してください。',
     sync_bad_sheet:'スプレッドシートのURLまたはIDが読み取れませんでした。',
     sync_need_secret:'合言葉を入力してください。',
     sync_secret_short:'合言葉は8文字以上で入力してください。',
@@ -297,6 +298,7 @@ const I18N = {
     sync_last:'Last sync', sync_conflicts:'Conflicts (sheet won)',
     sync_need_config:'Enter and save the bridge URL, spreadsheet and secret first.',
     sync_bad_url:'Enter the Apps Script /exec URL starting with https://.',
+    sync_bad_url_redirect:'That is the redirected URL, not the bridge URL. Enter the URL ending in /exec.',
     sync_bad_sheet:'Could not read the spreadsheet URL or ID.',
     sync_need_secret:'Please enter the passphrase.',
     sync_secret_short:'The passphrase must be at least 8 characters.',
@@ -646,10 +648,12 @@ function extractSpreadsheetId(input){
   return null;
 }
 
-/* ブリッジURLは https が原則。http はローカル検証用（127.0.0.1 / localhost）のみ許可。 */
+/* ブリッジURLは https が原則。http はローカル検証用（127.0.0.1 / localhost）のみ許可。
+   https の場合は /exec で終わるものだけ受け付ける（Safariで開いたときの転送先
+   googleusercontent.com/macros/echo のURLを貼る間違いを防ぐ）。 */
 function isBridgeUrlOk(url){
   if (!url) return false;
-  if (url.indexOf('https://')===0) return true;
+  if (url.indexOf('https://')===0) return url.replace(/\/+$/,'').endsWith('/exec');
   return url.indexOf('http://127.0.0.1')===0 || url.indexOf('http://localhost')===0;
 }
 function syncConfigured(){
@@ -667,7 +671,7 @@ async function syncSaveSettingsUI(quiet){
   const sheetUrl = sheetEl.value.trim();
   const secretInput = secretEl.value;
   if (!bridgeUrl || !isBridgeUrlOk(bridgeUrl)){
-    updateSyncStatus(t('sync_bad_url')); return false;
+    updateSyncStatus(bridgeUrl.indexOf('googleusercontent.com/macros/echo')>=0 ? t('sync_bad_url_redirect') : t('sync_bad_url')); return false;
   }
   const sheetId = extractSpreadsheetId(sheetUrl);
   if (!sheetId){
