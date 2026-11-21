@@ -14,11 +14,20 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <style>
 /* ---- theme variables ---- */
+/* Android版 STANDARD テーマ（Theme.kt の STANDARD scheme）の値をそのまま使う。
+   primary #0C3E63 / background #F4F7F9 / surface #FFFFFF / surfaceVariant #F1F5F9 /
+   onSurfaceVariant #64748B / primaryContainer #E2EFFD / secondaryContainer #E6F4EC /
+   tertiary #10B981 / outline #CBD5E1。角丸は STANDARD shapes: 4/8/12/16/24。 */
 :root{
   --navy:#0C3E63; --navy-dark:#0F1E36; --gold:#FABE0F; --rose:#C2486B;
-  --bg:#F2F5F7; --surface:#FFFFFF; --surface-muted:#E9EEF1; --text:#16222B;
-  --muted:#5B6B76; --border:#D3DCE1; --accent:#0C3E63; --danger:#B3261E;
+  --bg:#F4F7F9; --surface:#FFFFFF; --surface-muted:#F1F5F9; --text:#0F172A;
+  --muted:#64748B; --border:#CBD5E1; --accent:#0C3E63; --danger:#B3261E;
   --win:#1B7A3D; --loss:#B3261E; --tabbar-h:64px;
+  --primary-container:#E2EFFD; --secondary-container:#E6F4EC; --tertiary:#10B981;
+  --win-badge:#10B981; --loss-badge:#DC2626;
+  --radius-card:16px; --radius-btn:999px; --radius-input:12px;
+  --shadow-card:0 1px 3px rgba(15,23,42,.08);
+  --shadow-float:0 4px 16px rgba(15,23,42,.14);
 }
 [data-theme="mint_pale"]{
   --navy:#2F6B5E; --navy-dark:#234F46; --gold:#E8B64C; --rose:#C2486B;
@@ -37,24 +46,62 @@ body{
   padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 12px);}
 body.kb #tabbar{display:none;}
 body.kb #app{padding-bottom:12px;}
+/* Android版 STANDARD のヘッダー：背景はアプリ背景と同じ。左に丸いアプリアイコン、
+   タイトル＋金色PREMIUMピル＋連勝ピル、選手ピル。右に丸いアイコンボタン3つ。 */
 header{
   position:sticky; top:0; z-index:20;
-  background:var(--navy); color:#fff;
-  padding:10px 14px calc(10px + env(safe-area-inset-top)*0);
-  padding-top:calc(10px + env(safe-area-inset-top));
+  background:var(--bg);
+  padding:calc(8px + env(safe-area-inset-top)) 12px 8px;
   display:flex; align-items:center; gap:10px;
 }
-header h1{font-size:19px; margin:0; letter-spacing:.5px; white-space:nowrap;}
-header h1 .gold{color:var(--gold);}
-header .spacer{flex:1;}
-header select{
-  max-width:150px; font-size:15px; padding:8px 6px; border-radius:8px;
-  border:1px solid rgba(255,255,255,.4); background:rgba(255,255,255,.12); color:#fff;
+.app-icon{
+  flex:0 0 auto; width:56px; height:56px; border-radius:50%; padding:0;
+  border:3px solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box,
+    linear-gradient(135deg,#FABE0F,#7DD3FC,#0C3E63) border-box;
+  font-size:26px; line-height:1; cursor:pointer; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
 }
-header select option{color:#16222B;}
+.app-icon img{width:100%; height:100%; object-fit:cover; border-radius:50%;}
+.hdr-titles{flex:1; min-width:0;}
+.hdr-row1{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+header h1{font-size:21px; margin:0; letter-spacing:.5px; white-space:nowrap; color:var(--navy); font-weight:800;}
+.pro-pill{
+  background:linear-gradient(135deg,#E8C87A,#D9A441); color:#4A3600;
+  font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; white-space:nowrap;
+}
+.streak-pill{
+  background:var(--primary-container); color:var(--navy);
+  font-size:13px; font-weight:700; padding:4px 10px; border-radius:999px; white-space:nowrap;
+}
+.hdr-row2{margin-top:6px;}
+.player-pill{
+  display:inline-flex; align-items:center; gap:6px; max-width:100%;
+  background:var(--surface); border:1px solid var(--border); border-radius:999px;
+  padding:4px 12px 4px 4px; font-size:15px; font-weight:700; color:var(--text);
+  min-height:36px; cursor:pointer; font-family:inherit;
+}
+.player-pill .ph{width:28px; height:28px; border-radius:50%; background:var(--primary-container);
+  display:inline-flex; align-items:center; justify-content:center; font-size:15px; overflow:hidden; flex:0 0 auto;}
+.player-pill .ph img{width:100%; height:100%; object-fit:cover;}
+.player-pill select{
+  border:none; background:transparent; font-size:15px; font-weight:700; color:var(--text);
+  padding:0; min-height:0; width:auto; max-width:170px; appearance:none; -webkit-appearance:none;
+}
+.hdr-icons{display:flex; gap:8px; flex:0 0 auto;}
+.hdr-icon-btn{
+  width:48px; height:48px; min-width:48px; min-height:48px; border-radius:50%;
+  border:1px solid var(--border); background:var(--surface); color:var(--navy);
+  font-size:21px; cursor:pointer; padding:0;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:var(--shadow-card);
+}
+.hdr-icon-btn .ph{width:100%; height:100%; border-radius:50%; overflow:hidden;
+  display:flex; align-items:center; justify-content:center; font-size:22px;}
+.hdr-icon-btn .ph img{width:100%; height:100%; object-fit:cover;}
 .icon-btn{
-  min-width:44px; min-height:44px; border-radius:10px; border:1px solid rgba(255,255,255,.4);
-  background:rgba(255,255,255,.12); color:#fff; font-size:20px; cursor:pointer;
+  min-width:44px; min-height:44px; border-radius:50%; border:1px solid var(--border);
+  background:var(--surface); color:var(--navy); font-size:20px; cursor:pointer;
 }
 #install-banner{
   display:none; margin:10px 12px 0; padding:12px; border-radius:12px;
@@ -64,8 +111,8 @@ header select option{color:#16222B;}
 #install-banner button{margin-top:8px;}
 main{padding:12px;}
 .card{
-  background:var(--surface); border:1px solid var(--border); border-radius:14px;
-  padding:14px; margin-bottom:12px;
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-card);
+  padding:14px; margin-bottom:12px; box-shadow:var(--shadow-card);
 }
 .card h2{font-size:17px; margin:0 0 8px;}
 .card h3{font-size:15px; margin:14px 0 6px;}
@@ -82,19 +129,20 @@ main{padding:12px;}
 .badge.free{background:var(--surface-muted); color:var(--muted);}
 .badge.demo{background:#F3D9E2; color:var(--rose);}
 .badge.sync{background:#E3ECF5; color:var(--navy);}
+/* Android版 STANDARD はピル型ボタン。メインは紺ベタ、サブは白地＋枠線。 */
 button, .btn{
-  font-size:16px; min-height:48px; padding:10px 16px; border-radius:12px;
+  font-size:16px; min-height:48px; padding:10px 18px; border-radius:var(--radius-btn);
   border:1px solid var(--border); background:var(--surface); color:var(--text);
   cursor:pointer; font-family:inherit;
 }
-button.primary, .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:700;}
+button.primary, .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:700; box-shadow:var(--shadow-card);}
 button.danger{background:#fff; border-color:var(--danger); color:var(--danger);}
 button.gold{background:var(--gold); border-color:var(--gold); color:#4A3600; font-weight:700;}
 button:disabled{opacity:.45; cursor:default;}
 button.block{width:100%;}
 label{display:block; font-size:14px; font-weight:700; margin:12px 0 4px;}
 input, select, textarea{
-  width:100%; font-size:16px; padding:11px 10px; border-radius:10px;
+  width:100%; font-size:16px; padding:11px 10px; border-radius:var(--radius-input);
   border:1px solid var(--border); background:var(--surface); color:var(--text);
   font-family:inherit;
 }
@@ -123,20 +171,25 @@ textarea{min-height:76px; resize:vertical;}
 .bar-row .bar-track{flex:1; height:10px; background:var(--surface-muted); border-radius:6px; overflow:hidden;}
 .bar-row .bar-fill{height:100%; background:var(--accent);}
 .bar-row .bar-val{flex:0 0 52px; text-align:right;}
+/* Android版のタブバー：画面下に浮いた白い丸角バー。選択中は薄青の丸背景＋ラベル付き。 */
 #tabbar{
-  position:fixed; left:0; right:0; bottom:0; z-index:30;
-  background:var(--surface); border-top:1px solid var(--border);
-  padding-bottom:env(safe-area-inset-bottom);
+  position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); z-index:30;
+  background:var(--surface); border:1px solid var(--border); border-radius:28px;
+  box-shadow:var(--shadow-float);
+  padding:6px;
 }
 #tabbar .tabs{max-width:480px; margin:0 auto; display:flex;}
 #tabbar button{
-  flex:1; border:none; background:none; border-radius:0; min-height:var(--tabbar-h);
+  flex:1; border:none; background:none; border-radius:24px; min-height:var(--tabbar-h);
   padding:6px 0 8px; font-size:12px; color:var(--muted);
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
 }
-#tabbar button .ic{font-size:22px; line-height:1;}
+#tabbar button .ic{
+  font-size:22px; line-height:1; width:44px; height:32px; border-radius:999px;
+  display:flex; align-items:center; justify-content:center;
+}
 #tabbar button.active{color:var(--accent); font-weight:700;}
-#tabbar button.active .ic{color:var(--accent);}
+#tabbar button.active .ic{color:var(--accent); background:var(--primary-container);}
 #overlay{
   display:none; position:fixed; inset:0; z-index:50; background:rgba(10,25,35,.55);
   align-items:flex-end; justify-content:center;
@@ -165,6 +218,90 @@ textarea{min-height:76px; resize:vertical;}
 .tabs-inline{display:flex; gap:8px; margin-bottom:12px;}
 .tabs-inline button{flex:1; min-height:44px; font-size:15px;}
 .tabs-inline button.active{background:var(--accent); color:#fff; border-color:var(--accent); font-weight:700;}
+/* ---- Android版 STANDARD の部品 ---- */
+/* Focusカード：タイトル行（競技ノート＋管理ピル）、中の薄青パネル */
+.focus-title{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;}
+.focus-title h2{margin:0; color:var(--navy); font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.focus-title button{flex:0 0 auto; white-space:nowrap; font-size:14px; min-height:40px; padding:8px 12px;}
+.focus-title h2 .sport-emoji{font-size:15px;}
+.focus-who{display:flex; align-items:center; gap:12px; margin-bottom:12px;}
+.focus-photo{width:64px; height:64px; border-radius:50%; flex:0 0 auto; overflow:hidden;
+  background:var(--primary-container); border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center; font-size:30px;}
+.focus-photo img{width:100%; height:100%; object-fit:cover;}
+.focus-name{font-size:26px; font-weight:800; line-height:1.2;}
+.focus-panel{
+  background:var(--primary-container); border-radius:var(--radius-card);
+  padding:14px; display:flex; gap:12px; align-items:flex-start;
+}
+.focus-heart{
+  flex:0 0 auto; width:52px; height:52px; border-radius:50%; background:var(--navy);
+  color:#fff; font-size:24px; display:flex; align-items:center; justify-content:center;
+}
+.focus-panel .lbl{font-size:15px; font-weight:700; color:var(--navy); margin-bottom:4px;}
+.focus-panel .txt{font-size:17px; font-weight:700; line-height:1.45;}
+.focus-panel .edit{margin-left:auto; flex:0 0 auto; min-width:44px; min-height:44px; padding:6px 10px; font-size:18px;}
+/* タイムライン見出し */
+.tl-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin:18px 2px 10px;}
+.tl-head h2{font-size:20px; margin:0; font-weight:800;}
+.tl-head .count{font-size:15px; color:var(--muted); font-weight:700; white-space:nowrap;}
+/* タイムラインの試合カード：緑の枠、WINバッジは緑ベタ、スコアは緑 */
+.tl-card{border:1.5px solid #BFE3C8;}
+.tl-card .tl-top{display:flex; align-items:center; gap:8px;}
+.tl-card .tl-top .tname{font-size:17px; font-weight:800; flex:1; min-width:0;}
+.tl-card .tl-top .date{font-size:14px; color:var(--muted); white-space:nowrap;}
+.win-badge, .loss-badge{
+  display:inline-block; padding:4px 10px; border-radius:10px; font-size:14px; font-weight:800;
+  color:#fff; white-space:nowrap; flex:0 0 auto;
+}
+.win-badge{background:var(--win-badge);}
+.loss-badge{background:var(--loss-badge);}
+.tl-card .tl-vs{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-top:10px;}
+.tl-card .tl-vs .opp{font-size:17px; font-weight:700;}
+.tl-card .tl-vs .score{font-size:17px; font-weight:800; color:var(--win); white-space:nowrap;}
+.tl-card .tl-foot{display:flex; justify-content:flex-end; margin-top:10px;}
+.tl-card .tl-foot button{min-height:40px; font-size:14px; padding:6px 14px;}
+.note-card{border:1.5px solid var(--border);}
+.note-card .nc-head{display:flex; gap:8px; align-items:baseline;}
+.note-card .nc-head .date{margin-left:auto; font-size:13px; color:var(--muted); white-space:nowrap;}
+/* 登録画面：3連セグメント＋簡易/詳細トグル＋ステップピル */
+.seg{display:flex; background:var(--secondary-container); border-radius:999px; padding:4px; gap:4px; margin-bottom:12px;}
+.seg button{flex:1; min-height:44px; font-size:15px; font-weight:700; border:none; background:transparent; color:var(--win); padding:6px 4px;}
+.seg button.active{background:var(--tertiary); color:#fff; box-shadow:var(--shadow-card);}
+.seg button.active.match{background:var(--accent);}
+.input-toggle{display:flex; gap:8px; align-items:center; background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-card); padding:10px 12px; margin-bottom:12px;}
+.input-toggle .simple{font-size:15px; font-weight:700; color:var(--muted); flex:1;}
+.input-toggle button{flex:1; min-height:44px; font-size:14px; white-space:nowrap; padding:6px 8px;}
+.input-toggle button.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+.step-pills{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; margin-bottom:4px;
+  scrollbar-width:none; -webkit-overflow-scrolling:touch;}
+.step-pills::-webkit-scrollbar{display:none;}
+.step-pills button{
+  flex:0 0 auto; min-height:40px; font-size:14px; font-weight:700; color:var(--muted);
+  background:var(--surface); border:1px solid var(--border); padding:6px 14px; white-space:nowrap;
+}
+.step-pills button.done{color:var(--navy); border-color:var(--navy);}
+.step-pills button.current{background:var(--primary-container); color:var(--navy); border-color:var(--navy);}
+.step-pills button .chk{color:var(--tertiary);}
+.step-warn{color:var(--loss); font-weight:700; font-size:15px; margin:4px 2px 10px;}
+.step-sec{scroll-margin-top:150px;}
+.step-sec>h3{color:var(--navy);}
+/* 分析画面：タイトル＋全て/単/複ピル＋レイヤータブ */
+.an-head{display:flex; align-items:baseline; gap:10px; margin:4px 2px 10px; flex-wrap:wrap;}
+.an-head h2{font-size:24px; margin:0; font-weight:800; flex:1;}
+.an-pills{display:flex; gap:6px; background:var(--surface-muted); border-radius:999px; padding:4px;}
+.an-pills button{flex:0 0 auto; min-height:36px; font-size:14px; font-weight:700; border:none; background:transparent; padding:4px 12px; color:var(--muted);}
+.an-pills button.active{background:var(--tertiary); color:#fff; box-shadow:var(--shadow-card);}
+.an-tabs{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; margin-bottom:4px;
+  scrollbar-width:none; -webkit-overflow-scrolling:touch;}
+.an-tabs::-webkit-scrollbar{display:none;}
+.an-tabs button{
+  flex:0 0 auto; min-height:40px; font-size:15px; font-weight:700; color:var(--muted);
+  background:var(--surface); border:1px solid var(--border); padding:6px 16px; white-space:nowrap;
+}
+.an-tabs button.active{color:var(--navy); border-color:var(--navy); background:var(--primary-container);}
+.an-card{scroll-margin-top:150px;}
 @media (max-width:360px){ header h1{font-size:17px;} }
 /* Phase 3: score sheet */
 .sheet-table{width:100%;border-collapse:collapse;font-size:15px}
@@ -183,10 +320,17 @@ textarea{min-height:76px; resize:vertical;}
 <body data-theme="standard">
 <div id="app">
   <header>
-    <h1>Smash<span class="gold">Stats</span></h1>
-    <div class="spacer"></div>
-    <select id="player-select" aria-label="選手切替"></select>
-    <button class="icon-btn" id="btn-settings" aria-label="設定">⚙️</button>
+    <button class="app-icon" id="btn-photo" type="button" aria-label="選手写真">🏸</button>
+    <div class="hdr-titles">
+      <div class="hdr-row1"><h1>SmashStats</h1><span class="pro-pill" id="hdr-pro" style="display:none">★ PREMIUM</span><span class="streak-pill" id="hdr-streak" style="display:none"></span></div>
+      <div class="hdr-row2"><span class="player-pill"><span class="ph" id="hdr-player-photo">🏸</span><select id="player-select" aria-label="選手切替"></select><span aria-hidden="true">▾</span></span></div>
+    </div>
+    <div class="hdr-icons">
+      <button class="hdr-icon-btn" id="btn-ai" type="button" aria-label="AIプロンプト">✨</button>
+      <button class="hdr-icon-btn" id="btn-venue" type="button" aria-label="会場">📍</button>
+      <button class="hdr-icon-btn" id="btn-settings" type="button" aria-label="設定">⚙️</button>
+    </div>
+    <input type="file" id="photo-input" accept="image/*" style="display:none">
   </header>
   <div id="install-banner"></div>
   <main id="view"></main>
@@ -317,6 +461,14 @@ const I18N = {
     losses:'敗北',
     an_month:'今月', an_3m:'3か月', an_year:'今年', an_all:'全期間',
     an_no_data:'データがありません',
+    an_timeline:'成長と気づきのタイムライン', focus_manage:'Focus設定/管理', focus_theme_now:'今のテーマ（Focus)',
+    record_match_btn:'試合結果を記録', add_note_btn:'気づきを残す', img_prompt_btn:'画像プロンプト',
+    reg_match_tab:'試合登録', reg_gear_tab:'用具登録', reg_player_tab:'選手登録',
+    input_simple:'簡易入力（通常）', input_detail:'詳細入力',
+    step1:'1.日程・大会', step2:'2.対戦相手', step3:'3.スコア', step4:'4.環境・用具', step5:'5.振り返り',
+    step2_warn:'Step 2 で「対戦選手1」を入力してください（タップで移動）', reg_save_match:'試合を登録する',
+    an_stats_title:'スタッツ分析', an_type_all:'全て', an_type_singles:'単', an_type_doubles:'複',
+    layer_growth:'成長推移', layer_winloss:'勝敗展開', layer_gear:'用具相性', layer_tactics:'戦術・状況', layer_rivals:'ライバル',
     an_a:'A 成長', an_b:'B 勝敗', an_c:'C 用具・環境', an_d:'D 戦術', an_e:'E 対戦相手',
     an_rivals:'ライバル推移', an_scorecard:'スコアカード分析',
     an_recent5:'直近5試合', an_recent10:'直近10試合', an_avg_pd:'平均得失点差/ゲーム',
@@ -512,6 +664,14 @@ const I18N = {
     losses:'Losses',
     an_month:'This month', an_3m:'3 months', an_year:'This year', an_all:'All time',
     an_no_data:'No data yet',
+    an_timeline:'Growth & notes timeline', focus_manage:'Focus settings', focus_theme_now:'Current theme (Focus)',
+    record_match_btn:'Record match result', add_note_btn:'Add a note', img_prompt_btn:'Image prompt',
+    reg_match_tab:'Register match', reg_gear_tab:'Register gear', reg_player_tab:'Register player',
+    input_simple:'Quick input', input_detail:'Detailed input',
+    step1:'1. Date & event', step2:'2. Opponent', step3:'3. Score', step4:'4. Environment & gear', step5:'5. Review',
+    step2_warn:'Enter Opponent 1 in Step 2 (tap to jump there)', reg_save_match:'Save match',
+    an_stats_title:'Stats analysis', an_type_all:'All', an_type_singles:'Singles', an_type_doubles:'Doubles',
+    layer_growth:'Growth', layer_winloss:'Win / Loss', layer_gear:'Gear fit', layer_tactics:'Tactics', layer_rivals:'Rivals',
     an_a:'A Growth', an_b:'B Win / Loss', an_c:'C Gear & Conditions', an_d:'D Tactics', an_e:'E Opponents',
     an_rivals:'Rival trends', an_scorecard:'Score-card analysis',
     an_recent5:'Last 5 matches', an_recent10:'Last 10 matches', an_avg_pd:'Avg point diff / game',
@@ -618,6 +778,79 @@ function t(key){ const d = I18N[LANG] || I18N.ja; return d[key] || I18N.ja[key] 
 function jaEn(j,e){ return LANG==='ja'?j:e; }
 function tf(key, vars){ let s=t(key); for (const k in vars) s=s.split('{'+k+'}').join(vars[k]); return s; }
 function sportLabel(code){ return (SPORT_LABEL[LANG]||SPORT_LABEL.ja)[code] || code; }
+const SPORT_EMOJI = {BADMINTON:'🏸', TENNIS:'🎾', SOFT_TENNIS:'🎾', TABLE_TENNIS:'🏓', PICKLEBALL:'🏓'};
+function sportEmoji(code){ return SPORT_EMOJI[code] || '🏸'; }
+
+/* ---------------- 選手写真（端末内だけ。localStorageに160pxへ縮小して保存） ---------------- */
+function playerPhotoKey(pid){ return 'ss-photo-' + pid; }
+function playerPhotoURL(pid){
+  if (!pid) return null;
+  try{ return localStorage.getItem(playerPhotoKey(pid)) || null; }catch(e){ return null; }
+}
+function playerPhotoHTML(pid, cls){
+  const url = playerPhotoURL(pid);
+  const p = (state.players||[]).find(function(x){ return x.playerId===pid; });
+  const initial = p ? esc(p.playerName.slice(0,1)) : '🏸';
+  if (url) return '<span class="'+cls+'"><img src="'+url+'" alt=""></span>';
+  return '<span class="'+cls+'">'+initial+'</span>';
+}
+function openPhotoPicker(){
+  if (!currentPlayer()){ toast(t('no_player')); return; }
+  const inp = $('#photo-input');
+  if (inp) inp.click();
+}
+function onPhotoChosen(file){
+  if (!file || !currentPlayer()) return;
+  const rd = new FileReader();
+  rd.onload = function(){
+    const img = new Image();
+    img.onload = function(){
+      const size = 160;
+      const cv = document.createElement('canvas');
+      cv.width = size; cv.height = size;
+      const ctx = cv.getContext('2d');
+      const s = Math.min(img.width, img.height);
+      ctx.drawImage(img, (img.width-s)/2, (img.height-s)/2, s, s, 0, 0, size, size);
+      try{ localStorage.setItem(playerPhotoKey(state.currentPlayerId), cv.toDataURL('image/jpeg', 0.85)); }catch(e){}
+      render();
+    };
+    img.src = rd.result;
+  };
+  rd.readAsDataURL(file);
+}
+function currentStreak(){
+  const ms = playerMatches().slice().sort(function(a,b){
+    return (b.matchDateEpochDay-a.matchDateEpochDay) || (b.createdAt-a.createdAt);
+  });
+  if (!ms.length) return null;
+  const last = ms[0].isWin;
+  let n = 0;
+  for (const m of ms){ if (m.isWin===last) n++; else break; }
+  return {win:last, n:n};
+}
+function renderHeader(){
+  const p = currentPlayer();
+  const pro = $('#hdr-pro');
+  if (pro) pro.style.display = state.isPro ? '' : 'none';
+  const st = $('#hdr-streak');
+  const cs = p ? currentStreak() : null;
+  if (st){
+    if (cs && cs.n>0){ st.style.display=''; st.textContent = '🔥 ' + cs.n + jaEn(cs.win?'連勝':'連敗', cs.win?' win streak':' loss streak'); }
+    else st.style.display='none';
+  }
+  const ph = $('#hdr-player-photo');
+  if (ph){
+    const url = p ? playerPhotoURL(p.playerId) : null;
+    if (url) ph.innerHTML = '<img src="'+url+'" alt="">';
+    else ph.textContent = p ? p.playerName.slice(0,1) : '🏸';
+  }
+  const appIcon = $('#btn-photo');
+  if (appIcon){
+    const url = p ? playerPhotoURL(p.playerId) : null;
+    if (url) appIcon.innerHTML = '<img src="'+url+'" alt="">';
+    else appIcon.textContent = p ? sportEmoji(p.sportType) : '🏸';
+  }
+}
 
 /* ---------------- ユーティリティ ---------------- */
 function $(sel, root){ return (root||document).querySelector(sel); }
@@ -1645,6 +1878,7 @@ function render(){
   document.body.dataset.theme = THEME;
   document.documentElement.lang = (LANG==='ja'?'ja':'en');
   renderPlayerSelect();
+  renderHeader();
   renderInstallBanner();
   $all('[data-i18n]').forEach(function(el){ el.textContent = t(el.dataset.i18n); });
   $all('#tabbar button').forEach(function(b){
@@ -1695,48 +1929,99 @@ function proNotice(msg){
   setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 5000);
 }
 
-/* ---- ホーム ---- */
+/* ---- ホーム（Android版と同じ構造：Focusカード → 記録ボタン → タイムライン） ---- */
 function homeHTML(){
   const p = currentPlayer();
   const ms = playerMatches();
-  const wins = ms.filter(function(m){return m.isWin;}).length;
   const focus = state.focuses
     .filter(function(f){return f.playerId===state.currentPlayerId && !f.endDate;})
     .sort(function(a,b){return b.startDate-a.startDate;})[0];
+  const notes = (state.notes||[]).filter(function(n){ return n.playerId===state.currentPlayerId; })
+    .sort(function(a,b){ return (b.noteDate-a.noteDate) || (b.createdAt-a.createdAt); });
   let h = '';
   if (state.demo) h += '<div><span class="badge demo">'+esc(t('demo_badge'))+'</span></div>';
   if (!p){
     h += '<div class="card"><p>'+esc(t('no_player'))+'</p>'
       + '<button type="button" class="primary block" onclick="showPlayerForm()">'+esc(t('add_player'))+'</button></div>';
   } else {
-    h += '<div class="card"><h2>'+esc(p.playerName)+' <span class="muted small">'+esc(sportLabel(p.sportType))+' / '+esc(p.defaultTeamName||'')+'</span></h2>'
-      + '<div class="stat-grid"><div class="stat"><div class="num">'+ms.length+'</div><div class="lbl">'+esc(t('total_matches'))+'</div></div>'
-      + '<div class="stat"><div class="num">'+wins+'</div><div class="lbl">'+esc(t('wins'))+'</div></div>'
-      + '<div class="stat"><div class="num">'+(ms.length?Math.round(wins/ms.length*100):0)+'%</div><div class="lbl">'+esc(t('win_rate'))+'</div></div></div></div>';
-    h += '<div class="card"><h2>'+esc(t('focus_now'))+'</h2>'
-      + (focus?'<p>'+esc(focus.title)+'</p><p class="muted small">'+esc(fmtDate(focus.startDate))+' 〜</p>':'<p class="muted">'+esc(t('no_focus'))+'</p>')
-      + '<button type="button" onclick="showFocusForm()">＋ '+esc(t('focus_now'))+'</button></div>';
-    h += '<div class="card"><h2>'+esc(t('recent_matches'))+'</h2>';
-    if (!ms.length) h += '<p class="muted">'+esc(t('no_matches'))+'</p>';
-    else h += ms.slice(0,3).map(matchCardHTML).join('');
-    h += '<button type="button" class="block" onclick="setTab(\'matches\')">'+esc(t('tab_matches'))+'</button></div>';
+    /* Focusカード：競技ノート＋選手＋Focus設定/管理＋今のテーマ */
+    h += '<div class="card"><div class="focus-title"><h2><span class="sport-emoji">'+sportEmoji(p.sportType)+'</span> '
+      + esc(sportLabel(p.sportType)) + jaEn('ノート',' Notes') + '</h2>'
+      + '<button type="button" onclick="showFocusForm()">★ '+esc(t('focus_manage'))+'</button></div>'
+      + '<div class="focus-who">' + playerPhotoHTML(p.playerId, 'focus-photo')
+      + '<div class="focus-name">'+esc(p.playerName)+'</div></div>'
+      + '<div class="focus-panel"><span class="focus-heart">♥</span><div style="flex:1;min-width:0">'
+      + '<div class="lbl">'+esc(t('focus_theme_now'))+'</div>'
+      + (focus?'<div class="txt">'+esc(focus.title)+'</div>':'<div class="txt muted">'+esc(t('no_focus'))+'</div>')
+      + '</div><button type="button" class="edit" onclick="showFocusForm()" aria-label="'+esc(t('edit'))+'">✏️</button></div></div>';
+    /* 記録ボタン2つ */
+    h += '<div class="row"><button type="button" class="primary" style="min-height:56px" onclick="newDraft(); setTab(\'register\')">＋ '+esc(t('record_match_btn'))+'</button>'
+      + '<button type="button" style="min-height:56px" onclick="showNoteForm()">✏️ '+esc(t('add_note_btn'))+'</button></div>'
+      + '<div style="height:12px"></div>';
+    /* タイムライン：試合＋気づきを日付順に */
+    const items = [];
+    ms.slice(0,5).forEach(function(m){ items.push({d:m.matchDateEpochDay, c:m.createdAt, html:matchCardHTML(m)}); });
+    notes.slice(0,3).forEach(function(n){
+      items.push({d:n.noteDate||0, c:n.createdAt||0, html:'<div class="card note-card"><div class="nc-head"><span>💬</span><b>'+esc(t('notes'))+'</b><span class="date">'+esc(fmtDate(n.noteDate||0))+'</span></div><p style="margin:8px 0 0">'+esc(n.content||'')+'</p></div>'});
+    });
+    items.sort(function(a,b){ return (b.d-a.d) || (b.c-a.c); });
+    h += '<div class="tl-head"><h2>'+esc(t('an_timeline'))+' 📖</h2><span class="count">'+jaEn('全 ','Total ')+(ms.length+notes.length)+jaEn(' 件',' items')+'</span></div>';
+    if (!items.length) h += '<p class="muted">'+esc(t('no_matches'))+'</p>';
+    else h += items.slice(0,6).map(function(x){ return x.html; }).join('');
+    h += '<button type="button" class="block" onclick="setTab(\'matches\')">'+esc(t('tab_matches'))+'</button>';
     if (state.outboxCount>0){
       h += '<div class="card"><span class="badge sync">'+esc(t('outbox_pending'))+' '+state.outboxCount+'</span>'
         + '<p class="muted small">'+esc(t('sync_pending_note'))+'</p></div>';
     }
   }
-  h += '<div id="player-form-slot"></div><div id="focus-form-slot"></div>';
+  h += '<div id="player-form-slot"></div><div id="focus-form-slot"></div><div id="note-form-slot"></div>';
   return h;
+}
+/* 気づき（ノート）の追加：Android版「気づきを残す」 */
+function showNoteForm(){
+  const p = currentPlayer();
+  const slot = $('#note-form-slot');
+  if (!slot || !p) return;
+  slot.innerHTML = '<div class="card"><h3>'+esc(t('add_note_btn'))+'</h3>'
+    + '<label>'+esc(t('note_content'))+'</label><textarea id="n-content"></textarea>'
+    + '<div style="height:10px"></div><div class="row">'
+    + '<button type="button" class="primary" onclick="saveNote()">'+esc(t('save'))+'</button>'
+    + '<button type="button" onclick="render()">'+esc(t('cancel'))+'</button></div></div>';
+  const ta = $('#n-content'); if (ta) ta.focus();
+}
+async function saveNote(){
+  const p = currentPlayer(); if (!p) return;
+  const content = $('#n-content').value.trim();
+  if (!content) return;
+  const now = Date.now();
+  await idbPut('notes', {
+    noteId:uuid(), playerId:p.playerId, content:content, photoPath:null,
+    noteDate:dateToEpochDay(new Date()), createdAt:now, updatedAt:now, isDeleted:false
+  });
+  await loadAll(); toast(t('saved')); render();
 }
 function matchCardHTML(m){
   const sets = parseScoresJson(m.scoresJson);
-  const badge = m.isWin?'<span class="badge win">'+esc(t('win'))+'</span>':'<span class="badge loss">'+esc(t('loss'))+'</span>';
-  return '<div class="card match-card" onclick="editMatch(\''+esc(m.matchId)+'\')">'
-    + '<div class="top"><div><div class="opp">'+esc(m.opponentDisplayName)+'</div>'
-    + '<div class="sub">'+esc(fmtDate(m.matchDateEpochDay))+' ・ '+esc(m.tournamentName||'')+' ・ '+esc(m.roundName||'')+'</div></div>'
-    + '<div style="text-align:right">'+badge+'<div class="score">'+esc(scoreText(sets))+'</div></div></div>'
-    + (m.matchNote?'<div class="sub">'+esc(m.matchNote)+'</div>':'')
+  const badge = m.isWin
+    ? '<span class="win-badge">WIN 🏆</span>'
+    : '<span class="loss-badge">'+esc(t('loss'))+'</span>';
+  return '<div class="card tl-card match-card" onclick="editMatch(\''+esc(m.matchId)+'\')">'
+    + '<div class="tl-top">'+badge+'<span class="tname">'+esc(m.tournamentName||'')+'</span>'
+    + '<span class="date">'+esc(fmtDate(m.matchDateEpochDay))+'</span></div>'
+    + '<div class="tl-vs"><span class="opp">vs '+esc(m.opponentDisplayName)+(m.opponentTeamNameSnapshot?' ('+esc(m.opponentTeamNameSnapshot)+')':'')+'</span>'
+    + '<span class="score">'+esc(scoreText(sets))+'</span></div>'
+    + (m.matchNote?'<div class="sub muted" style="margin-top:6px">'+esc(m.matchNote)+'</div>':'')
+    + '<div class="tl-foot"><button type="button" onclick="event.stopPropagation(); goAiImage()">🖼 '+esc(t('img_prompt_btn'))+' 🎨</button></div>'
     + '</div>';
+}
+function goAiImage(){
+  setTab('analytics');
+  state.aiKind='image'; state.aiText=null;
+  render();
+  setTimeout(function(){
+    const el = document.getElementById('an-ai');
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 60);
 }
 
 /* ---- 試合一覧（検索は一覧部分だけ更新。入力欄は再描画しない） ---- */
@@ -1821,48 +2106,131 @@ function editMatch(id){
   };
   setTab('register');
 }
+/* Android版の登録画面：3連セグメント → 簡易/詳細トグル → ステップピル（1〜5）→ 各ステップ */
+function regStepState(){
+  const d = state.draft;
+  const hasScore = d.sets.some(function(s){ return s.myScore!=null || s.opponentScore!=null; });
+  return {
+    s1: !!(d.tournamentName || d.matchDateEpochDay),
+    s2: !!((d.opponentDisplayName||'').trim()),
+    s3: hasScore,
+    s4: d.courtSurface!=='UNKNOWN' || !!d.gearId,
+    s5: !!((d.matchNote||'').trim())
+  };
+}
+function regScrollTo(id){
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function regSetDetail(detail){
+  readRegisterForm();
+  state.regDetail = detail;
+  render();
+}
+function regShowPlayer(){
+  readRegisterForm();
+  showPlayerForm();
+}
+function readRegisterForm(){
+  const d = state.draft;
+  if (!d) return;
+  const val = function(id){ const el = document.getElementById(id); return el?el.value:''; };
+  if (val('f-date')) d.matchDateEpochDay = dateInputToEpochDay(val('f-date'));
+  d.tournamentName = val('f-tournament');
+  d.tournamentYear = parseInt(val('f-year'),10)||d.tournamentYear;
+  d.roundName = val('f-round');
+  d.matchType = val('f-type')||d.matchType;
+  d.courtSurface = val('f-surface')||d.courtSurface;
+  d.opponentDisplayName = val('f-opponent');
+  const venueEl = document.getElementById('f-venue');
+  d.venueId = venueEl && venueEl.value!=='' ? parseInt(venueEl.value,10) : null;
+  d.partnerName = val('f-partner');
+  d.environmentType = val('f-env')||d.environmentType;
+  const gearEl = document.getElementById('f-gear');
+  d.gearId = gearEl && gearEl.value!=='' ? gearEl.value : null;
+  d.isTeamMatch = !!(document.getElementById('f-team')||{}).checked;
+  d.teamMyScore = val('f-team-my')===''?null:parseInt(val('f-team-my'),10);
+  d.teamOpponentScore = val('f-team-op')===''?null:parseInt(val('f-team-op'),10);
+  d.ballOrShuttle = val('f-ball');
+  d.videoPathOrUrl = val('f-video');
+  d.matchNote = val('f-note');
+  readSetsFromForm();
+}
 function registerHTML(){
   const d = state.draft;
   const p = currentPlayer();
   if (!p) return '<div class="card"><p>'+esc(t('need_player'))+'</p><button type="button" class="primary block" onclick="showPlayerForm()">'+esc(t('add_player'))+'</button><div id="player-form-slot"></div></div>';
   if (!d) newDraft();
   const dd = state.draft;
-  let h = '<div class="card"><h2>'+esc(state.editingMatchId?t('edit_match'):t('register_match'))+'</h2>';
+  const steps = regStepState();
+  const stepBtn = function(key, id, label){
+    const done = steps[key];
+    const cur = !done && (key==='s1' || steps['s'+(parseInt(key.slice(1),10)-1)]);
+    return '<button type="button" class="'+(done?'done':cur?'current':'')+'" onclick="regScrollTo(\''+id+'\')">'
+      + (done?'<span class="chk">✓ </span>':'') + esc(label) + '</button>';
+  };
+  const adv = state.regDetail ? '' : ' style="display:none"';
+  let h = '<div class="seg">'
+    + '<button type="button" class="active match">'+esc(t('reg_match_tab'))+'</button>'
+    + '<button type="button" onclick="setTab(\'gear\')">'+esc(t('reg_gear_tab'))+'</button>'
+    + '<button type="button" onclick="regShowPlayer()">'+esc(t('reg_player_tab'))+'</button></div>';
+  h += '<div class="input-toggle">'
+    + '<button type="button" class="'+(state.regDetail?'':'active')+'" onclick="regSetDetail(false)">⚡ '+esc(t('input_simple'))+'</button>'
+    + '<button type="button" class="'+(state.regDetail?'active':'')+'" onclick="regSetDetail(true)">⚙️ '+esc(t('input_detail'))+'</button></div>';
+  h += '<div class="step-pills">'
+    + stepBtn('s1','step1',t('step1')) + stepBtn('s2','step2',t('step2')) + stepBtn('s3','step3',t('step3'))
+    + stepBtn('s4','step4',t('step4')) + stepBtn('s5','step5',t('step5'))
+    + '</div>';
+  if (!dd.opponentDisplayName) h += '<div class="step-warn" id="step-warn" onclick="regScrollTo(\'step2\')">⚠ '+esc(t('step2_warn'))+'</div>';
+  h += '<div class="card"><h2>'+esc(state.editingMatchId?t('edit_match'):t('register_match'))+'</h2>';
   h += '<div id="match-error"></div>';
+  /* Step 1: いつ・どこで・どの大会 */
+  h += '<div class="step-sec" id="step1"><h3>'+esc(t('step1'))+'</h3>';
   h += '<label>'+esc(t('match_date'))+'</label><input id="f-date" type="date" value="'+esc(epochDayToInput(dd.matchDateEpochDay))+'">';
-  h += '<label>'+esc(t('tournament'))+'</label><input id="f-tournament" type="text" value="'+esc(dd.tournamentName)+'" placeholder="'+jaEn('○○大会','e.g. City Tournament')+'">';
+  h += '<label>'+esc(t('tournament'))+'</label><input id="f-tournament" type="text" value="'+esc(dd.tournamentName)+'" placeholder="'+jaEn('例: 練習試合 / 市民大会 / ○○ジュニア','e.g. Practice match / City Tournament')+'">';
   h += '<div class="row"><div><label>'+esc(t('year'))+'</label><input id="f-year" type="number" value="'+esc(dd.tournamentYear)+'" min="2000" max="2100"></div>'
     + '<div><label>'+esc(t('round'))+'</label><input id="f-round" type="text" value="'+esc(dd.roundName)+'" placeholder="'+jaEn('1回戦','Round 1')+'"></div></div>';
-  h += '<div class="row"><div><label>'+esc(t('match_type'))+'</label><select id="f-type">'
+  h += '<label>'+esc(t('venue'))+'</label><select id="f-venue"><option value="">'+esc(t('none'))+'</option>'
+    + (state.venues||[]).map(function(v){ return '<option value="'+v.id+'"'+(dd.venueId===v.id?' selected':'')+'>'+esc(v.name)+'</option>'; }).join('')+'</select></div>';
+  /* Step 2: 対戦相手・試合形式 */
+  h += '<div class="step-sec" id="step2"><h3>'+esc(t('step2'))+'</h3>';
+  h += '<label>'+esc(t('match_type'))+'</label><select id="f-type">'
     + '<option value="SINGLES"'+(dd.matchType==='SINGLES'?' selected':'')+'>'+esc(t('singles'))+'</option>'
-    + '<option value="DOUBLES"'+(dd.matchType==='DOUBLES'?' selected':'')+'>'+esc(t('doubles'))+'</option></select></div>'
-    + '<div><label>'+esc(t('surface'))+'</label><select id="f-surface">'
-    + SURFACES.map(function(s){return '<option value="'+s+'"'+(dd.courtSurface===s?' selected':'')+'>'+(s==='UNKNOWN'?esc(t('surface_unknown')):s)+'</option>';}).join('')+'</select></div></div>';
+    + '<option value="DOUBLES"'+(dd.matchType==='DOUBLES'?' selected':'')+'>'+esc(t('doubles'))+'</option></select>';
   const oppNames = {};
   (state.opponentProfiles||[]).forEach(function(o){ oppNames[o.name]=1; });
   state.matches.forEach(function(m){ if (m.opponentDisplayName) oppNames[m.opponentDisplayName]=1; });
-  h += '<label>'+esc(t('opponent'))+'</label><input id="f-opponent" type="text" list="opp-list" value="'+esc(dd.opponentDisplayName)+'">'
+  h += '<label>'+esc(t('opponent'))+'</label><input id="f-opponent" type="text" list="opp-list" value="'+esc(dd.opponentDisplayName)+'" oninput="var w=document.getElementById(\'step-warn\'); if(w && this.value.trim()) w.style.display=\'none\';">'
     + '<datalist id="opp-list">'+Object.keys(oppNames).map(function(n){ return '<option value="'+esc(n)+'">'; }).join('')+'</datalist>';
-  h += '<label>'+esc(t('venue'))+'</label><select id="f-venue"><option value="">'+esc(t('none'))+'</option>'
-    + (state.venues||[]).map(function(v){ return '<option value="'+v.id+'"'+(dd.venueId===v.id?' selected':'')+'>'+esc(v.name)+'</option>'; }).join('')+'</select>';
-  h += '<label>'+esc(t('partner'))+'</label><input id="f-partner" type="text" value="'+esc(dd.partner)+'">';
-  h += '<label>'+esc(t('env'))+'</label><select id="f-env">'
-    + '<option value="INDOOR"'+(dd.environmentType==='INDOOR'?' selected':'')+'>'+esc(t('indoor'))+'</option>'
-    + '<option value="OUTDOOR"'+(dd.environmentType==='OUTDOOR'?' selected':'')+'>'+esc(t('outdoor'))+'</option></select>';
-  h += '<h3>'+esc(t('sets'))+'</h3><div id="sets-slot">'+setsHTML()+'</div>'
-    + '<button type="button" onclick="addSet()">＋ '+esc(t('add_set'))+'</button>';
-  h += '<h3>'+esc(t('team_match'))+'</h3>'
+  h += '<label>'+esc(t('partner'))+'</label><input id="f-partner" type="text" value="'+esc(dd.partnerName)+'">';
+  h += '<div'+adv+'><h3>'+esc(t('team_match'))+'</h3>'
     + '<label><input id="f-team" type="checkbox" style="width:auto;min-height:24px"'+(dd.isTeamMatch?' checked':'')+'> '+esc(t('team_match'))+'</label>'
     + '<div class="row"><div><label>'+esc(t('team_score'))+jaEn('（自）',' (You)')+'</label><input id="f-team-my" type="number" min="0" value="'+(dd.teamMyScore==null?'':dd.teamMyScore)+'"></div>'
-    + '<div><label>'+esc(t('team_score'))+jaEn('（相手）',' (Opponent)')+'</label><input id="f-team-op" type="number" min="0" value="'+(dd.teamOpponentScore==null?'':dd.teamOpponentScore)+'"></div></div>';
-  h += '<label>'+esc(t('ball'))+'</label><input id="f-ball" type="text" value="'+esc(dd.ballOrShuttle)+'">';
-  h += '<label>'+esc(t('video'))+'</label><input id="f-video" type="url" value="'+esc(dd.videoPathOrUrl)+'" placeholder="https://">';
-  h += '<label>'+esc(t('memo'))+'</label><textarea id="f-note">'+esc(dd.matchNote)+'</textarea>';
+    + '<div><label>'+esc(t('team_score'))+jaEn('（相手）',' (Opponent)')+'</label><input id="f-team-op" type="number" min="0" value="'+(dd.teamOpponentScore==null?'':dd.teamOpponentScore)+'"></div></div></div></div>';
+  /* Step 3: スコア */
+  h += '<div class="step-sec" id="step3"><h3>'+esc(t('sets'))+'</h3><div id="sets-slot">'+setsHTML()+'</div>'
+    + '<button type="button" onclick="addSet()">＋ '+esc(t('add_set'))+'</button></div>';
+  /* Step 4: 環境・用具 */
+  h += '<div class="step-sec" id="step4"><h3>'+esc(t('step4'))+'</h3>';
+  h += '<div class="row"><div><label>'+esc(t('surface'))+'</label><select id="f-surface">'
+    + SURFACES.map(function(s){return '<option value="'+s+'"'+(dd.courtSurface===s?' selected':'')+'>'+(s==='UNKNOWN'?esc(t('surface_unknown')):s)+'</option>';}).join('')+'</select></div>'
+    + '<div><label>'+esc(t('env'))+'</label><select id="f-env">'
+    + '<option value="INDOOR"'+(dd.environmentType==='INDOOR'?' selected':'')+'>'+esc(t('indoor'))+'</option>'
+    + '<option value="OUTDOOR"'+(dd.environmentType==='OUTDOOR'?' selected':'')+'>'+esc(t('outdoor'))+'</option></select></div></div>';
+  const myGears = (state.gears||[]).filter(function(g){ return g.playerId===p.playerId; });
+  h += '<label>'+esc(t('gear_list'))+'</label><select id="f-gear"><option value="">'+esc(t('none'))+'</option>'
+    + myGears.map(function(g){ return '<option value="'+esc(g.gearId)+'"'+(dd.gearId===g.gearId?' selected':'')+'>'+esc(g.racketName)+(g.stringName?' ('+esc(g.stringName)+')':'')+'</option>'; }).join('')+'</select>';
+  h += '<div'+adv+'><label>'+esc(t('ball'))+'</label><input id="f-ball" type="text" value="'+esc(dd.ballOrShuttle)+'"></div></div>';
+  /* Step 5: 振り返り */
+  h += '<div class="step-sec" id="step5"><h3>'+esc(t('step5'))+'</h3>';
+  h += '<div'+adv+'><label>'+esc(t('video'))+'</label><input id="f-video" type="url" value="'+esc(dd.videoPathOrUrl)+'" placeholder="https://"></div>';
+  h += '<label>'+esc(t('memo'))+'</label><textarea id="f-note">'+esc(dd.matchNote)+'</textarea></div>';
   h += '<div style="height:12px"></div>';
-  h += '<button type="button" class="primary block" onclick="saveMatch()">'+esc(t('save'))+'</button> ';
+  h += '<button type="button" class="primary block" style="min-height:56px" onclick="saveMatch()">✓ '+esc(t('reg_save_match'))+'</button> ';
   h += '<div style="height:8px"></div><button type="button" class="block" onclick="showScoreSheet()">'+esc(t('scoresheet'))+'</button>';
   if (state.editingMatchId) h += '<div style="height:8px"></div><button type="button" class="danger block" onclick="deleteMatch()">'+esc(t('del'))+'</button>';
   h += '</div>';
+  h += '<div id="player-form-slot"></div>';
   return h;
 }
 function setsHTML(){
@@ -1928,6 +2296,8 @@ async function saveMatch(){
   const venueEl = $('#f-venue');
   const venueId = venueEl && venueEl.value!=='' ? parseInt(venueEl.value,10) : null;
   const oppProfile = (state.opponentProfiles||[]).find(function(o){ return o.name===opp; });
+  const gearEl = $('#f-gear');
+  const gearId = gearEl && gearEl.value!=='' ? gearEl.value : null;
   const m = {
     matchId:d.matchId, playerId:d.playerId, sportType:d.sportType, matchType:$('#f-type').value,
     playerTeamNameSnapshot:(currentPlayer()||{}).defaultTeamName||null,
@@ -1936,7 +2306,7 @@ async function saveMatch(){
     opponentMembersJson:JSON.stringify([opp]),
     opponentTeamNameSnapshot: oppProfile?oppProfile.teamName:(d.opponentTeamNameSnapshot||null),
     courtSurface:$('#f-surface').value, environmentType:$('#f-env').value,
-    gearId:d.gearId||null, tournamentName:$('#f-tournament').value.trim(),
+    gearId:gearId, tournamentName:$('#f-tournament').value.trim(),
     tournamentYear:parseInt($('#f-year').value,10)||new Date().getFullYear(),
     matchDateEpochDay:dateInputToEpochDay(dateVal),
     finalResultCode:'NORMAL', roundName:$('#f-round').value.trim()||null,
@@ -2577,12 +2947,24 @@ function anPeriodBounds(){
   return null;
 }
 function anPeriodMatches(){
-  const ms = playerMatches();
+  let ms = playerMatches();
   const from = anPeriodBounds();
-  if (from==null) return ms;
-  return ms.filter(function(m){ return m.matchDateEpochDay>=from; });
+  if (from!=null) ms = ms.filter(function(m){ return m.matchDateEpochDay>=from; });
+  if (state.anTypeFilter==='SINGLES') ms = ms.filter(function(m){ return m.matchType==='SINGLES'; });
+  else if (state.anTypeFilter==='DOUBLES') ms = ms.filter(function(m){ return m.matchType==='DOUBLES'; });
+  return ms;
 }
 function setAnPeriod(p){ state.analyticsPeriod=p; render(); }
+function setAnTypeFilter(f){ state.anTypeFilter=f; render(); }
+function anScrollTo(id){
+  const el = document.getElementById(id);
+  if (el){
+    el.scrollIntoView({behavior:'smooth', block:'start'});
+    $all('.an-tabs button').forEach(function(b){
+      b.classList.toggle('active', b.dataset.anTarget===id);
+    });
+  }
+}
 function setIgMode(m){ state.igMode=m; render(); }
 
 /* ---- 分析（Phase 3：レイヤーA〜E＋ライバル＋スコアカード） ---- */
@@ -2595,7 +2977,24 @@ function analyticsHTML(){
   const periodBtn = function(key, label){
     return '<button type="button" class="'+(state.analyticsPeriod===key?'active':'')+'" onclick="setAnPeriod(\''+key+'\')">'+esc(label)+'</button>';
   };
-  let h = '<div class="card"><h2>'+esc(p.playerName)+'</h2><div class="stat-grid">'
+  const base = (function(){ const ms0=playerMatches(); const from=anPeriodBounds(); return from==null?ms0:ms0.filter(function(m){ return m.matchDateEpochDay>=from; }); })();
+  const nAll = base.length;
+  const nS = base.filter(function(m){ return m.matchType==='SINGLES'; }).length;
+  const nD = base.filter(function(m){ return m.matchType==='DOUBLES'; }).length;
+  const typePill = function(f, label, n){
+    return '<button type="button" class="'+((state.anTypeFilter||'all')===f?'active':'')+'" onclick="setAnTypeFilter(\''+f+'\')">'+esc(label)+' '+n+'</button>';
+  };
+  let h = '<div class="an-head"><h2>'+esc(t('an_stats_title'))+'</h2><div class="an-pills">'
+    + typePill('all', t('an_type_all'), nAll) + typePill('SINGLES', t('an_type_singles'), nS) + typePill('DOUBLES', t('an_type_doubles'), nD)
+    + '</div></div>';
+  const layerTab = function(id, label){
+    return '<button type="button" data-an-target="'+id+'" onclick="anScrollTo(\''+id+'\')">'+esc(label)+'</button>';
+  };
+  h += '<div class="an-tabs">'
+    + layerTab('an-a', t('layer_growth')) + layerTab('an-b', t('layer_winloss')) + layerTab('an-c', t('layer_gear'))
+    + layerTab('an-d', t('layer_tactics')) + layerTab('an-e', t('layer_rivals'))
+    + '</div>';
+  h += '<div class="card"><h2>'+esc(p.playerName)+'</h2><div class="stat-grid">'
     + '<div class="stat"><div class="num">'+A.total+'</div><div class="lbl">'+esc(t('total_matches'))+'</div></div>'
     + '<div class="stat"><div class="num">'+A.wins+'</div><div class="lbl">'+esc(t('wins'))+'</div></div>'
     + '<div class="stat"><div class="num">'+pct0(A.winRate)+'</div><div class="lbl">'+esc(t('win_rate'))+'</div></div></div></div>';
@@ -2603,7 +3002,7 @@ function analyticsHTML(){
     + periodBtn('month', t('an_month')) + periodBtn('3m', t('an_3m')) + periodBtn('year', t('an_year')) + periodBtn('all', t('an_all'))
     + '</div>';
   /* A */
-  h += '<div class="card"><h2>'+esc(t('an_a'))+'</h2>';
+  h += '<div class="card an-card" id="an-a"><h2>'+esc(t('an_a'))+'</h2>';
   if (!A.unlocked) h += noDataHTML();
   else {
     h += kvRow(t('an_recent5'), A.r5.wins+jaEn('勝',' W - ')+(A.r5.total-A.r5.wins)+jaEn('敗',' L')+jaEn('（',' (')+pct1(A.r5.rate)+jaEn('）',')'));
@@ -2623,7 +3022,7 @@ function analyticsHTML(){
   }
   h += '</div>';
   /* B */
-  h += '<div class="card"><h2>'+esc(t('an_b'))+'</h2>';
+  h += '<div class="card an-card" id="an-b"><h2>'+esc(t('an_b'))+'</h2>';
   if (!B.unlocked) h += noDataHTML();
   else {
     h += kvRow(t('an_first_set'), pct1(B.fst.rate)+jaEn('（',' (')+B.fst.wins+'/'+B.fst.total+jaEn('）',')'));
@@ -2643,7 +3042,7 @@ function analyticsHTML(){
   }
   h += '</div>';
   /* C */
-  h += '<div class="card"><h2>'+esc(t('an_c'))+'</h2>';
+  h += '<div class="card an-card" id="an-c"><h2>'+esc(t('an_c'))+'</h2>';
   if (!C.unlocked) h += noDataHTML();
   else {
     h += '<h3>'+esc(t('an_gear_rate'))+'</h3>';
@@ -2668,7 +3067,7 @@ function analyticsHTML(){
   }
   h += '</div>';
   /* D */
-  h += '<div class="card"><h2>'+esc(t('an_d'))+'</h2>';
+  h += '<div class="card an-card" id="an-d"><h2>'+esc(t('an_d'))+'</h2>';
   if (!D.unlocked) h += noDataHTML();
   else {
     h += kvRow(t('an_straight'), D.straight.n+jaEn('勝',' W')+jaEn('（全勝利の ',' (')+pct1(D.straight.rate)+jaEn('',' of all wins')+jaEn('）',')'));
@@ -2691,7 +3090,7 @@ function analyticsHTML(){
   }
   h += '</div>';
   /* E */
-  h += '<div class="card"><h2>'+esc(t('an_e'))+'</h2>';
+  h += '<div class="card an-card" id="an-e"><h2>'+esc(t('an_e'))+'</h2>';
   if (!E.unlocked) h += noDataHTML();
   else {
     h += kvRow(t('an_singles'), E.singles.n+jaEn('試合 ',' matches ')+pct1(E.singles.rate));
@@ -2705,7 +3104,7 @@ function analyticsHTML(){
   }
   h += '</div>';
   /* Rivals */
-  h += '<div class="card"><h2>'+esc(t('an_rivals'))+'</h2>';
+  h += '<div class="card an-card" id="an-rivals"><h2>'+esc(t('an_rivals'))+'</h2>';
   if (!R.unlocked) h += '<p class="muted small">'+esc(R.threshold)+'</p>';
   else {
     h += '<h3>'+esc(jaEn('得意な相手','Strong against'))+'</h3>';
@@ -2720,7 +3119,7 @@ function analyticsHTML(){
   }
   h += '</div>';
   /* ScoreCard */
-  h += '<div class="card"><h2>'+esc(t('an_scorecard'))+'</h2>';
+  h += '<div class="card an-card" id="an-scorecard"><h2>'+esc(t('an_scorecard'))+'</h2>';
   if (!SC.unlocked) h += '<p class="muted small">'+esc(t('an_scorecard_empty'))+'</p>';
   else {
     h += kvRow(t('an_gp_conv'), pct1(SC.gp.conv*100)+jaEn('（',' (')+SC.gp.converted+'/'+SC.gp.faced+jaEn('）',')'));
@@ -2739,7 +3138,7 @@ function analyticsHTML(){
   }
   h += '</div>';
   /* Instagram */
-  h += '<div class="card"><h2>'+esc(t('ig_title'))+'</h2>'
+  h += '<div class="card an-card" id="an-ig"><h2>'+esc(t('ig_title'))+'</h2>'
     + '<div class="tabs-inline"><button type="button" class="'+(state.igMode==='summary'?'active':'')+'" onclick="setIgMode(\'summary\')">'+esc(t('ig_summary'))+'</button>'
     + '<button type="button" class="'+(state.igMode==='monthly'?'active':'')+'" onclick="setIgMode(\'monthly\')">'+esc(t('ig_monthly'))+'</button></div>'
     + '<canvas id="ig-canvas" width="1080" height="1080" style="width:100%;max-width:360px;height:auto;border-radius:12px;background:#0C3E63"></canvas>'
@@ -2747,7 +3146,7 @@ function analyticsHTML(){
     + '<p class="muted small">1080×1080 / '+esc(t('ig_note'))+'</p></div>';
   /* AI prompt */
   if (!state.aiText) state.aiText = aiBuild(state.aiKind||'issues');
-  h += '<div class="card"><h2>'+esc(t('ai_title'))+'</h2>'
+  h += '<div class="card an-card" id="an-ai"><h2>'+esc(t('ai_title'))+'</h2>'
     + '<div class="tabs-inline">'
     + '<button type="button" data-ai-kind="issues" class="'+(state.aiKind==='issues'?'active':'')+'" onclick="aiShow(\'issues\')">'+esc(t('ai_issues'))+'</button>'
     + '<button type="button" data-ai-kind="tactics" class="'+(state.aiKind==='tactics'?'active':'')+'" onclick="aiShow(\'tactics\')">'+esc(t('ai_tactics'))+'</button>'
@@ -3295,7 +3694,7 @@ function settingsHTML(){
     + '<button type="button" onclick="syncRestoreUI()">'+esc(t('sync_restore'))+'</button></div>'
     + '<div id="sync-status" style="margin-top:10px">'+syncStatusHTML()+'</div>'
     + '<div class="kv"><span>'+esc(t('storage'))+'</span><b>'+esc(state.persisted===true?t('storage_persisted'):state.persisted===false?t('storage_not_persisted'):'—')+'</b></div></div>';
-  h += '<div class="card"><h2>'+esc(t('venue_list'))+'</h2>'+venueListHTML()
+  h += '<div class="card" id="set-venue"><h2>'+esc(t('venue_list'))+'</h2>'+venueListHTML()
     + '<div style="height:8px"></div><button type="button" class="primary block" onclick="showVenueForm(null)">＋ '+esc(t('add_venue'))+'</button>'
     + '<div id="venue-form-slot"></div></div>';
   h += '<div class="card"><h2>'+esc(t('opp_list'))+'</h2>'+oppListHTML()
@@ -3315,7 +3714,7 @@ function settingsHTML(){
       ? '<button type="button" class="danger block" onclick="deleteDemo()">'+esc(t('demo_delete'))+'</button>'
       : '<button type="button" class="block" onclick="loadDemo()">'+esc(t('demo_load'))+'</button>')
     + '</div>';
-  h += '<div class="card"><p class="muted small">SmashStats Web 2.3.0 — Phase 4'+jaEn('（Pro・ライセンス）',' (Pro & license)')+'<br>DB: smashstats-web'+jaEn('（IndexedDB）',' (IndexedDB)')+jaEn('・ schema v16相当',' · schema v16 equivalent')+'</p></div>';
+  h += '<div class="card"><p class="muted small">SmashStats Web 2.4.0 — UI再現（STANDARD）'+jaEn('',' (STANDARD UI)')+'<br>DB: smashstats-web'+jaEn('（IndexedDB）',' (IndexedDB)')+jaEn('・ schema v16相当',' · schema v16 equivalent')+'</p></div>';
   return h;
 }
 function setLang(l){ LANG=l; localStorage.setItem('ss-lang', l); render(); }
@@ -3403,6 +3802,29 @@ function bindGlobal(){
     b.addEventListener('click', function(){ setTab(b.dataset.tab); });
   });
   $('#btn-settings').addEventListener('click', function(){ state.view='settings'; render(); });
+  const btnPhoto = $('#btn-photo');
+  if (btnPhoto) btnPhoto.addEventListener('click', openPhotoPicker);
+  const btnAi = $('#btn-ai');
+  if (btnAi) btnAi.addEventListener('click', function(){
+    setTab('analytics');
+    setTimeout(function(){
+      const el = document.getElementById('an-ai');
+      if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 60);
+  });
+  const btnVenue = $('#btn-venue');
+  if (btnVenue) btnVenue.addEventListener('click', function(){
+    state.view='settings'; render();
+    setTimeout(function(){
+      const el = document.getElementById('set-venue');
+      if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 60);
+  });
+  const photoInput = $('#photo-input');
+  if (photoInput) photoInput.addEventListener('change', function(){
+    if (photoInput.files && photoInput.files[0]) onPhotoChosen(photoInput.files[0]);
+    photoInput.value='';
+  });
   const sel = $('#player-select');
   sel.addEventListener('change', function(){
     if (sel.value==='__add__'){ showPlayerForm(); renderPlayerSelect(); return; }
