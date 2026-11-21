@@ -1395,7 +1395,8 @@ const SYNC_CALL_TIMEOUT_MS = 60000; // ブリッジ1回あたりの待ち上限�
    Android版の価格が決まったらここ（表示用）と license-worker 側の
    STRIPE_PRICE_JPY / STRIPE_PRICE_ID（請求額）に同じ金額を入れる。
    LICENSE_WORKER_URL はライセンスサーバー（Cloudflare Worker）のURL。
-   空のままでは購入・検証は「未設定」表示になる。設定画面からも入力できる。 */
+   全ユーザー共通のため、デプロイ後にここへURLを入れる。ユーザーに入力させない。
+   空のままでは購入・検証は「未設定」表示になる。 */
 const LICENSE_WORKER_URL = '';
 const LICENSE_PRICE_JPY = null; // ★価格未定。例: 1980
 const LICENSE_MAX_DEVICES = 2;
@@ -1857,18 +1858,6 @@ async function setProLocal(on, info){
     }
   }
 }
-/* ライセンスサーバーURLを設定画面から保存する。 */
-async function licenseSaveServerUI(){
-  const el = document.getElementById('lic-worker-url');
-  const url = el ? el.value.trim() : '';
-  if (url && url.indexOf('https://')!==0 && url.indexOf('http://127.0.0.1')!==0 && url.indexOf('http://localhost')!==0){
-    proNotice(t('lic_not_configured')); return;
-  }
-  state.license.workerUrl = url;
-  await metaSet('licenseWorkerUrl', url);
-  toast(t('saved'));
-  render();
-}
 /* 購入: Stripe Checkout セッションを作って遷移する。 */
 async function licenseBuyUI(){
   if (LICENSE_PRICE_JPY == null){ proNotice(t('lic_price_soon')); return; }
@@ -2045,11 +2034,7 @@ function licenseHTML(){
         + '<p class="muted small">'+esc(t('lic_restore_note'))+'</p>';
     }
   }
-  h += '<div style="height:10px"></div>'
-    + '<label>'+esc(t('lic_server_url'))+'</label>'
-    + '<input id="lic-worker-url" type="url" inputmode="url" autocomplete="off" placeholder="https://smashstats-license.…workers.dev" value="'+esc(state.license.workerUrl)+'">'
-    + '<p class="muted small">'+esc(t('lic_server_hint'))+'</p>'
-    + '<button type="button" onclick="licenseSaveServerUI()">'+esc(t('save'))+'</button></div>';
+  h += '</div>';
   return h;
 }
 
@@ -4485,7 +4470,7 @@ function settingsHTML(){
       ? '<button type="button" class="danger block" onclick="deleteDemo()">'+esc(t('demo_delete'))+'</button>'
       : '<button type="button" class="block" onclick="loadDemo()">'+esc(t('demo_load'))+'</button>')
     + '</div>';
-  h += '<div class="card"><p class="muted small">SmashStats Web 2.6.1 — ブリッジURL既定値'+jaEn('',' (SUPPORT_NOTE UI)')+'<br>DB: smashstats-web'+jaEn('（IndexedDB）',' (IndexedDB)')+jaEn('・ schema v16相当',' · schema v16 equivalent')+'</p></div>';
+  h += '<div class="card"><p class="muted small">SmashStats Web 2.6.2 — ライセンスサーバーURL入力欄の削除'+jaEn('',' (SUPPORT_NOTE UI)')+'<br>DB: smashstats-web'+jaEn('（IndexedDB）',' (IndexedDB)')+jaEn('・ schema v16相当',' · schema v16 equivalent')+'</p></div>';
   return h;
 }
 function setLang(l){ LANG=l; localStorage.setItem('ss-lang', l); render(); }
