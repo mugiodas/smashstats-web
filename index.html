@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0C3E63">
+<meta name="theme-color" content="#FDF1F0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,18 +14,32 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <style>
 /* ---- theme variables ---- */
-/* Android版 STANDARD テーマ（Theme.kt の STANDARD scheme）の値をそのまま使う。
-   primary #0C3E63 / background #F4F7F9 / surface #FFFFFF / surfaceVariant #F1F5F9 /
-   onSurfaceVariant #64748B / primaryContainer #E2EFFD / secondaryContainer #E6F4EC /
-   tertiary #10B981 / outline #CBD5E1。角丸は STANDARD shapes: 4/8/12/16/24。 */
+/* Android版 SUPPORT_NOTE テーマ（Theme.kt の SUPPORT_NOTE scheme）の値をそのまま使う。
+   primary #FF8EAC / background #FDF1F0 / surface #FFF9FA / surfaceVariant #FFF0F2 /
+   onSurface #4E3629 / onSurfaceVariant #7A5C61 / primaryContainer #FFECEF /
+   secondaryContainer #E8F5E9 / outline #F2D7DE。角丸は SUPPORT_NOTE shapes: 8/12/20/24/28。
+   ボタンの濃いピンク #E85D7F はスクショのCTA（「試合結果を記録」「全て」ピル等）に合わせたもの。
+   文字は Android版に合わせて小さくする（本文 11〜13sp 中心、見出し 14〜18sp、大きい数値 24〜30sp）。 */
 :root{
+  --navy:#4E3629; --navy-dark:#3A281E; --gold:#E8B64C; --rose:#E85D7F;
+  --bg:#FDF1F0; --surface:#FFF9FA; --surface-muted:#FFF0F2; --text:#4E3629;
+  --muted:#7A5C61; --border:#F2D7DE; --accent:#E85D7F; --danger:#B3261E;
+  --win:#1B7A3D; --loss:#C62828; --tabbar-h:56px;
+  --primary:#FF8EAC; --primary-container:#FFECEF; --secondary-container:#E8F5E9; --tertiary:#10B981;
+  --on-primary:#6A1B29; --on-primary-container:#800F2F;
+  --win-badge:#10B981; --loss-badge:#DC2626;
+  --radius-card:20px; --radius-btn:999px; --radius-input:12px;
+  --shadow-card:0 1px 3px rgba(78,54,41,.07);
+  --shadow-float:0 4px 16px rgba(78,54,41,.12);
+}
+[data-theme="standard"]{
   --navy:#0C3E63; --navy-dark:#0F1E36; --gold:#FABE0F; --rose:#C2486B;
   --bg:#F4F7F9; --surface:#FFFFFF; --surface-muted:#F1F5F9; --text:#0F172A;
   --muted:#64748B; --border:#CBD5E1; --accent:#0C3E63; --danger:#B3261E;
-  --win:#1B7A3D; --loss:#B3261E; --tabbar-h:64px;
+  --win:#1B7A3D; --loss:#B3261E;
   --primary-container:#E2EFFD; --secondary-container:#E6F4EC; --tertiary:#10B981;
-  --win-badge:#10B981; --loss-badge:#DC2626;
-  --radius-card:16px; --radius-btn:999px; --radius-input:12px;
+  --on-primary:#FFFFFF; --on-primary-container:#0C3E63;
+  --radius-card:16px;
   --shadow-card:0 1px 3px rgba(15,23,42,.08);
   --shadow-float:0 4px 16px rgba(15,23,42,.14);
 }
@@ -39,7 +53,7 @@
 html,body{margin:0; padding:0;}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
-  background:var(--bg); color:var(--text); font-size:16px; line-height:1.5;
+  background:var(--bg); color:var(--text); font-size:14px; line-height:1.45;
   padding-top:env(safe-area-inset-top);
 }
 #app{max-width:480px; margin:0 auto; min-height:100vh; background:var(--bg);
@@ -51,75 +65,75 @@ body.kb #app{padding-bottom:12px;}
 header{
   position:sticky; top:0; z-index:20;
   background:var(--bg);
-  padding:calc(8px + env(safe-area-inset-top)) 12px 8px;
-  display:flex; align-items:center; gap:10px;
+  padding:calc(6px + env(safe-area-inset-top)) 12px 6px;
+  display:flex; align-items:center; gap:8px;
 }
 .app-icon{
-  flex:0 0 auto; width:56px; height:56px; border-radius:50%; padding:0;
-  border:3px solid transparent;
+  flex:0 0 auto; width:48px; height:48px; border-radius:50%; padding:0;
+  border:2px solid transparent;
   background:linear-gradient(#fff,#fff) padding-box,
-    linear-gradient(135deg,#FABE0F,#7DD3FC,#0C3E63) border-box;
-  font-size:26px; line-height:1; cursor:pointer; overflow:hidden;
+    linear-gradient(135deg,#FABE0F,#FF8EAC,#E85D7F) border-box;
+  font-size:22px; line-height:1; cursor:pointer; overflow:hidden;
   display:flex; align-items:center; justify-content:center;
 }
 .app-icon img{width:100%; height:100%; object-fit:cover; border-radius:50%;}
 .hdr-titles{flex:1; min-width:0;}
-.hdr-row1{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
-header h1{font-size:21px; margin:0; letter-spacing:.5px; white-space:nowrap; color:var(--navy); font-weight:800;}
+.hdr-row1{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+header h1{font-size:19px; margin:0; letter-spacing:.5px; white-space:nowrap; color:var(--rose); font-weight:800; font-style:italic;}
 .pro-pill{
   background:linear-gradient(135deg,#E8C87A,#D9A441); color:#4A3600;
-  font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; white-space:nowrap;
+  font-size:11px; font-weight:800; padding:3px 8px; border-radius:999px; white-space:nowrap;
 }
 .streak-pill{
   background:var(--primary-container); color:var(--navy);
-  font-size:13px; font-weight:700; padding:4px 10px; border-radius:999px; white-space:nowrap;
+  font-size:12px; font-weight:700; padding:3px 8px; border-radius:999px; white-space:nowrap;
 }
-.hdr-row2{margin-top:6px;}
+.hdr-row2{margin-top:4px;}
 .player-pill{
   display:inline-flex; align-items:center; gap:6px; max-width:100%;
   background:var(--surface); border:1px solid var(--border); border-radius:999px;
-  padding:4px 12px 4px 4px; font-size:15px; font-weight:700; color:var(--text);
-  min-height:36px; cursor:pointer; font-family:inherit;
+  padding:3px 10px 3px 3px; font-size:13px; font-weight:700; color:var(--text);
+  min-height:30px; cursor:pointer; font-family:inherit;
 }
-.player-pill .ph{width:28px; height:28px; border-radius:50%; background:var(--primary-container);
-  display:inline-flex; align-items:center; justify-content:center; font-size:15px; overflow:hidden; flex:0 0 auto;}
+.player-pill .ph{width:24px; height:24px; border-radius:50%; background:var(--primary-container);
+  display:inline-flex; align-items:center; justify-content:center; font-size:13px; overflow:hidden; flex:0 0 auto;}
 .player-pill .ph img{width:100%; height:100%; object-fit:cover;}
 .player-pill select{
-  border:none; background:transparent; font-size:15px; font-weight:700; color:var(--text);
+  border:none; background:transparent; font-size:13px; font-weight:700; color:var(--text);
   padding:0; min-height:0; width:auto; max-width:170px; appearance:none; -webkit-appearance:none;
 }
-.hdr-icons{display:flex; gap:8px; flex:0 0 auto;}
+.hdr-icons{display:flex; gap:6px; flex:0 0 auto;}
 .hdr-icon-btn{
-  width:48px; height:48px; min-width:48px; min-height:48px; border-radius:50%;
-  border:1px solid var(--border); background:var(--surface); color:var(--navy);
-  font-size:21px; cursor:pointer; padding:0;
+  width:42px; height:42px; min-width:42px; min-height:42px; border-radius:50%;
+  border:1px solid var(--border); background:var(--surface); color:var(--rose);
+  font-size:18px; cursor:pointer; padding:0;
   display:flex; align-items:center; justify-content:center;
   box-shadow:var(--shadow-card);
 }
 .hdr-icon-btn .ph{width:100%; height:100%; border-radius:50%; overflow:hidden;
-  display:flex; align-items:center; justify-content:center; font-size:22px;}
+  display:flex; align-items:center; justify-content:center; font-size:18px;}
 .hdr-icon-btn .ph img{width:100%; height:100%; object-fit:cover;}
 .icon-btn{
-  min-width:44px; min-height:44px; border-radius:50%; border:1px solid var(--border);
-  background:var(--surface); color:var(--navy); font-size:20px; cursor:pointer;
+  min-width:40px; min-height:40px; border-radius:50%; border:1px solid var(--border);
+  background:var(--surface); color:var(--navy); font-size:18px; cursor:pointer;
 }
 #install-banner{
-  display:none; margin:10px 12px 0; padding:12px; border-radius:12px;
-  background:#FFF7D6; border:1px solid var(--gold); color:#5A4300; font-size:14px;
+  display:none; margin:10px 12px 0; padding:10px; border-radius:12px;
+  background:#FFF7D6; border:1px solid var(--gold); color:#5A4300; font-size:13px;
 }
 #install-banner.show{display:block;}
 #install-banner button{margin-top:8px;}
-main{padding:12px;}
+main{padding:14px;}
 .card{
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-card);
-  padding:14px; margin-bottom:12px; box-shadow:var(--shadow-card);
+  padding:12px; margin-bottom:10px; box-shadow:var(--shadow-card);
 }
-.card h2{font-size:17px; margin:0 0 8px;}
-.card h3{font-size:15px; margin:14px 0 6px;}
-.muted{color:var(--muted); font-size:14px;}
-.small{font-size:13px;}
+.card h2{font-size:16px; margin:0 0 6px;}
+.card h3{font-size:13px; margin:10px 0 4px;}
+.muted{color:var(--muted); font-size:12px;}
+.small{font-size:11px;}
 .badge{
-  display:inline-block; padding:2px 9px; border-radius:999px; font-size:13px; font-weight:700;
+  display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700;
   white-space:nowrap; flex-shrink:0;
 }
 .badge.win{background:#DDF2E3; color:var(--win);}
@@ -129,9 +143,9 @@ main{padding:12px;}
 .badge.free{background:var(--surface-muted); color:var(--muted);}
 .badge.demo{background:#F3D9E2; color:var(--rose);}
 .badge.sync{background:#E3ECF5; color:var(--navy);}
-/* Android版 STANDARD はピル型ボタン。メインは紺ベタ、サブは白地＋枠線。 */
+/* Android版はピル型ボタン。メインはピンクベタ、サブは白地＋枠線。文字は小さめに。 */
 button, .btn{
-  font-size:16px; min-height:48px; padding:10px 18px; border-radius:var(--radius-btn);
+  font-size:14px; min-height:40px; padding:8px 14px; border-radius:var(--radius-btn);
   border:1px solid var(--border); background:var(--surface); color:var(--text);
   cursor:pointer; font-family:inherit;
 }
@@ -140,52 +154,52 @@ button.danger{background:#fff; border-color:var(--danger); color:var(--danger);}
 button.gold{background:var(--gold); border-color:var(--gold); color:#4A3600; font-weight:700;}
 button:disabled{opacity:.45; cursor:default;}
 button.block{width:100%;}
-label{display:block; font-size:14px; font-weight:700; margin:12px 0 4px;}
+label{display:block; font-size:12px; font-weight:700; margin:10px 0 3px;}
 input, select, textarea{
-  width:100%; font-size:16px; padding:11px 10px; border-radius:var(--radius-input);
+  width:100%; font-size:14px; padding:9px 10px; border-radius:var(--radius-input);
   border:1px solid var(--border); background:var(--surface); color:var(--text);
   font-family:inherit;
 }
-input[type="date"]{min-height:48px;}
-textarea{min-height:76px; resize:vertical;}
+input[type="date"]{min-height:40px;}
+textarea{min-height:64px; resize:vertical;}
 .row{display:flex; gap:8px; align-items:center;}
 .row>*{flex:1;}
 .row .narrow{flex:0 0 auto;}
 .set-row{
-  border:1px solid var(--border); border-radius:12px; padding:10px; margin-bottom:10px;
+  border:1px solid var(--border); border-radius:12px; padding:8px; margin-bottom:8px;
   background:var(--surface-muted);
 }
 .set-row .set-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
-.set-row .set-head b{font-size:15px;}
+.set-row .set-head b{font-size:13px;}
 .match-card{cursor:pointer;}
 .match-card .top{display:flex; justify-content:space-between; gap:8px; align-items:flex-start;}
-.match-card .opp{font-size:17px; font-weight:700;}
-.match-card .score{font-size:17px; font-weight:700; white-space:nowrap;}
-.match-card .sub{font-size:14px; color:var(--muted); margin-top:4px;}
+.match-card .opp{font-size:15px; font-weight:700;}
+.match-card .score{font-size:15px; font-weight:700; white-space:nowrap;}
+.match-card .sub{font-size:12px; color:var(--muted); margin-top:4px;}
 .stat-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center;}
-.stat-grid .stat{background:var(--surface-muted); border-radius:12px; padding:10px 4px;}
-.stat-grid .num{font-size:22px; font-weight:800;}
-.stat-grid .lbl{font-size:12px; color:var(--muted);}
-.bar-row{display:flex; align-items:center; gap:8px; font-size:14px; margin:6px 0;}
-.bar-row .bar-label{flex:0 0 92px;}
+.stat-grid .stat{background:var(--surface-muted); border-radius:12px; padding:8px 4px;}
+.stat-grid .num{font-size:28px; font-weight:800;}
+.stat-grid .lbl{font-size:11px; color:var(--muted);}
+.bar-row{display:flex; align-items:center; gap:8px; font-size:12px; margin:5px 0;}
+.bar-row .bar-label{flex:0 0 84px;}
 .bar-row .bar-track{flex:1; height:10px; background:var(--surface-muted); border-radius:6px; overflow:hidden;}
 .bar-row .bar-fill{height:100%; background:var(--accent);}
-.bar-row .bar-val{flex:0 0 52px; text-align:right;}
-/* Android版のタブバー：画面下に浮いた白い丸角バー。選択中は薄青の丸背景＋ラベル付き。 */
+.bar-row .bar-val{flex:0 0 48px; text-align:right;}
+/* Android版のタブバー：画面下に浮いた白い丸角バー。選択中は薄いピンクの丸背景＋ラベル付き。 */
 #tabbar{
-  position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); z-index:30;
+  position:fixed; left:12px; right:12px; bottom:calc(10px + env(safe-area-inset-bottom)); z-index:30;
   background:var(--surface); border:1px solid var(--border); border-radius:28px;
   box-shadow:var(--shadow-float);
-  padding:6px;
+  padding:4px;
 }
 #tabbar .tabs{max-width:480px; margin:0 auto; display:flex;}
 #tabbar button{
   flex:1; border:none; background:none; border-radius:24px; min-height:var(--tabbar-h);
-  padding:6px 0 8px; font-size:12px; color:var(--muted);
+  padding:4px 0 6px; font-size:11px; color:var(--muted);
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
 }
 #tabbar button .ic{
-  font-size:22px; line-height:1; width:44px; height:32px; border-radius:999px;
+  font-size:20px; line-height:1; width:40px; height:28px; border-radius:999px;
   display:flex; align-items:center; justify-content:center;
 }
 #tabbar button.active{color:var(--accent); font-weight:700;}
@@ -197,117 +211,120 @@ textarea{min-height:76px; resize:vertical;}
 #overlay.show{display:flex;}
 #overlay .sheet{
   width:100%; max-width:480px; max-height:86vh; overflow:auto;
-  background:var(--surface); border-radius:18px 18px 0 0; padding:16px 16px calc(20px + env(safe-area-inset-bottom));
+  background:var(--surface); border-radius:18px 18px 0 0; padding:14px 14px calc(20px + env(safe-area-inset-bottom));
 }
 #overlay .sheet h2{margin-top:0;}
 .point-btns{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0;}
-.point-btns button{min-height:72px; font-size:20px; font-weight:800;}
-.score-big{font-size:34px; font-weight:800; text-align:center; margin:8px 0;}
+.point-btns button{min-height:60px; font-size:18px; font-weight:800;}
+.score-big{font-size:30px; font-weight:800; text-align:center; margin:8px 0;}
 .notice{
-  border-radius:12px; padding:12px; margin-bottom:12px; font-size:15px;
+  border-radius:12px; padding:10px; margin-bottom:10px; font-size:13px;
   background:#FFF7D6; border:1px solid var(--gold);
 }
 .notice.info{background:#E3ECF5; border-color:#9DB8D2;}
 .notice.error{background:#FBE3E1; border-color:#E0A49F;}
 .empty{padding:22px 10px; text-align:center; color:var(--muted);}
-.divider{height:1px; background:var(--border); margin:14px 0;}
-.kv{display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px solid var(--surface-muted); font-size:15px;}
+.divider{height:1px; background:var(--border); margin:12px 0;}
+.kv{display:flex; justify-content:space-between; gap:10px; padding:5px 0; border-bottom:1px solid var(--surface-muted); font-size:13px;}
 .kv:last-child{border-bottom:none;}
 .kv span{text-wrap:balance;}
 .kv b{text-align:right; text-wrap:balance;}
-.tabs-inline{display:flex; gap:8px; margin-bottom:12px;}
-.tabs-inline button{flex:1; min-height:44px; font-size:15px;}
+.tabs-inline{display:flex; gap:8px; margin-bottom:10px; overflow-x:auto; scrollbar-width:none;}
+.tabs-inline::-webkit-scrollbar{display:none;}
+.tabs-inline button{flex:0 0 auto; min-height:36px; font-size:13px; white-space:nowrap;}
+.tabs-inline.compact{gap:6px;}
+.tabs-inline.compact button{font-size:12px; padding:4px 10px; min-height:32px;}
 .tabs-inline button.active{background:var(--accent); color:#fff; border-color:var(--accent); font-weight:700;}
-/* ---- Android版 STANDARD の部品 ---- */
-/* Focusカード：タイトル行（競技ノート＋管理ピル）、中の薄青パネル */
-.focus-title{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;}
-.focus-title h2{margin:0; color:var(--navy); font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-.focus-title button{flex:0 0 auto; white-space:nowrap; font-size:14px; min-height:40px; padding:8px 12px;}
-.focus-title h2 .sport-emoji{font-size:15px;}
-.focus-who{display:flex; align-items:center; gap:12px; margin-bottom:12px;}
-.focus-photo{width:64px; height:64px; border-radius:50%; flex:0 0 auto; overflow:hidden;
+/* ---- Android版の部品 ---- */
+/* Focusカード：タイトル行（競技ノート＋管理ピル）、中の薄ピンクパネル */
+.focus-title{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;}
+.focus-title h2{margin:0; color:var(--navy); font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.focus-title button{flex:0 0 auto; white-space:nowrap; font-size:12px; min-height:32px; padding:6px 10px;}
+.focus-title h2 .sport-emoji{font-size:14px;}
+.focus-who{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.focus-photo{width:56px; height:56px; border-radius:50%; flex:0 0 auto; overflow:hidden;
   background:var(--primary-container); border:2px solid var(--border);
-  display:flex; align-items:center; justify-content:center; font-size:30px;}
+  display:flex; align-items:center; justify-content:center; font-size:26px;}
 .focus-photo img{width:100%; height:100%; object-fit:cover;}
-.focus-name{font-size:26px; font-weight:800; line-height:1.2;}
+.focus-name{font-size:22px; font-weight:800; line-height:1.2;}
 .focus-panel{
   background:var(--primary-container); border-radius:var(--radius-card);
-  padding:14px; display:flex; gap:12px; align-items:flex-start;
+  padding:12px; display:flex; gap:10px; align-items:flex-start;
 }
 .focus-heart{
-  flex:0 0 auto; width:52px; height:52px; border-radius:50%; background:var(--navy);
-  color:#fff; font-size:24px; display:flex; align-items:center; justify-content:center;
+  flex:0 0 auto; width:44px; height:44px; border-radius:50%; background:var(--accent);
+  color:#fff; font-size:20px; display:flex; align-items:center; justify-content:center;
 }
-.focus-panel .lbl{font-size:15px; font-weight:700; color:var(--navy); margin-bottom:4px;}
-.focus-panel .txt{font-size:17px; font-weight:700; line-height:1.45;}
-.focus-panel .edit{margin-left:auto; flex:0 0 auto; min-width:44px; min-height:44px; padding:6px 10px; font-size:18px;}
+.focus-panel .lbl{font-size:13px; font-weight:700; color:var(--navy); margin-bottom:4px;}
+.focus-panel .txt{font-size:15px; font-weight:700; line-height:1.45;}
+.focus-panel .edit{margin-left:auto; flex:0 0 auto; min-width:36px; min-height:36px; padding:6px 10px; font-size:16px;}
 /* タイムライン見出し */
-.tl-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin:18px 2px 10px;}
-.tl-head h2{font-size:20px; margin:0; font-weight:800;}
-.tl-head .count{font-size:15px; color:var(--muted); font-weight:700; white-space:nowrap;}
+.tl-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin:12px 2px 8px;}
+.tl-head h2{font-size:18px; margin:0; font-weight:800;}
+.tl-head .count{font-size:12px; color:var(--muted); font-weight:700; white-space:nowrap;}
 /* タイムラインの試合カード：緑の枠、WINバッジは緑ベタ、スコアは緑 */
 .tl-card{border:1.5px solid #BFE3C8;}
-.tl-card .tl-top{display:flex; align-items:center; gap:8px;}
-.tl-card .tl-top .tname{font-size:17px; font-weight:800; flex:1; min-width:0;}
-.tl-card .tl-top .date{font-size:14px; color:var(--muted); white-space:nowrap;}
+.tl-card .tl-top{display:flex; align-items:center; gap:6px;}
+.tl-card .tl-top .tname{font-size:15px; font-weight:800; flex:1; min-width:0;}
+.tl-card .tl-top .date{font-size:12px; color:var(--muted); white-space:nowrap;}
 .win-badge, .loss-badge{
-  display:inline-block; padding:4px 10px; border-radius:10px; font-size:14px; font-weight:800;
+  display:inline-block; padding:3px 8px; border-radius:10px; font-size:12px; font-weight:800;
   color:#fff; white-space:nowrap; flex:0 0 auto;
 }
 .win-badge{background:var(--win-badge);}
 .loss-badge{background:var(--loss-badge);}
-.tl-card .tl-vs{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-top:10px;}
-.tl-card .tl-vs .opp{font-size:17px; font-weight:700;}
-.tl-card .tl-vs .score{font-size:17px; font-weight:800; color:var(--win); white-space:nowrap;}
-.tl-card .tl-foot{display:flex; justify-content:flex-end; margin-top:10px;}
-.tl-card .tl-foot button{min-height:40px; font-size:14px; padding:6px 14px;}
+.tl-card .tl-vs{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-top:8px;}
+.tl-card .tl-vs .opp{font-size:15px; font-weight:700;}
+.tl-card .tl-vs .score{font-size:15px; font-weight:800; color:var(--win); white-space:nowrap;}
+.tl-card .tl-foot{display:flex; justify-content:flex-end; margin-top:8px;}
+.tl-card .tl-foot button{min-height:34px; font-size:13px; padding:6px 12px;}
 .note-card{border:1.5px solid var(--border);}
 .note-card .nc-head{display:flex; gap:8px; align-items:baseline;}
-.note-card .nc-head .date{margin-left:auto; font-size:13px; color:var(--muted); white-space:nowrap;}
+.note-card .nc-head .date{margin-left:auto; font-size:12px; color:var(--muted); white-space:nowrap;}
 /* 登録画面：3連セグメント＋簡易/詳細トグル＋ステップピル */
-.seg{display:flex; background:var(--secondary-container); border-radius:999px; padding:4px; gap:4px; margin-bottom:12px;}
-.seg button{flex:1; min-height:44px; font-size:15px; font-weight:700; border:none; background:transparent; color:var(--win); padding:6px 4px;}
-.seg button.active{background:var(--tertiary); color:#fff; box-shadow:var(--shadow-card);}
+.seg{display:flex; background:var(--secondary-container); border-radius:999px; padding:4px; gap:4px; margin-bottom:10px;}
+.seg button{flex:1; min-height:36px; font-size:13px; font-weight:700; border:none; background:transparent; color:var(--win); padding:6px 4px;}
+.seg button.active{background:var(--accent); color:#fff; box-shadow:var(--shadow-card);}
 .seg button.active.match{background:var(--accent);}
 .input-toggle{display:flex; gap:8px; align-items:center; background:var(--surface); border:1px solid var(--border);
-  border-radius:var(--radius-card); padding:10px 12px; margin-bottom:12px;}
-.input-toggle .simple{font-size:15px; font-weight:700; color:var(--muted); flex:1;}
-.input-toggle button{flex:1; min-height:44px; font-size:14px; white-space:nowrap; padding:6px 8px;}
+  border-radius:var(--radius-card); padding:8px 10px; margin-bottom:10px;}
+.input-toggle .simple{font-size:13px; font-weight:700; color:var(--muted); flex:1;}
+.input-toggle button{flex:1; min-height:36px; font-size:13px; white-space:nowrap; padding:6px 8px;}
 .input-toggle button.active{background:var(--accent); color:#fff; border-color:var(--accent);}
-.step-pills{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; margin-bottom:4px;
+.step-pills{display:flex; gap:6px; overflow-x:auto; padding:2px 2px 8px; margin-bottom:4px;
   scrollbar-width:none; -webkit-overflow-scrolling:touch;}
 .step-pills::-webkit-scrollbar{display:none;}
 .step-pills button{
-  flex:0 0 auto; min-height:40px; font-size:14px; font-weight:700; color:var(--muted);
-  background:var(--surface); border:1px solid var(--border); padding:6px 14px; white-space:nowrap;
+  flex:0 0 auto; min-height:32px; font-size:12px; font-weight:700; color:var(--muted);
+  background:var(--surface); border:1px solid var(--border); padding:5px 12px; white-space:nowrap;
 }
 .step-pills button.done{color:var(--navy); border-color:var(--navy);}
 .step-pills button.current{background:var(--primary-container); color:var(--navy); border-color:var(--navy);}
 .step-pills button .chk{color:var(--tertiary);}
-.step-warn{color:var(--loss); font-weight:700; font-size:15px; margin:4px 2px 10px;}
+.step-warn{color:var(--loss); font-weight:700; font-size:13px; margin:4px 2px 8px;}
 .step-sec{scroll-margin-top:150px;}
 .step-sec>h3{color:var(--navy);}
 /* 分析画面：タイトル＋全て/単/複ピル＋レイヤータブ */
-.an-head{display:flex; align-items:baseline; gap:10px; margin:4px 2px 10px; flex-wrap:wrap;}
-.an-head h2{font-size:24px; margin:0; font-weight:800; flex:1;}
+.an-head{display:flex; align-items:baseline; gap:10px; margin:4px 2px 8px; flex-wrap:wrap;}
+.an-head h2{font-size:20px; margin:0; font-weight:800; flex:1;}
 .an-pills{display:flex; gap:6px; background:var(--surface-muted); border-radius:999px; padding:4px;}
-.an-pills button{flex:0 0 auto; min-height:36px; font-size:14px; font-weight:700; border:none; background:transparent; padding:4px 12px; color:var(--muted);}
-.an-pills button.active{background:var(--tertiary); color:#fff; box-shadow:var(--shadow-card);}
-.an-tabs{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; margin-bottom:4px;
+.an-pills button{flex:0 0 auto; min-height:30px; font-size:13px; font-weight:700; border:none; background:transparent; padding:4px 12px; color:var(--muted);}
+.an-pills button.active{background:var(--accent); color:#fff; box-shadow:var(--shadow-card);}
+.an-tabs{display:flex; gap:6px; overflow-x:auto; padding:2px 2px 8px; margin-bottom:4px;
   scrollbar-width:none; -webkit-overflow-scrolling:touch;}
 .an-tabs::-webkit-scrollbar{display:none;}
 .an-tabs button{
-  flex:0 0 auto; min-height:40px; font-size:15px; font-weight:700; color:var(--muted);
-  background:var(--surface); border:1px solid var(--border); padding:6px 16px; white-space:nowrap;
+  flex:0 0 auto; min-height:34px; font-size:13px; font-weight:700; color:var(--muted);
+  background:var(--surface); border:1px solid var(--border); padding:6px 14px; white-space:nowrap;
 }
 .an-tabs button.active{color:var(--navy); border-color:var(--navy); background:var(--primary-container);}
 .an-card{scroll-margin-top:150px;}
-@media (max-width:360px){ header h1{font-size:17px;} }
+@media (max-width:360px){ header h1{font-size:16px;} }
 /* Phase 3: score sheet */
-.sheet-table{width:100%;border-collapse:collapse;font-size:15px}
-.sheet-table th,.sheet-table td{border:1px solid var(--border);padding:8px;text-align:center}
+.sheet-table{width:100%;border-collapse:collapse;font-size:13px}
+.sheet-table th,.sheet-table td{border:1px solid var(--border);padding:6px;text-align:center}
 .sheet-table td:first-child{font-weight:700}
-.small{font-size:12px}
+.small{font-size:11px}
 @media print{
   body{background:#fff}
   header, #tabbar, #install-banner, .no-print{display:none !important}
@@ -315,9 +332,158 @@ textarea{min-height:76px; resize:vertical;}
   #overlay .sheet{max-height:none;border-radius:0;box-shadow:none;padding:0}
   .sheet-table th,.sheet-table td{border-color:#999}
 }
+/* ---- 高密度・SUPPORT_NOTE再現の部品 ---- */
+/* 小さいタグ（単/複・ラウンド・種目） */
+.tag{display:inline-block; padding:2px 7px; border-radius:8px; font-size:11px; font-weight:700;
+  background:var(--surface-muted); color:var(--muted); border:1px solid var(--border); white-space:nowrap; flex:0 0 auto;}
+.tag.green{background:#DDF2E3; color:var(--win); border-color:#BFE3C8;}
+.tag.pink{background:var(--primary-container); color:var(--on-primary-container); border-color:#F6C6D2;}
+.tag.gold{background:#FDF3D7; color:#7A5A00; border-color:#F0D9A0;}
+/* 小さいフィルタピル（タイムライン用） */
+.mini-pills{display:flex; gap:6px; overflow-x:auto; padding:2px 2px 8px; scrollbar-width:none;}
+.mini-pills::-webkit-scrollbar{display:none;}
+.mini-pills button{flex:0 0 auto; min-height:30px; font-size:12px; font-weight:700; padding:4px 14px;}
+.mini-pills button.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+/* チップ選択（対戦相手編集・用具テンション） */
+.chip-grid{display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 4px;}
+.chip{min-height:32px; font-size:13px; font-weight:700; padding:5px 14px; border-radius:999px;
+  background:var(--surface); border:1px solid var(--border); color:var(--text);}
+.chip.on-green{background:#CDEBCF; border-color:#9CCFA4; color:#1B5E20;}
+.chip.on-orange{background:#FBE3C8; border-color:#F0C49A; color:#8A4B00;}
+.chip.on-blue{background:#C9DCF5; border-color:#9DB8D2; color:#1D4E89;}
+.chip.on-pink{background:#F6C6D2; border-color:#EFA9BC; color:#800F2F;}
+.chip.add{color:var(--rose); border-color:#F6C6D2; background:var(--surface);}
+.chip .x{font-weight:400; margin-left:4px; opacity:.7;}
+.chip-sec{margin:10px 0 2px;}
+.chip-sec .sec-tag{display:inline-block; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:800; margin-right:6px; vertical-align:middle;}
+.chip-sec .sec-tag.green{background:#DDF2E3; color:#1B5E20;}
+.chip-sec .sec-tag.orange{background:#FBE3C8; color:#8A4B00;}
+.chip-sec .sec-tag.blue{background:#C9DCF5; color:#1D4E89;}
+.chip-sec .sec-tag.pink{background:#F6C6D2; color:#800F2F;}
+.chip-sec b{font-size:14px;}
+.chip-sec .cnt{color:var(--muted); font-size:12px; font-weight:400;}
+/* テンションのステッパー */
+.stepper{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:8px 0;}
+.stepper .step-btn{width:48px; height:48px; min-width:48px; min-height:48px; border-radius:50%;
+  background:var(--secondary-container); border:none; color:var(--win); font-size:24px; font-weight:800;
+  display:flex; align-items:center; justify-content:center; padding:0;}
+.stepper .step-val{font-size:24px; font-weight:800; color:var(--on-primary-container); text-align:center;}
+.unit-toggle{display:flex; gap:6px; margin-left:auto;}
+.unit-toggle button{min-height:32px; font-size:13px; padding:4px 14px;}
+.unit-toggle button.active{background:var(--secondary-container); border-color:var(--secondary-container); color:var(--win);}
+/* 大会カード（分析・大会別／試合一覧のグループ） */
+.tour-card{border:1.5px solid #E8C87A;}
+.tour-card .tour-head{display:flex; align-items:center; gap:6px; cursor:pointer;}
+.tour-card .tour-head .star{color:#D9A441; font-size:16px; flex:0 0 auto;}
+.tour-card .tour-head .tname{font-size:15px; font-weight:800; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.tour-card .tour-head .tname .yr{font-size:12px; font-weight:400; color:var(--muted);}
+.tour-card .tour-head .rate{font-size:13px; font-weight:800; padding:3px 10px; border-radius:10px; background:#DDF2E3; color:var(--win); white-space:nowrap;}
+.tour-card .tour-head .rate.bad{background:#FBE3E1; color:var(--loss);}
+.tour-card .tour-head .chev{color:var(--muted); font-size:14px; flex:0 0 auto;}
+.tour-card .best-row{display:flex; gap:6px; align-items:center; margin-top:8px; flex-wrap:wrap;}
+.tour-card .best-pill{font-size:12px; font-weight:800; padding:3px 10px; border-radius:8px; border:1.5px solid #E8C87A; color:#7A5A00; background:#FDF3D7; white-space:nowrap;}
+.tour-card .best-pill.blue{border-color:#9DB8D2; color:#1D4E89; background:#E3ECF5;}
+.tour-card .flow-mini{font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.year-pills{display:flex; gap:6px; margin:10px 0 8px; flex-wrap:wrap;}
+.year-pills button{min-height:30px; font-size:12px; padding:4px 12px;}
+.year-pills button.active{background:var(--secondary-container); border-color:var(--secondary-container); color:var(--win);}
+.flow-row{display:flex; gap:4px; align-items:center; overflow-x:auto; padding:2px 0 8px; scrollbar-width:none;}
+.flow-row::-webkit-scrollbar{display:none;}
+.flow-row .fchip{flex:0 0 auto; font-size:12px; font-weight:700; padding:4px 10px; border-radius:8px;
+  background:var(--surface-muted); border:1px solid var(--border); white-space:nowrap;}
+.flow-row .fchip.w{background:#DDF2E3; border-color:#BFE3C8; color:var(--win);}
+.flow-row .fchip.l{background:#FBE3E1; border-color:#EFC5C1; color:var(--loss);}
+.flow-row .farr{color:var(--muted); flex:0 0 auto; font-size:12px;}
+.tour-match{display:flex; align-items:center; gap:8px; padding:7px 8px; background:var(--surface);
+  border:1px solid var(--surface-muted); border-radius:10px; margin-bottom:6px; cursor:pointer;}
+.tour-match .w{flex:0 0 auto; width:22px; height:22px; border-radius:6px; background:var(--win-badge); color:#fff;
+  font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center;}
+.tour-match .w.l{background:var(--loss-badge);}
+.tour-match .tm{flex:1; min-width:0; font-size:13px;}
+.tour-match .tm .vs{color:var(--muted); font-weight:400;}
+.tour-match .sc{font-size:13px; font-weight:800; color:var(--win); white-space:nowrap;}
+.tour-match .sc.l{color:var(--loss);}
+/* 試合一覧のカード（スクショ9：タグ行＋名前＋スコアボックス） */
+.list-card{cursor:pointer;}
+.list-card .tags-row{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+.list-card .tags-row .date{margin-left:auto; font-size:12px; color:var(--muted); white-space:nowrap;}
+.list-card .names{display:flex; align-items:center; gap:8px; margin-top:8px;}
+.list-card .names .nm{flex:1; min-width:0; font-size:15px; font-weight:700; line-height:1.35;}
+.list-card .names .nm .club{font-size:11px; font-weight:400; color:var(--muted); display:block;}
+.score-box{flex:0 0 auto; min-width:96px; background:var(--surface-muted); border:1px solid var(--border);
+  border-radius:12px; padding:6px 10px; text-align:center;}
+.score-box .sl{font-size:14px; font-weight:700; line-height:1.5;}
+.score-box .sl b{color:var(--rose);}
+.score-box .sl .muted{color:var(--muted); font-weight:400;}
+/* 試合詳細ダイアログ（スクショ10） */
+.md-title{font-size:18px; font-weight:800; margin:0;}
+.md-sub{font-size:13px; color:var(--muted); margin-top:4px;}
+.md-sub b{color:var(--rose);}
+.md-hero{background:var(--surface-muted); border:1.5px solid var(--border); border-radius:16px; padding:12px; margin-top:10px;}
+.md-hero .tags-row{display:flex; gap:6px; flex-wrap:wrap;}
+.md-hero .vs3{display:flex; align-items:center; gap:8px; margin-top:10px;}
+.md-hero .vs3 .nm{flex:1; min-width:0; text-align:center; font-size:15px; font-weight:700; line-height:1.35;}
+.md-hero .vs3 .nm .club{font-size:11px; font-weight:400; color:var(--muted); display:block;}
+.md-hero .vs3 .sets{flex:0 0 auto; background:var(--surface); border:1.5px solid var(--border); border-radius:14px;
+  padding:8px 14px; text-align:center;}
+.md-hero .vs3 .sets .big{font-size:28px; font-weight:800; line-height:1.1; display:block;}
+.md-hero .vs3 .sets .tot{font-size:12px; color:var(--muted); margin-top:2px; display:block;}
+.cond-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;}
+.cond-grid .cell{background:var(--surface); border:1px solid var(--surface-muted); border-radius:12px; padding:8px 10px;}
+.cond-grid .cell .cl{font-size:11px; color:var(--muted); margin-bottom:2px;}
+.cond-grid .cell .cv{font-size:13px; font-weight:700; line-height:1.4;}
+.setbar{margin-top:8px;}
+.setbar .sb-row{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; margin-bottom:4px;}
+.setbar .sb-row .dot{width:10px; height:10px; border-radius:50%; flex:0 0 auto;}
+.setbar .sb-row .sc{margin-left:auto; font-weight:800;}
+.setbar .sb-row .sc.win{color:var(--win);}
+.setbar .sb-row .sc.loss{color:var(--loss);}
+.setbar .track{height:8px; border-radius:4px; overflow:hidden; display:flex; background:#F6C6D2;}
+.setbar .track .f-win{background:#5FA97B;}
+/* ライバル詳細カード（スクショ2） */
+.rival-sec{margin:12px 0 4px;}
+.rival-sec h4{margin:0 0 6px; font-size:14px; font-weight:800;}
+.rival-sec h4.green{color:#1B5E20;}
+.rival-sec h4.orange{color:#B45309;}
+.rival-sec h4.blue{color:#1D4E89;}
+.rival-sec h4.pink{color:#800F2F;}
+.memo-box{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 12px; margin-top:8px;}
+.memo-box .mh{font-size:13px; font-weight:800; margin-bottom:4px;}
+.memo-box .mb{font-size:13px; line-height:1.5;}
+/* 成長サマリーカード（スクショ5） */
+.sum-card .sum-title{display:flex; justify-content:space-between; align-items:center; gap:8px;}
+.sum-card .sum-title h3{font-size:16px; margin:0;}
+.sum-card .sum-chip{font-size:11px; font-weight:700; background:var(--surface-muted); border-radius:8px; padding:3px 8px; color:var(--rose); white-space:nowrap;}
+.sum-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center; margin-top:10px;}
+.sum-3 .n{font-size:30px; font-weight:800; line-height:1.1;}
+.sum-3 .n.pink{color:var(--rose);}
+.sum-3 .l{font-size:11px; color:var(--muted); margin-top:2px;}
+.mini-2{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.mini-2 .cell{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:10px;}
+.mini-2 .cell h4{margin:0 0 6px; font-size:13px; font-weight:700;}
+.mini-2 .cell .big{font-size:22px; font-weight:800; color:var(--rose);}
+.mini-2 .cell .big .up{font-size:12px; background:#DDF2E3; color:var(--win); border-radius:6px; padding:2px 6px; font-weight:700; vertical-align:middle;}
+.mini-2 .cell p{margin:6px 0 0; font-size:12px; color:var(--text);}
+/* 用具登録ダイアログ（スクショ1） */
+.gear-photo-row{display:flex; gap:12px; align-items:stretch;}
+.gear-photo{flex:0 0 auto; width:96px; min-height:96px; border:1.5px solid var(--border); border-radius:16px;
+  background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  font-size:22px; color:var(--rose); cursor:pointer; position:relative; overflow:hidden; padding:6px;}
+.gear-photo .cap{font-size:12px; font-weight:700;}
+.gear-photo .plus{position:absolute; right:4px; bottom:4px; width:22px; height:22px; border-radius:50%;
+  background:var(--accent); color:#fff; font-size:14px; display:flex; align-items:center; justify-content:center;}
+.gear-photo img{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
+.maint-row{display:flex; align-items:center; gap:6px; padding:8px 0; border-bottom:1px solid var(--surface-muted);}
+.maint-row:last-child{border-bottom:none;}
+.maint-row .ml{flex:1; min-width:0;}
+.maint-row .ml .l{font-size:12px; color:var(--muted);}
+.maint-row .ml .v{font-size:13px; font-weight:700;}
+.maint-row .today-btn{min-height:32px; font-size:12px; padding:4px 10px; color:var(--rose);}
+.maint-row .cal-btn{width:36px; height:36px; min-width:36px; border-radius:50%; border:none; background:var(--secondary-container); color:var(--win); font-size:18px; padding:0;}
+.sec-h{color:var(--rose); font-size:14px; font-weight:800; margin:12px 0 4px;}
 </style>
 </head>
-<body data-theme="standard">
+<body data-theme="support_note">
 <div id="app">
   <header>
     <button class="app-icon" id="btn-photo" type="button" aria-label="選手写真">🏸</button>
@@ -379,6 +545,27 @@ const I18N = {
     days_since:'張り替えからの経過日数', matches_since:'張り替え後の試合数',
     record_maintenance:'張り替えを記録', maintenance_history:'張り替え履歴',
     language:'言語', theme:'テーマ', theme_standard:'スタンダード', theme_mint:'ミントペール',
+    theme_support_note:'サポートノート（ピンク）',
+    an_1m:'過去1ヶ月', an_6m:'過去6ヶ月',
+    tl_all:'すべて', tl_match:'試合', tl_note:'気づき', tl_focus:'Focus',
+    tl_counts:'試合 {m} ・ メモ {n}',
+    gear_new:'新しい用具を登録', gear_photo:'写真', gear_tension_set:'ガット・テンション設定',
+    gear_maint:'メンテナンス日と交換目安', gear_string_last:'最新ガット張替え日', gear_grip_last:'グリップ最終交換日',
+    gear_today:'今日', gear_save:'用具を登録する',
+    rival_vs:'対戦成績', rival_strong:'得意ショット', rival_weak:'苦手ショット',
+    rival_strong_c:'得意コース', rival_weak_c:'苦手コース', rival_memo:'攻略メモ',
+    rival_no_profile:'対戦相手の情報はまだありません。', rival_add_info:'情報を追加',
+    opp_add_item:'＋ 項目を追加', opp_custom_ph:'追加する項目を入力',
+    tour_title:'大会別戦績推移', tour_expand_all:'すべて展開', tour_collapse_all:'すべて閉じる',
+    tour_all_years:'全年度', tour_win_title:'優勝', tour_runner_up:'準優勝',
+    tour_best4:'ベスト4', tour_best8:'ベスト8',
+    md_condition:'試合コンディション・環境', md_surface:'サーフェス', md_env:'コート環境',
+    md_division:'大会区分', md_format:'試合方式', md_sets:'セット・ゲーム別スコア推移',
+    md_total_pts:'総得点', md_edit_match:'試合内容を編集する',
+    an_recent_form:'直近フォーム（調子）', an_streak_now:'現在の連続記録',
+    an_max_streak_w:'期間内最多連勝', an_max_streak_l:'期間内最多連敗',
+    an_avg_pd_chip:'1G平均点差',
+    m_all_count:'全 {m} 試合・{t} 大会',
     plan:'プラン', free_plan:'無料プラン', pro_plan:'Pro',
     pro_soon:'Pro（買い切り）は選手・試合の登録が無制限になります。過去のデータはそのまま使えます。',
     data_location:'データの置き場所', data_location_note:'試合データはこの端末と、自分のスプレッドシートの両方に保存します。同期は手動または起動時に行います。',
@@ -582,6 +769,27 @@ const I18N = {
     days_since:'Days since restring', matches_since:'Matches since restring',
     record_maintenance:'Record restring', maintenance_history:'Restring history',
     language:'Language', theme:'Theme', theme_standard:'Standard', theme_mint:'Mint Pale',
+    theme_support_note:'Support Note (Pink)',
+    an_1m:'Last month', an_6m:'Last 6 months',
+    tl_all:'All', tl_match:'Matches', tl_note:'Notes', tl_focus:'Focus',
+    tl_counts:'Matches {m} · Notes {n}',
+    gear_new:'Register new gear', gear_photo:'Photo', gear_tension_set:'String & tension',
+    gear_maint:'Maintenance & replacement', gear_string_last:'Latest restring date', gear_grip_last:'Last grip change',
+    gear_today:'Today', gear_save:'Register gear',
+    rival_vs:'Head-to-head', rival_strong:'Strong shots', rival_weak:'Weak shots',
+    rival_strong_c:'Strong courses', rival_weak_c:'Weak courses', rival_memo:'Strategy memo',
+    rival_no_profile:'No opponent info yet.', rival_add_info:'Add info',
+    opp_add_item:'+ Add item', opp_custom_ph:'Enter a new item',
+    tour_title:'Tournament results', tour_expand_all:'Expand all', tour_collapse_all:'Collapse all',
+    tour_all_years:'All years', tour_win_title:'Champion', tour_runner_up:'Runner-up',
+    tour_best4:'Semifinal', tour_best8:'Quarterfinal',
+    md_condition:'Match conditions', md_surface:'Surface', md_env:'Court',
+    md_division:'Division', md_format:'Format', md_sets:'Set score progression',
+    md_total_pts:'Total points', md_edit_match:'Edit match',
+    an_recent_form:'Recent form', an_streak_now:'Current streak',
+    an_max_streak_w:'Most wins in a row', an_max_streak_l:'Most losses in a row',
+    an_avg_pd_chip:'Avg point diff / game',
+    m_all_count:'{m} matches · {t} tournaments',
     plan:'Plan', free_plan:'Free plan', pro_plan:'Pro',
     pro_soon:'Pro (one-time purchase) removes the player and match limits. Your existing data stays as is.',
     data_location:'Where data lives', data_location_note:'Match data is kept on this device and in your own spreadsheet. Sync runs manually or at startup.',
@@ -769,10 +977,11 @@ const SPORT_LABEL = {
   en:{BADMINTON:'Badminton',TENNIS:'Tennis',SOFT_TENNIS:'Soft Tennis',TABLE_TENNIS:'Table Tennis',PICKLEBALL:'Pickleball'}
 };
 const SURFACES = ['HARD','CLAY','OMNI','CARPET','WOOD','MAT','UNKNOWN'];
-const THEMES = { standard:'theme_standard', mint_pale:'theme_mint' };
+const THEMES = { support_note:'theme_support_note', standard:'theme_standard', mint_pale:'theme_mint' };
 
 let LANG = localStorage.getItem('ss-lang') || 'ja';
-let THEME = localStorage.getItem('ss-theme') || 'standard';
+let THEME = localStorage.getItem('ss-theme') || 'support_note';
+if (THEME==='standard') THEME='support_note'; // 旧デフォルト（STANDARD）を使っていた端末はピンクへ移行
 if (!I18N[LANG]) LANG = 'ja';
 function t(key){ const d = I18N[LANG] || I18N.ja; return d[key] || I18N.ja[key] || key; }
 function jaEn(j,e){ return LANG==='ja'?j:e; }
@@ -1811,8 +2020,9 @@ const state = {
   outboxCount:0, isPro:false, persisted:null, demo:false,
   license:{workerUrl:'', keyHash:'', email:'', lastVerifiedAt:null, devices:0, justIssued:'', restoreHint:''},
   sync:{bridgeUrl:'', spreadsheetUrl:'', spreadsheetId:'', secret:'', lastSyncAt:null, lastError:null, conflictCount:0, syncing:false, statusText:'', phase:null, startedAt:null},
-  search:'', filter:'all',
-  editingMatchId:null, editingGearId:null,
+  search:'', filter:'all', tlFilter:'all',
+  editingMatchId:null, editingGearId:null, gearForm:null,
+  tourOpen:{}, tourYearSel:{}, tourExpandAll:false, anTourExpandAll:false,
   venues:[], opponentProfiles:[],
   analyticsPeriod:'all', igMode:'summary', aiKind:'issues', aiText:'',
   draft:null, // 試合フォームの下書き（メモリ上のみ）
@@ -1938,36 +2148,47 @@ function homeHTML(){
     .sort(function(a,b){return b.startDate-a.startDate;})[0];
   const notes = (state.notes||[]).filter(function(n){ return n.playerId===state.currentPlayerId; })
     .sort(function(a,b){ return (b.noteDate-a.noteDate) || (b.createdAt-a.createdAt); });
+  const focuses = (state.focuses||[]).filter(function(f){ return f.playerId===state.currentPlayerId; })
+    .sort(function(a,b){ return (b.startDate-a.startDate) || (b.createdAt-a.createdAt); });
   let h = '';
   if (state.demo) h += '<div><span class="badge demo">'+esc(t('demo_badge'))+'</span></div>';
   if (!p){
     h += '<div class="card"><p>'+esc(t('no_player'))+'</p>'
       + '<button type="button" class="primary block" onclick="showPlayerForm()">'+esc(t('add_player'))+'</button></div>';
   } else {
-    /* Focusカード：競技ノート＋選手＋Focus設定/管理＋今のテーマ */
+    /* Focusカード：競技ノート＋試合数・メモ数、選手、今のテーマ＋管理 */
     h += '<div class="card"><div class="focus-title"><h2><span class="sport-emoji">'+sportEmoji(p.sportType)+'</span> '
       + esc(sportLabel(p.sportType)) + jaEn('ノート',' Notes') + '</h2>'
-      + '<button type="button" onclick="showFocusForm()">★ '+esc(t('focus_manage'))+'</button></div>'
+      + '<span class="count">'+esc(tf('tl_counts',{m:ms.length,n:notes.length}))+'</span></div>'
       + '<div class="focus-who">' + playerPhotoHTML(p.playerId, 'focus-photo')
       + '<div class="focus-name">'+esc(p.playerName)+'</div></div>'
       + '<div class="focus-panel"><span class="focus-heart">♥</span><div style="flex:1;min-width:0">'
       + '<div class="lbl">'+esc(t('focus_theme_now'))+'</div>'
       + (focus?'<div class="txt">'+esc(focus.title)+'</div>':'<div class="txt muted">'+esc(t('no_focus'))+'</div>')
-      + '</div><button type="button" class="edit" onclick="showFocusForm()" aria-label="'+esc(t('edit'))+'">✏️</button></div></div>';
+      + '</div><button type="button" class="edit" onclick="showFocusForm()" aria-label="'+esc(t('edit'))+'">'+jaEn('管理','Manage')+' ✏️</button></div></div>';
     /* 記録ボタン2つ */
-    h += '<div class="row"><button type="button" class="primary" style="min-height:56px" onclick="newDraft(); setTab(\'register\')">＋ '+esc(t('record_match_btn'))+'</button>'
-      + '<button type="button" style="min-height:56px" onclick="showNoteForm()">✏️ '+esc(t('add_note_btn'))+'</button></div>'
-      + '<div style="height:12px"></div>';
-    /* タイムライン：試合＋気づきを日付順に */
+    h += '<div class="row"><button type="button" class="primary" style="min-height:48px" onclick="newDraft(); setTab(\'register\')">＋ '+esc(t('record_match_btn'))+'</button>'
+      + '<button type="button" style="min-height:48px" onclick="showNoteForm()">✏️ '+esc(t('add_note_btn'))+'</button></div>'
+      + '<div style="height:10px"></div>';
+    /* タイムライン：試合＋気づき＋Focusを日付順に（フィルタ付き） */
     const items = [];
-    ms.slice(0,5).forEach(function(m){ items.push({d:m.matchDateEpochDay, c:m.createdAt, html:matchCardHTML(m)}); });
-    notes.slice(0,3).forEach(function(n){
-      items.push({d:n.noteDate||0, c:n.createdAt||0, html:'<div class="card note-card"><div class="nc-head"><span>💬</span><b>'+esc(t('notes'))+'</b><span class="date">'+esc(fmtDate(n.noteDate||0))+'</span></div><p style="margin:8px 0 0">'+esc(n.content||'')+'</p></div>'});
+    ms.forEach(function(m){ items.push({d:m.matchDateEpochDay, c:m.createdAt, k:'m', html:matchCardHTML(m)}); });
+    notes.forEach(function(n){
+      items.push({d:n.noteDate||0, c:n.createdAt||0, k:'n', html:noteCardHTML(n)});
+    });
+    focuses.forEach(function(f){
+      items.push({d:f.startDate||0, c:f.createdAt||0, k:'f', html:'<div class="card note-card"><div class="nc-head"><span>★</span><b>'+esc(f.title)+'</b><span class="date">'+esc(fmtDate(f.startDate||0))+(f.endDate?' - '+esc(fmtDate(f.endDate)):'')+'</span></div></div>'});
     });
     items.sort(function(a,b){ return (b.d-a.d) || (b.c-a.c); });
-    h += '<div class="tl-head"><h2>'+esc(t('an_timeline'))+' 📖</h2><span class="count">'+jaEn('全 ','Total ')+(ms.length+notes.length)+jaEn(' 件',' items')+'</span></div>';
-    if (!items.length) h += '<p class="muted">'+esc(t('no_matches'))+'</p>';
-    else h += items.slice(0,6).map(function(x){ return x.html; }).join('');
+    const total = ms.length+notes.length;
+    h += '<div class="tl-head"><h2>'+esc(t('an_timeline'))+' 📖</h2><span class="count">'+jaEn('全 ','Total ')+total+jaEn(' 件',' items')+'</span></div>';
+    const pill = function(k, label){
+      return '<button type="button" class="'+(state.tlFilter===k?'active':'')+'" onclick="setTlFilter(\''+k+'\')">'+esc(label)+'</button>';
+    };
+    h += '<div class="mini-pills">'+pill('all', t('tl_all'))+pill('m', t('tl_match'))+pill('n', t('tl_note'))+pill('f', t('tl_focus'))+'</div>';
+    const shown = items.filter(function(x){ return state.tlFilter==='all' || x.k===state.tlFilter; }).slice(0,8);
+    if (!shown.length) h += '<p class="muted">'+esc(t('no_matches'))+'</p>';
+    else h += shown.map(function(x){ return x.html; }).join('');
     h += '<button type="button" class="block" onclick="setTab(\'matches\')">'+esc(t('tab_matches'))+'</button>';
     if (state.outboxCount>0){
       h += '<div class="card"><span class="badge sync">'+esc(t('outbox_pending'))+' '+state.outboxCount+'</span>'
@@ -1977,13 +2198,29 @@ function homeHTML(){
   h += '<div id="player-form-slot"></div><div id="focus-form-slot"></div><div id="note-form-slot"></div>';
   return h;
 }
-/* 気づき（ノート）の追加：Android版「気づきを残す」 */
-function showNoteForm(){
+function setTlFilter(k){ state.tlFilter=k; render(); }
+/* 気づき・メモのカード（編集・削除アイコン付き） */
+function noteCardHTML(n){
+  return '<div class="card note-card"><div class="nc-head"><span>✏️</span><b>'+esc(t('notes'))+'</b><span class="date">'+esc(fmtDate(n.noteDate||0))+'</span>'
+    + '<button type="button" style="min-height:28px;padding:2px 8px;font-size:12px" onclick="showNoteForm(\''+esc(n.noteId)+'\')">✏️</button>'
+    + '<button type="button" style="min-height:28px;padding:2px 8px;font-size:12px" onclick="deleteNote(\''+esc(n.noteId)+'\')">🗑</button></div>'
+    + '<p style="margin:8px 0 0">'+esc(n.content||'')+'</p></div>';
+}
+async function deleteNote(noteId){
+  if (!confirm(t('confirm_delete'))) return;
+  const n = (state.notes||[]).find(function(x){return x.noteId===noteId;});
+  if (n){ n.isDeleted=true; n.updatedAt=Date.now(); await idbPut('notes', n); }
+  await loadAll(); toast(t('deleted')); render();
+}
+/* 気づき（ノート）の追加・編集：Android版「気づきを残す」 */
+function showNoteForm(noteId){
   const p = currentPlayer();
   const slot = $('#note-form-slot');
   if (!slot || !p) return;
+  const n = noteId ? (state.notes||[]).find(function(x){return x.noteId===noteId;}) : null;
+  state.editingNoteId = n?n.noteId:null;
   slot.innerHTML = '<div class="card"><h3>'+esc(t('add_note_btn'))+'</h3>'
-    + '<label>'+esc(t('note_content'))+'</label><textarea id="n-content"></textarea>'
+    + '<label>'+esc(t('note_content'))+'</label><textarea id="n-content">'+esc(n?n.content||'':'')+'</textarea>'
     + '<div style="height:10px"></div><div class="row">'
     + '<button type="button" class="primary" onclick="saveNote()">'+esc(t('save'))+'</button>'
     + '<button type="button" onclick="render()">'+esc(t('cancel'))+'</button></div></div>';
@@ -1994,25 +2231,107 @@ async function saveNote(){
   const content = $('#n-content').value.trim();
   if (!content) return;
   const now = Date.now();
-  await idbPut('notes', {
-    noteId:uuid(), playerId:p.playerId, content:content, photoPath:null,
-    noteDate:dateToEpochDay(new Date()), createdAt:now, updatedAt:now, isDeleted:false
-  });
+  if (state.editingNoteId){
+    const n = (state.notes||[]).find(function(x){return x.noteId===state.editingNoteId;});
+    if (n){ n.content=content; n.updatedAt=now; await idbPut('notes', n); }
+    state.editingNoteId=null;
+  } else {
+    await idbPut('notes', {
+      noteId:uuid(), playerId:p.playerId, content:content, photoPath:null,
+      noteDate:dateToEpochDay(new Date()), createdAt:now, updatedAt:now, isDeleted:false
+    });
+  }
   await loadAll(); toast(t('saved')); render();
 }
+/* 試合カード（ホームのタイムライン用。タップで詳細ダイアログ） */
 function matchCardHTML(m){
   const sets = parseScoresJson(m.scoresJson);
   const badge = m.isWin
     ? '<span class="win-badge">WIN 🏆</span>'
     : '<span class="loss-badge">'+esc(t('loss'))+'</span>';
-  return '<div class="card tl-card match-card" onclick="editMatch(\''+esc(m.matchId)+'\')">'
-    + '<div class="tl-top">'+badge+'<span class="tname">'+esc(m.tournamentName||'')+'</span>'
+  const typeTag = '<span class="tag '+(m.matchType==='DOUBLES'?'pink':'green')+'">'+esc(m.matchType==='DOUBLES'?t('doubles'):t('singles'))+'</span>';
+  const roundTag = m.roundName?'<span class="tag">'+esc(m.roundName)+'</span>':'';
+  return '<div class="card tl-card match-card" onclick="openMatchDetail(\''+esc(m.matchId)+'\')">'
+    + '<div class="tl-top">'+badge+typeTag+'<span class="tname">'+esc(m.tournamentName||'')+'</span>'+roundTag
     + '<span class="date">'+esc(fmtDate(m.matchDateEpochDay))+'</span></div>'
     + '<div class="tl-vs"><span class="opp">vs '+esc(m.opponentDisplayName)+(m.opponentTeamNameSnapshot?' ('+esc(m.opponentTeamNameSnapshot)+')':'')+'</span>'
     + '<span class="score">'+esc(scoreText(sets))+'</span></div>'
     + (m.matchNote?'<div class="sub muted" style="margin-top:6px">'+esc(m.matchNote)+'</div>':'')
-    + '<div class="tl-foot"><button type="button" onclick="event.stopPropagation(); goAiImage()">🖼 '+esc(t('img_prompt_btn'))+' 🎨</button></div>'
+    + '<div class="tl-foot"><button type="button" onclick="event.stopPropagation(); showMatchScoreSheet(\''+esc(m.matchId)+'\')">☰ '+esc(t('scoresheet'))+'</button> '
+    + '<button type="button" onclick="event.stopPropagation(); goAiImage()">↗ '+esc(t('img_prompt_btn'))+'</button></div>'
     + '</div>';
+}
+function showMatchScoreSheet(matchId){
+  const m = state.matches.find(function(x){return x.matchId===matchId;});
+  if (!m) return;
+  const sheet = $('#overlay-sheet');
+  sheet.innerHTML = scoreSheetHTML(m);
+  $('#overlay').classList.add('show');
+}
+/* サーフェス表示名（試合詳細ダイアログ用。生のコード WOOD 等は出さない） */
+function surfaceLabel(code){
+  if (!code || code==='UNKNOWN') return t('surface_unknown');
+  const map = {HARD:jaEn('ハードコート','Hard court'), CLAY:jaEn('クレー','Clay'), OMNI:jaEn('オムニコート','Omni'), CARPET:jaEn('カーペット','Carpet'), WOOD:jaEn('木床','Wood floor'), MAT:jaEn('マット','Mat')};
+  return map[code]||code;
+}
+/* 日付を「2026.05.03 (日)」形式にする（試合詳細ダイアログ用） */
+function fmtDateDots(ed){
+  if (ed==null) return '';
+  const d = epochDayToDate(ed);
+  const wd = jaEn(['日','月','火','水','木','金','土'][d.getDay()], ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]);
+  return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0')+' ('+wd+')';
+}
+/* 試合詳細ダイアログ（スクショ10）：勝敗バッジ・セット数・合計点、コンディション・環境、セット別スコアバー */
+function openMatchDetail(matchId){
+  const m = state.matches.find(function(x){return x.matchId===matchId;});
+  if (!m) return;
+  const p = currentPlayer();
+  const sets = parseScoresJson(m.scoresJson);
+  let myPts=0, opPts=0, mySets=0, opSets=0;
+  sets.forEach(function(s){
+    const a=s.myScore||0, b=s.opponentScore||0;
+    myPts+=a; opPts+=b;
+    if (a>b) mySets++; else if (b>a) opSets++;
+  });
+  const res = anResult(m);
+  const badge = res==='WIN' ? '<span class="win-badge">WIN</span>' : '<span class="loss-badge">'+esc(t('loss'))+'</span>';
+  const myName = p?p.playerName:'';
+  const myClub = p?p.defaultTeamName||'':'';
+  const opName = m.opponentDisplayName;
+  const opClub = m.opponentTeamNameSnapshot||'';
+  const myNames = (m.matchType==='DOUBLES' && m.partnerName) ? esc(myName)+'<br>'+esc(m.partnerName) : esc(myName);
+  let h = '<h2 class="md-title">'+esc(m.tournamentName||jaEn('大会名なし','No tournament'))+'</h2>'
+    + '<div class="md-sub">'+esc(fmtDateDots(m.matchDateEpochDay))+' ・ <b>'+esc(m.roundName||jaEn('ラウンド未設定','No round'))+'</b></div>'
+    + '<div class="md-hero"><div class="tags-row">'+badge
+    + '<span class="tag green">'+esc(sportLabel(m.sportType))+'</span>'
+    + '<span class="tag '+(m.matchType==='DOUBLES'?'pink':'green')+'">'+esc(m.matchType==='DOUBLES'?t('doubles'):t('singles'))+'</span></div>'
+    + '<div class="vs3"><span class="nm">'+myNames+(myClub?'<span class="club">'+esc(myClub)+'</span>':'')+'</span>'
+    + '<span class="sets"><span class="big">'+mySets+' - '+opSets+'</span><span class="tot">'+myPts+' - '+opPts+'</span></span>'
+    + '<span class="nm">'+esc(opName)+(opClub?'<span class="club">'+esc(opClub)+'</span>':'')+'</span></div></div>'
+    + '<div class="cond-grid">'
+    + '<div class="cell"><div class="cl">'+esc(t('md_surface'))+'</div><div class="cv">'+esc(surfaceLabel(m.courtSurface))+'</div></div>'
+    + '<div class="cell"><div class="cl">'+esc(t('md_env'))+'</div><div class="cv">'+esc(m.environmentType==='OUTDOOR'?t('outdoor'):t('indoor'))+'</div></div>'
+    + '<div class="cell"><div class="cl">'+esc(t('md_division'))+'</div><div class="cv">'+esc(m.tournamentDivision||'—')+'</div></div>'
+    + '<div class="cell"><div class="cl">'+esc(t('md_format'))+'</div><div class="cv">'+esc(m.tournamentFormat||'—')+'</div></div>'
+    + '</div>'
+    + '<div class="setbar">'
+    + sets.map(function(s, i){
+        const a=s.myScore, b=s.opponentScore;
+        if (a==null && b==null) return '';
+        const won=(a||0)>(b||0), tot=(a||0)+(b||0), pct=tot?Math.round((a||0)/tot*100):50;
+        return '<div class="sb-row"><span class="dot" style="background:'+(won?'#5FA97B':'#E85D7F')+'"></span>'
+          + '<span>'+jaEn('第','Set ')+(i+1)+jaEn('セット','')+'</span>'
+          + '<span class="sc '+(won?'win':'loss')+'">'+a+' - '+b+'</span></div>'
+          + '<div class="track" style="margin-bottom:8px"><div class="f-win" style="width:'+pct+'%"></div></div>';
+      }).join('')
+    + '</div>'
+    + '<div style="height:8px"></div><div class="row"><button type="button" onclick="showMatchScoreSheet(\''+esc(m.matchId)+'\')">☰ '+esc(t('scoresheet'))+'</button></div>'
+    + '<div style="height:10px"></div><div class="row">'
+    + '<button type="button" class="danger" onclick="closeOverlay(); state.editingMatchId=\''+esc(m.matchId)+'\'; deleteMatch()">🗑 '+esc(t('del'))+'</button>'
+    + '<button type="button" class="primary" onclick="closeOverlay(); editMatch(\''+esc(m.matchId)+'\')">✏️ '+esc(t('md_edit_match'))+'</button></div>';
+  const sheet = $('#overlay-sheet');
+  sheet.innerHTML = h;
+  $('#overlay').classList.add('show');
 }
 function goAiImage(){
   setTab('analytics');
@@ -2047,10 +2366,86 @@ function filteredMatches(){
     return (m.opponentDisplayName||'').includes(q) || (m.tournamentName||'').includes(q);
   });
 }
+/* 試合一覧：大会＋年度でグループ化（スクショ9） */
+function tourGroupKey(m){ return (m.tournamentName||'')+'\u0000'+(m.tournamentYear||anResolveYear(m)); }
+function tourGroups(list){
+  const map = {};
+  list.forEach(function(m){
+    const k = tourGroupKey(m);
+    if (!map[k]) map[k] = {name:m.tournamentName||'', year:m.tournamentYear||anResolveYear(m), ms:[]};
+    map[k].ms.push(m);
+  });
+  const arr = Object.keys(map).map(function(k){ return map[k]; });
+  arr.forEach(function(g){
+    g.ms.sort(function(a,b){ return (b.matchDateEpochDay-a.matchDateEpochDay)||(b.createdAt-a.createdAt); });
+  });
+  arr.sort(function(a,b){ return (b.ms[0].matchDateEpochDay-a.ms[0].matchDateEpochDay); });
+  return arr;
+}
+function isTourOpen(key, gi){
+  if (state.tourExpandAll) return true;
+  if (key in state.tourOpen) return state.tourOpen[key];
+  return gi===0;
+}
+function toggleTour(key){ state.tourOpen[key]=!isTourOpen(key, -1); render(); }
+function toggleAllTours(){
+  state.tourExpandAll=!state.tourExpandAll;
+  if (!state.tourExpandAll) state.tourOpen={};
+  render();
+}
+/* 試合一覧のカード（スクショ9：タグ行＋名前＋スコアボックス） */
+function listMatchCardHTML(m){
+  const sets = parseScoresJson(m.scoresJson);
+  const res = anResult(m);
+  const badge = res==='WIN' ? '<span class="win-badge">WIN</span>' : '<span class="loss-badge">'+esc(t('loss'))+'</span>';
+  const p = currentPlayer();
+  const myName = p?p.playerName:'';
+  const myClub = p?p.defaultTeamName||'':'';
+  const myNames = (m.matchType==='DOUBLES' && m.partnerName) ? esc(myName)+'<br>'+esc(m.partnerName) : esc(myName);
+  const scoreLines = sets.map(function(s){
+    const a=s.myScore, b=s.opponentScore;
+    if (a==null && b==null) return '';
+    const aw=(a||0)>(b||0), bw=(b||0)>(a||0);
+    return '<div class="sl">'+(aw?'<b>'+a+'</b>':'<span class="muted">'+a+'</span>')+' - '+(bw?'<b>'+b+'</b>':'<span class="muted">'+b+'</span>')+'</div>';
+  }).join('');
+  return '<div class="card list-card" style="margin-bottom:8px" onclick="openMatchDetail(\''+esc(m.matchId)+'\')">'
+    + '<div class="tags-row">'+badge
+    + '<span class="tag '+(m.matchType==='DOUBLES'?'pink':'green')+'">'+esc(m.matchType==='DOUBLES'?t('doubles'):t('singles'))+'</span>'
+    + (m.roundName?'<span class="tag">'+esc(m.roundName)+'</span>':'')
+    + '<span class="date">'+esc(fmtDate(m.matchDateEpochDay))+'</span></div>'
+    + '<div class="names"><span class="nm">'+myNames+(myClub?'<span class="club">'+esc(myClub)+'</span>':'')+'</span>'
+    + '<span class="score-box">'+scoreLines+'</span>'
+    + '<span class="nm" style="text-align:right">'+esc(m.opponentDisplayName)+(m.opponentTeamNameSnapshot?'<span class="club">'+esc(m.opponentTeamNameSnapshot)+'</span>':'')+'</span></div>'
+    + '<div class="tl-foot"><button type="button" onclick="event.stopPropagation(); goAiImage()">↗ '+esc(t('img_prompt_btn'))+'</button></div>'
+    + '</div>';
+}
 function matchListHTML(){
   const list = filteredMatches();
   if (!list.length) return '<div class="empty">'+esc(t('no_matches'))+'</div>';
-  return list.map(matchCardHTML).join('');
+  const groups = tourGroups(list);
+  let h = '<div class="tl-head" style="margin-top:2px"><span class="count">'+esc(tf('m_all_count',{m:list.length,t:groups.length}))+'</span>'
+    + '<button type="button" style="min-height:28px;padding:2px 10px;font-size:12px" onclick="toggleAllTours()">'+esc(state.tourExpandAll?t('tour_collapse_all'):t('tour_expand_all'))+'</button></div>';
+  groups.forEach(function(g, gi){
+    const key = tourGroupKey(g.ms[0]);
+    const open = isTourOpen(key, gi);
+    const w = anWins(g.ms), l = anLosses(g.ms);
+    const flow = g.ms.slice().sort(function(a,b){ return anRoundOrder(a.roundName)-anRoundOrder(b.roundName); });
+    h += '<div class="card tour-card" style="margin-bottom:10px"><div class="tour-head" onclick="toggleTour(\''+esc(key)+'\')">'
+      + '<span class="star">★</span><span class="tname">'+esc(g.name||jaEn('大会名なし','No tournament'))+'</span><span style="font-size:12px;color:var(--muted);white-space:nowrap;flex:0 0 auto">('+g.year+jaEn('年','')+')</span>'
+      + '<span class="tag gold">'+g.ms.length+jaEn('戦 ',' matches ')+w+jaEn('勝','W')+l+jaEn('敗','L')+'</span>'
+      + '<span class="chev">'+(open?'⌃':'⌄')+'</span></div>';
+    if (open){
+      h += '<div class="flow-row" style="margin-top:8px">'
+        + flow.map(function(m, i){
+            const r = anResult(m)==='WIN' ? 'w' : 'l';
+            return (i?'<span class="farr">→</span>':'')+'<span class="fchip '+r+'">'+esc(m.roundName||('R'+(i+1)))+' '+(anResult(m)==='WIN'?'W':'L')+'</span>';
+          }).join('')
+        + '<button type="button" style="min-height:28px;padding:2px 10px;font-size:12px;margin-left:auto;flex:0 0 auto" onclick="event.stopPropagation(); goAiImage()">📷 '+esc(t('img_prompt_btn'))+'</button></div>';
+      h += g.ms.map(listMatchCardHTML).join('');
+    }
+    h += '</div>';
+  });
+  return h;
 }
 function bindMatchesSearch(){
   const input = $('#match-search');
@@ -2941,8 +3336,9 @@ function anScoreCard(ms){
 
 function anPeriodBounds(){
   const now = new Date();
-  if (state.analyticsPeriod==='month') return dateToEpochDay(new Date(now.getFullYear(), now.getMonth(), 1));
+  if (state.analyticsPeriod==='1m') return dateToEpochDay(new Date(now.getFullYear(), now.getMonth(), 1));
   if (state.analyticsPeriod==='3m') return dateToEpochDay(new Date(now.getFullYear(), now.getMonth()-2, 1));
+  if (state.analyticsPeriod==='6m') return dateToEpochDay(new Date(now.getFullYear(), now.getMonth()-5, 1));
   if (state.analyticsPeriod==='year') return dateToEpochDay(new Date(now.getFullYear(), 0, 1));
   return null;
 }
@@ -2966,6 +3362,90 @@ function anScrollTo(id){
   }
 }
 function setIgMode(m){ state.igMode=m; render(); }
+
+/* 大会別：大会名でまとめ、年度ごとに最高結果・勝敗を集計する */
+function tourBest(ms){
+  let bestOrder = 0, bestRound = '', bestWon = false, finalWon = false, any = false;
+  ms.forEach(function(m){
+    const o = anRoundOrder(m.roundName);
+    const won = anResult(m)==='WIN';
+    if (m.roundName==='決勝' && won) finalWon = true;
+    const rank = (o>=20) ? 0 : o; /* 練習会・不明はトーナメント進行の比較対象外 */
+    if (rank > bestOrder || (rank===bestOrder && rank>0 && won)){ bestOrder=rank; bestRound=m.roundName||''; bestWon=won; any=true; }
+  });
+  if (!any){
+    const last = ms.slice().sort(function(a,b){ return (b.matchDateEpochDay-a.matchDateEpochDay)||(b.createdAt-a.createdAt); })[0];
+    if (last) return {label:(last.roundName||'')+(anResult(last)==='WIN'?jaEn('勝利',' win'):jaEn('敗退',' loss')), trophy:false, order:0};
+    return {label:'—', trophy:false, order:0};
+  }
+  if (finalWon) return {label:t('tour_win_title'), trophy:true, order:bestOrder};
+  if (bestOrder===18) return {label:t('tour_runner_up'), trophy:false, order:bestOrder};
+  if (bestRound==='準決勝') return {label: bestWon ? jaEn('決勝進出','Reached final') : t('tour_best4'), trophy:false, order:bestOrder};
+  if (bestRound==='準々決勝') return {label: bestWon ? jaEn('準決勝進出','Reached semifinal') : t('tour_best8'), trophy:false, order:bestOrder};
+  if (bestRound) return {label: bestWon ? bestRound+jaEn('勝利',' win') : bestRound+jaEn('敗退',' loss'), trophy:false, order:bestOrder};
+  return {label:'—', trophy:false, order:0};
+}
+function anTournaments(ms){
+  const byName = {};
+  ms.forEach(function(m){
+    const name = m.tournamentName||'';
+    const year = anResolveYear(m);
+    if (!byName[name]) byName[name] = {name:name, years:{}};
+    if (!byName[name].years[year]) byName[name].years[year] = [];
+    byName[name].years[year].push(m);
+  });
+  const arr = Object.keys(byName).map(function(name){
+    const t = byName[name];
+    const years = Object.keys(t.years).map(Number).sort(function(a,b){return b-a;}).map(function(y){
+      const list = t.years[y];
+      list.sort(function(a,b){ return (b.matchDateEpochDay-a.matchDateEpochDay)||(b.createdAt-a.createdAt); });
+      return {year:y, ms:list, wins:anWins(list), losses:anLosses(list), rate:anRate(list), best:tourBest(list)};
+    });
+    const all = [].concat.apply([], years.map(function(y){return y.ms;}));
+    return {name:name, years:years, total:all.length, wins:anWins(all), losses:anLosses(all), rate:anRate(all), best:tourBest(all),
+      lastDate: Math.max.apply(null, all.map(function(m){return m.matchDateEpochDay;}))};
+  });
+  arr.sort(function(a,b){ return b.lastDate-a.lastDate; });
+  return arr;
+}
+function isAnTourOpen(key, ti){
+  if (state.anTourExpandAll) return true;
+  if (key in state.tourOpen) return state.tourOpen[key];
+  return ti===0;
+}
+function toggleAnTour(key){ state.tourOpen[key]=!isAnTourOpen(key, -1); render(); }
+function toggleAllAnTours(){
+  state.anTourExpandAll=!state.anTourExpandAll;
+  if (!state.anTourExpandAll) state.tourOpen={};
+  render();
+}
+function setTourYear(key, year){ state.tourYearSel[key]=String(year); render(); }
+/* ライバル詳細（スクショ2）：得意／苦手の4区分＋攻略メモ、編集・削除 */
+function showRivalDetail(name){
+  const ms = playerMatches().filter(function(m){ return m.opponentDisplayName===name; });
+  const w = anWins(ms), l = anLosses(ms);
+  const o = (state.opponentProfiles||[]).find(function(x){ return x.name===name; });
+  const list = function(json){ try{ const a=JSON.parse(json||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } };
+  const chips = function(arr, cls){ return arr.length?arr.map(function(x){ return '<span class="chip '+cls+'">'+esc(x)+'</span>'; }).join(''):'<span class="muted small">—</span>'; };
+  let h = '<h2 class="md-title">'+esc(name)+'</h2>';
+  if (o) h += '<p class="md-sub">'+esc(o.teamName||'')+(o.dominantHand?' ・ '+esc(o.dominantHand)+jaEn('利き','-handed'):'')+'</p>';
+  h += '<p style="margin:8px 0 0;color:var(--rose);font-weight:700;font-size:13px">'+esc(t('rival_vs'))+': '+w+jaEn('勝 ','W ')+l+jaEn('敗','L')+jaEn('（計',' (')+ms.length+jaEn('戦）',' matches)')+'</p>';
+  if (!o){
+    h += '<p class="muted">'+esc(t('rival_no_profile'))+'</p>'
+      + '<button type="button" class="primary block" onclick="closeOverlay(); setTab(\'settings\'); setTimeout(function(){ showOpponentForm(null, \''+esc(name)+'\'); }, 60)">'+esc(t('rival_add_info'))+'</button>';
+  } else {
+    h += '<div class="rival-sec"><h4 class="green">【'+esc(t('rival_strong'))+'】</h4><div class="chip-grid">'+chips(list(o.strongShotsJson),'on-green')+'</div></div>'
+      + '<div class="rival-sec"><h4 class="orange">【'+esc(t('rival_weak'))+'】</h4><div class="chip-grid">'+chips(list(o.weakShotsJson),'on-orange')+'</div></div>'
+      + '<div class="rival-sec"><h4 class="blue">【'+esc(t('rival_strong_c'))+'】</h4><div class="chip-grid">'+chips(list(o.strongCoursesJson),'on-blue')+'</div></div>'
+      + '<div class="rival-sec"><h4 class="pink">【'+esc(t('rival_weak_c'))+'】</h4><div class="chip-grid">'+chips(list(o.weakCoursesJson),'on-pink')+'</div></div>'
+      + (o.tacticalMemo?'<div class="memo-box"><div class="mh">ⓘ '+esc(t('rival_memo'))+'</div><div class="mb">'+esc(o.tacticalMemo)+'</div></div>':'')
+      + '<div style="height:10px"></div><div class="row"><button type="button" onclick="closeOverlay(); setTab(\'settings\'); setTimeout(function(){ showOpponentForm(\''+esc(o.opponentId)+'\'); }, 60)">✏️ '+esc(t('edit'))+'</button>'
+      + '<button type="button" class="danger" onclick="closeOverlay(); deleteOpponent(\''+esc(o.opponentId)+'\')">🗑 '+esc(t('del'))+'</button></div>';
+  }
+  const sheet = $('#overlay-sheet');
+  sheet.innerHTML = h;
+  $('#overlay').classList.add('show');
+}
 
 /* ---- 分析（Phase 3：レイヤーA〜E＋ライバル＋スコアカード） ---- */
 function analyticsHTML(){
@@ -2992,35 +3472,44 @@ function analyticsHTML(){
   };
   h += '<div class="an-tabs">'
     + layerTab('an-a', t('layer_growth')) + layerTab('an-b', t('layer_winloss')) + layerTab('an-c', t('layer_gear'))
-    + layerTab('an-d', t('layer_tactics')) + layerTab('an-e', t('layer_rivals'))
+    + layerTab('an-d', t('layer_tactics')) + layerTab('an-rivals', t('layer_rivals'))
+    + layerTab('an-tour', t('tour_title')) + layerTab('an-scorecard', t('an_scorecard'))
     + '</div>';
-  h += '<div class="card"><h2>'+esc(p.playerName)+'</h2><div class="stat-grid">'
-    + '<div class="stat"><div class="num">'+A.total+'</div><div class="lbl">'+esc(t('total_matches'))+'</div></div>'
-    + '<div class="stat"><div class="num">'+A.wins+'</div><div class="lbl">'+esc(t('wins'))+'</div></div>'
-    + '<div class="stat"><div class="num">'+pct0(A.winRate)+'</div><div class="lbl">'+esc(t('win_rate'))+'</div></div></div></div>';
-  h += '<div class="tabs-inline">'
-    + periodBtn('month', t('an_month')) + periodBtn('3m', t('an_3m')) + periodBtn('year', t('an_year')) + periodBtn('all', t('an_all'))
+  h += '<div class="tabs-inline compact">'
+    + periodBtn('all', t('an_all')) + periodBtn('year', t('an_year')) + periodBtn('1m', t('an_1m')) + periodBtn('3m', t('an_3m')) + periodBtn('6m', t('an_6m'))
     + '</div>';
-  /* A */
-  h += '<div class="card an-card" id="an-a"><h2>'+esc(t('an_a'))+'</h2>';
-  if (!A.unlocked) h += noDataHTML();
+  const nDraws = ms.length - anWins(ms) - anLosses(ms);
+  h += '<div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin:2px 2px 10px; font-size:12px"><span style="color:var(--muted)">'+jaEn('集計期間： ','Period: ')+esc(({'1m':t('an_1m'),'3m':t('an_3m'),'6m':t('an_6m'),year:t('an_year'),all:t('an_all')}[state.analyticsPeriod]||''))+'</span>'
+    + '<span style="color:var(--rose); font-weight:700">'+jaEn('対象 ','Target ')+ms.length+jaEn('試合（',' matches (')+anWins(ms)+jaEn('勝 ','W ')+anLosses(ms)+jaEn('敗','L')+(nDraws?' '+jaEn('・',' / ')+nDraws+jaEn('分','D'):'')+' / '+pct0(anRate(ms))+jaEn('）',')')+'</span></div>';
+  /* A — 成長・活動サマリー（スクショ5） */
+  h += '<div class="card an-card sum-card" id="an-a"><div class="sum-title"><h3>'+jaEn('成長・活動サマリー','Growth & Activity Summary')+' 📈</h3>'
+    + '<span class="sum-chip">'+esc(t('an_avg_pd_chip'))+' '+(A.avgPd>=0?'+':'')+A.avgPd.toFixed(1)+'</span></div>'
+    + '<div class="sum-3">'
+    + '<div><div class="n">'+A.total+'</div><div class="l">'+esc(t('total_matches'))+'</div></div>'
+    + '<div><div class="n">'+A.wins+' / '+A.losses+(A.draws?' ('+A.draws+')':'')+'</div><div class="l">'+esc(t('wins'))+' / '+esc(t('losses'))+'</div></div>'
+    + '<div><div class="n pink">'+pct0(A.winRate)+'</div><div class="l">'+esc(t('win_rate'))+'</div></div></div></div>';
+  if (!A.unlocked) h += '<div class="card">'+noDataHTML()+'</div>';
   else {
-    h += kvRow(t('an_recent5'), A.r5.wins+jaEn('勝',' W - ')+(A.r5.total-A.r5.wins)+jaEn('敗',' L')+jaEn('（',' (')+pct1(A.r5.rate)+jaEn('）',')'));
-    h += kvRow(t('an_recent10'), A.r10.wins+jaEn('勝',' W - ')+(A.r10.total-A.r10.wins)+jaEn('敗',' L')+jaEn('（',' (')+pct1(A.r10.rate)+jaEn('）',')'));
-    h += kvRow(t('an_avg_pd'), (A.avgPd>=0?'+':'')+A.avgPd.toFixed(1));
-    h += kvRow(t('an_streak_max'), A.maxWin+jaEn('連勝','-win streak')+' / '+t('an_streak_max_l')+' '+A.maxLoss+jaEn('連敗','-loss streak'));
-    h += kvRow(t('an_current_streak'), A.curStreak.type==='WIN'?A.curStreak.n+jaEn('連勝','-win streak'):A.curStreak.type==='LOSS'?A.curStreak.n+jaEn('連敗','-loss streak'):'—');
-    h += kvRow(t('an_weekday'), pct1(A.weekday.rate)+jaEn('（',' (')+A.weekday.wins+'/'+A.weekday.total+jaEn('）',')'));
-    h += kvRow(t('an_weekend'), pct1(A.weekend.rate)+jaEn('（',' (')+A.weekend.wins+'/'+A.weekend.total+jaEn('）',')'));
-    h += kvRow(t('an_team'), A.team.n+jaEn('試合 ',' matches ')+pct1(A.team.rate));
-    h += kvRow(t('an_indiv'), A.indiv.n+jaEn('試合 ',' matches ')+pct1(A.indiv.rate));
-    h += '<h3>'+esc(t('monthly_win_rate'))+'</h3>';
+    const formDiff = Math.round(A.r5.rate - A.winRate);
+    h += '<div class="mini-2"><div class="cell"><h4>'+esc(t('an_recent_form'))+'</h4>'
+      + '<div class="big">'+pct0(A.r5.rate)+(formDiff>0?' <span class="up">↗ +'+formDiff+'%</span>':formDiff<0?' <span class="up" style="background:#FBE3E1;color:var(--loss)">↘ '+formDiff+'%</span>':'')+'</div>'
+      + '<p>'+jaEn('直近5戦：','Last 5: ')+A.r5.wins+jaEn('勝','W')+(A.r5.total-A.r5.wins)+jaEn('敗','L')+'</p>'
+      + '<p>'+jaEn('直近10戦：','Last 10: ')+pct0(A.r10.rate)+' ('+A.r10.wins+jaEn('勝','W')+')</p></div>'
+      + '<div class="cell"><h4>'+esc(t('an_streak_now'))+'</h4>'
+      + '<div class="big">'+(A.curStreak.type==='WIN'?A.curStreak.n+jaEn('連勝','-win streak'):A.curStreak.type==='LOSS'?A.curStreak.n+jaEn('連敗','-loss streak'):'—')+' 🔥</div>'
+      + '<p>'+esc(t('an_max_streak_w'))+': '+A.maxWin+jaEn('勝','W')+'</p>'
+      + '<p>'+esc(t('an_max_streak_l'))+': '+A.maxLoss+jaEn('敗','L')+'</p></div></div>'
+      + '<div class="card" style="margin-top:8px"><div style="display:flex;text-align:center">'
+      + '<div style="flex:1"><div class="small muted">'+esc(t('an_indiv'))+'</div><div style="font-size:18px;font-weight:800">'+pct1(A.indiv.rate)+' ('+A.indiv.n+jaEn('戦',' matches')+')</div></div>'
+      + '<div style="width:1px;background:var(--border)"></div>'
+      + '<div style="flex:1"><div class="small muted">'+esc(t('an_team'))+'</div><div style="font-size:18px;font-weight:800;color:var(--rose)">'+pct1(A.team.rate)+' ('+A.team.n+jaEn('戦',' matches')+')</div></div></div></div>'
+      + '<div class="card an-card"><h3>'+esc(t('monthly_win_rate'))+'</h3>';
     if (!A.monthly.length) h += noDataHTML();
     A.monthly.slice(-6).forEach(function(m){ h += barRow(m.label, m.rate, pct0(m.rate)+' ('+m.wins+'/'+m.total+')'); });
     h += '<h3>'+esc(t('year'))+'</h3>';
     A.annual.forEach(function(y){ h += kvRow(String(y.year), y.wins+jaEn('勝 ',' W ')+y.losses+jaEn('敗',' L')+(y.draws?' '+y.draws+jaEn('分',' D'):'')); });
+    h += '</div>';
   }
-  h += '</div>';
   /* B */
   h += '<div class="card an-card" id="an-b"><h2>'+esc(t('an_b'))+'</h2>';
   if (!B.unlocked) h += noDataHTML();
@@ -3109,12 +3598,54 @@ function analyticsHTML(){
   else {
     h += '<h3>'+esc(jaEn('得意な相手','Strong against'))+'</h3>';
     if (!R.best.length) h += noDataHTML();
-    R.best.forEach(function(x){ h += barRow(x.name, x.rate, pct0(x.rate)+' ('+x.wins+'-'+x.losses+')'); });
+    R.best.forEach(function(x){ h += '<div onclick="showRivalDetail(\''+esc(x.name)+'\')" style="cursor:pointer">'+barRow(x.name, x.rate, pct0(x.rate)+' ('+x.wins+'-'+x.losses+')')+'</div>'; });
     h += '<h3>'+esc(jaEn('苦手な相手','Struggling against'))+'</h3>';
     if (!R.worst.length) h += noDataHTML();
-    R.worst.forEach(function(x){ h += barRow(x.name, x.rate, pct0(x.rate)+' ('+x.wins+'-'+x.losses+')'); });
+    R.worst.forEach(function(x){ h += '<div onclick="showRivalDetail(\''+esc(x.name)+'\')" style="cursor:pointer">'+barRow(x.name, x.rate, pct0(x.rate)+' ('+x.wins+'-'+x.losses+')')+'</div>'; });
     R.trends.forEach(function(x){
-      h += '<div class="kv"><span><b>'+esc(x.name)+'</b><br><span class="muted small">'+esc(x.msg)+'<br>'+esc(x.dates.join(' / '))+'<br>'+esc(x.gameScores.join('、'))+'</span></span><b>'+x.wins+'-'+x.losses+'</b></div>';
+      h += '<div class="kv" onclick="showRivalDetail(\''+esc(x.name)+'\')" style="cursor:pointer"><span><b>'+esc(x.name)+'</b><br><span class="muted small">'+esc(x.msg)+'<br>'+esc(x.dates.join(' / '))+'<br>'+esc(x.gameScores.join('、'))+'</span></span><b>'+x.wins+'-'+x.losses+'</b></div>';
+    });
+  }
+  h += '</div>';
+  /* 大会別（スクショ4・7）：大会＋年度でグループ化、最高バッジ、年度ピル、ラウンドの流れ、試合行 */
+  h += '<div class="card an-card" id="an-tour"><h2>'+esc(t('tour_title'))+'</h2>';
+  const tours = anTournaments(ms);
+  if (!tours.length) h += noDataHTML();
+  else {
+    h += '<div style="text-align:right;margin-bottom:8px"><button type="button" style="min-height:28px;padding:2px 10px;font-size:12px" onclick="toggleAllAnTours()">'+esc(state.anTourExpandAll?t('tour_collapse_all'):t('tour_expand_all'))+'</button></div>';
+    tours.forEach(function(tour, ti){
+      const key = tour.name;
+      const open = isAnTourOpen(key, ti);
+      const selYear = state.tourYearSel[key]||'all';
+      h += '<div class="card tour-card" style="margin-bottom:10px"><div class="tour-head" onclick="toggleAnTour(\''+esc(key)+'\')">'
+        + '<span class="star">★</span><span class="tname">'+esc(tour.name||jaEn('大会名なし','No tournament'))+'</span><span style="font-size:12px;color:var(--muted);white-space:nowrap;flex:0 0 auto">('+(tour.years.length>1?tour.years[tour.years.length-1].year+'–'+tour.years[0].year:tour.years[0].year)+jaEn('年','')+')</span>'
+        + '<span class="rate '+(tour.rate<50?'bad':'')+'">'+tour.wins+jaEn('勝','W')+tour.losses+jaEn('敗','L')+' '+pct0(tour.rate)+'</span>'
+        + '<span class="chev">'+(open?'⌃':'⌄')+'</span></div>'
+        + '<div class="best-row"><span class="best-pill">'+(tour.best.trophy?'🏆 ':'')+esc(tour.best.label)+'</span>'
+        + '<span class="flow-mini">'+tour.years.map(function(y){ return (y.year%100)+"' "+y.best.label+' ('+y.wins+'-'+y.losses+')'; }).join(' › ')+'</span></div>';
+      if (open){
+        h += '<div class="year-pills">'
+          + '<button type="button" class="'+(selYear==='all'?'active':'')+'" onclick="setTourYear(\''+esc(key)+'\',\'all\')">'+esc(t('tour_all_years'))+' ('+tour.total+')</button>'
+          + tour.years.map(function(y){
+              return '<button type="button" class="'+(selYear===String(y.year)?'active':'')+'" onclick="setTourYear(\''+esc(key)+'\','+y.year+')">'+y.year+jaEn('年','')+' ('+y.wins+'-'+y.losses+')</button>';
+            }).join('')
+          + '</div>';
+        const shown = selYear==='all' ? [].concat.apply([], tour.years.map(function(y){return y.ms;})) : (tour.years.find(function(y){return y.year===Number(selYear);})||{ms:[]}).ms;
+        const flow = shown.slice().sort(function(a,b){ return anRoundOrder(a.roundName)-anRoundOrder(b.roundName); });
+        h += '<div class="flow-row">'
+          + flow.map(function(m, i){
+              const r = anResult(m)==='WIN' ? 'w' : 'l';
+              return (i?'<span class="farr">→</span>':'')+'<span class="fchip '+r+'">'+esc(m.roundName||('R'+(i+1)))+' '+(anResult(m)==='WIN'?'W':'L')+'</span>';
+            }).join('')
+          + '</div>';
+        h += shown.map(function(m){
+          const res = anResult(m);
+          return '<div class="tour-match"><span class="w'+(res==='WIN'?'':' l')+'">'+(res==='WIN'?'W':'L')+'</span>'
+            + '<span class="tm">'+esc(m.roundName||'')+' <span class="vs">vs '+esc(m.opponentDisplayName)+'</span></span>'
+            + '<span class="sc'+(res==='WIN'?'':' l')+'">'+esc(scoreText(parseScoresJson(m.scoresJson)))+'</span></div>';
+        }).join('');
+      }
+      h += '</div>';
     });
   }
   h += '</div>';
@@ -3177,7 +3708,7 @@ function igDraw(){
   ctx.fillStyle = '#FABE0F';
   ctx.font = '700 44px '+font;
   ctx.fillText(p?p.playerName:'', 80, 200);
-  const periodLabel = {month:t('an_month'), '3m':t('an_3m'), year:t('an_year'), all:t('an_all')}[state.analyticsPeriod]||'';
+  const periodLabel = {'1m':t('an_1m'), '3m':t('an_3m'), '6m':t('an_6m'), year:t('an_year'), all:t('an_all')}[state.analyticsPeriod]||'';
   ctx.fillStyle = '#CFE0EC';
   ctx.font = '400 34px '+font;
   ctx.fillText(periodLabel+' / '+(p?sportLabel(p.sportType):''), 80, 250);
@@ -3233,7 +3764,7 @@ function aiBuild(kind){
   const p = currentPlayer();
   const ms = anPeriodMatches();
   const A = anLayerA(ms), B = anLayerB(ms), C = anLayerC(ms, state.gears), D = anLayerD(ms), E = anLayerE(ms);
-  const periodLabel = {month:t('an_month'), '3m':t('an_3m'), year:t('an_year'), all:t('an_all')}[state.analyticsPeriod]||'';
+  const periodLabel = {'1m':t('an_1m'), '3m':t('an_3m'), '6m':t('an_6m'), year:t('an_year'), all:t('an_all')}[state.analyticsPeriod]||'';
   const L = [];
   const name = p?p.playerName:'';
   if (kind==='issues'){
@@ -3315,9 +3846,13 @@ function gearHTML(){
     const days = daysBetween(g.lastMaintenanceAt, Date.now());
     const used = state.matches.filter(function(m){return m.gearId===g.gearId && m.createdAt>=g.lastMaintenanceAt;}).length;
     const gr = gearRates.find(function(r){ return r.gearId===g.gearId; });
+    const photo = gearPhotoGet(g.gearId);
+    const gripAt = gearGripAt(g);
     h += '<div class="card" style="margin-bottom:8px"><div class="top" style="display:flex;justify-content:space-between;gap:8px">'
-      + '<div><b>'+esc(g.racketName)+'</b><div class="sub muted">'+esc(g.stringName||'')+' ・ '+esc(String(g.tensionValue==null?'':g.tensionValue))+' '+esc(g.tensionUnit||'')+'</div>'
+      + (photo?'<img src="'+photo+'" style="width:64px;height:64px;object-fit:cover;border-radius:12px;flex:0 0 auto">':'')
+      + '<div style="flex:1;min-width:0"><b>'+esc(g.racketName)+'</b><div class="sub muted">'+esc(g.stringName||'')+' ・ '+esc(String(g.tensionValue==null?'':g.tensionValue))+' '+esc(g.tensionUnit||'')+'</div>'
       + '<div class="sub muted">'+esc(t('last_maintenance'))+': '+esc(fmtDateTime(g.lastMaintenanceAt))+'</div>'
+      + (gripAt?'<div class="sub muted">'+esc(t('gear_grip_last'))+': '+esc(fmtDate(dateToEpochDay(new Date(gripAt))))+' ('+daysBetween(gripAt, Date.now())+jaEn('日前',' days ago')+')</div>':'')
       + '<div class="sub">'+esc(t('days_since'))+': <b>'+days+'</b> ・ '+esc(t('matches_since'))+': <b>'+used+'</b></div>'
       + (gr?'<div class="sub">'+esc(t('gear_win_rate'))+': <b>'+pct1(gr.rate)+'</b>'+jaEn('（',' (')+gr.count+jaEn('試合）',' matches)')+'</div>':'')+'</div>'
       + '<div><span class="badge '+(g.isActive?'win':'draw')+'">'+esc(g.isActive?t('active'):t('inactive'))+'</span></div></div>'
@@ -3328,23 +3863,133 @@ function gearHTML(){
   h += '<div id="gear-form-slot"></div>';
   return h;
 }
+/* 用具の写真（端末内のみ。選手写真と同じ localStorage 方式） */
+function gearPhotoGet(gearId){ try{ return localStorage.getItem('ss-gear-photo-'+gearId); }catch(e){ return null; } }
+/* 用具のグリップ最終交換日（Android版と同じく customItemsJson の __grip_maintenance_at__） */
+function gearGripAt(g){
+  try{
+    const items = JSON.parse(g.customItemsJson||'[]');
+    const it = items.find(function(x){ return x && x.name==='__grip_maintenance_at__'; });
+    return it && it.maintenanceAt ? it.maintenanceAt : null;
+  }catch(e){ return null; }
+}
+/* 用具登録ダイアログ（スクショ1）：写真枠、テンションのステッパーと数値ピル、メンテナンス日 */
 function showGearForm(gearId){
   const p = currentPlayer();
   const g = gearId?state.gears.find(function(x){return x.gearId===gearId;}):null;
   const slot = $('#gear-form-slot');
   if(!slot) return;
-  slot.innerHTML = '<div class="card"><h3>'+esc(g?t('edit'):t('add_gear'))+'</h3>'
-    + '<label>'+esc(t('racket'))+'</label><input id="g-racket" type="text" value="'+esc(g?g.racketName:'')+'">'
-    + '<label>'+esc(t('string_name'))+'</label><input id="g-string" type="text" value="'+esc(g?g.stringName||'':'')+'">'
-    + '<div class="row"><div><label>'+esc(t('tension'))+'</label><input id="g-tension" type="number" min="0" value="'+esc(g&&g.tensionValue!=null?g.tensionValue:'')+'"></div>'
-    + '<div><label>'+esc(t('tension_unit'))+'</label><select id="g-unit"><option value="lbs"'+(g&&g.tensionUnit==='lbs'?' selected':'')+'>lbs</option><option value="kg"'+(g&&g.tensionUnit==='kg'?' selected':'')+'>kg</option></select></div></div>'
-    + '<label>'+esc(t('last_maintenance'))+'</label><input id="g-last" type="date" value="'+esc(g?epochDayToInput(dateToEpochDay(new Date(g.lastMaintenanceAt))):epochDayToInput(dateToEpochDay(new Date())))+'">'
+  const gripAt = g ? gearGripAt(g) : null;
+  state.gearForm = {
+    gearId: g?g.gearId:null,
+    photo: g ? gearPhotoGet(g.gearId) : null,
+    tension: g&&g.tensionValue!=null?g.tensionValue:24,
+    unit: g&&g.tensionUnit?g.tensionUnit:'lbs',
+    stringDate: g?epochDayToInput(dateToEpochDay(new Date(g.lastMaintenanceAt))):epochDayToInput(dateToEpochDay(new Date())),
+    gripDate: gripAt?epochDayToInput(dateToEpochDay(new Date(gripAt))):''
+  };
+  slot.innerHTML = '<div class="card"><h3>'+esc(g?t('edit'):t('gear_new'))+'</h3>'
+    + '<div class="gear-photo-row">'
+    + '<div class="gear-photo" id="g-photo-box" onclick="document.getElementById(\'g-photo-input\').click()">'
+    + (state.gearForm.photo?'<img src="'+state.gearForm.photo+'">':'<span>🏸</span><span class="cap">'+esc(t('gear_photo'))+'</span>')
+    + '<span class="plus">＋</span></div>'
+    + '<input type="file" id="g-photo-input" accept="image/*" style="display:none">'
+    + '<div style="flex:1;min-width:0"><label>'+esc(t('racket'))+'</label><input id="g-racket" type="text" value="'+esc(g?g.racketName:'')+'">'
+    + '<label>'+esc(t('string_name'))+'</label><input id="g-string" type="text" value="'+esc(g?g.stringName||'':'')+'"></div></div>'
+    + '<div class="sec-h">'+esc(t('gear_tension_set'))+'</div>'
+    + '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px;font-weight:700">'+esc(t('tension'))+'</span>'
+    + '<span class="unit-toggle"><button type="button" id="g-unit-lbs" class="'+(state.gearForm.unit==='lbs'?'active':'')+'" onclick="setGearUnit(\'lbs\')">lbs</button><button type="button" id="g-unit-kg" class="'+(state.gearForm.unit==='kg'?'active':'')+'" onclick="setGearUnit(\'kg\')">kg</button></span></div>'
+    + '<div class="stepper"><button type="button" class="step-btn" onclick="gearStep(-1)">−</button>'
+    + '<span class="step-val" id="g-ten-val">'+state.gearForm.tension+' '+state.gearForm.unit+'</span>'
+    + '<button type="button" class="step-btn" onclick="gearStep(1)">＋</button></div>'
+    + '<div class="chip-grid" id="g-ten-pills">'+gearTensionPillsHTML()+'</div>'
+    + '<div class="sec-h">'+esc(t('gear_maint'))+'</div>'
+    + '<div class="maint-row"><div class="ml"><div class="l">'+esc(t('gear_string_last'))+'</div><div class="v" id="g-last-days"></div></div>'
+    + '<input type="date" id="g-last" value="'+state.gearForm.stringDate+'" style="width:118px" onchange="gearDateChanged(\'string\')">'
+    + '<button type="button" class="today-btn" onclick="gearSetToday(\'string\')">'+esc(t('gear_today'))+'</button>'
+    + '<button type="button" class="cal-btn" onclick="gearOpenCal(\'string\')">📅</button></div>'
+    + '<div class="maint-row"><div class="ml"><div class="l">'+esc(t('gear_grip_last'))+'</div><div class="v" id="g-grip-days"></div></div>'
+    + '<input type="date" id="g-grip" value="'+state.gearForm.gripDate+'" style="width:118px" onchange="gearDateChanged(\'grip\')">'
+    + '<button type="button" class="today-btn" onclick="gearSetToday(\'grip\')">'+esc(t('gear_today'))+'</button>'
+    + '<button type="button" class="cal-btn" onclick="gearOpenCal(\'grip\')">📅</button></div>'
     + '<div style="height:10px"></div><div class="row">'
-    + '<button type="button" class="primary" onclick="saveGear(\''+(g?esc(g.gearId):'')+'\')">'+esc(t('save'))+'</button>'
+    + '<button type="button" class="primary" onclick="saveGear(\''+(g?esc(g.gearId):'')+'\')">'+esc(g?t('save'):t('gear_save'))+'</button>'
     + '<button type="button" onclick="render()">'+esc(t('cancel'))+'</button>'
     + (g?'<button type="button" class="danger" onclick="deleteGear(\''+esc(g.gearId)+'\')">'+esc(t('del'))+'</button>':'')
     + '</div></div>';
+  gearUpdateMaintDays();
+  const pi = $('#g-photo-input');
+  if (pi) pi.addEventListener('change', function(){
+    const f = pi.files && pi.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = function(){ state.gearForm.photo = r.result; const box=$('#g-photo-box'); if(box) box.innerHTML='<img src="'+r.result+'"><span class="plus">＋</span>'; };
+    r.readAsDataURL(f);
+  });
   $('#g-racket').focus();
+}
+function gearTensionPillsHTML(){
+  const vals = state.gearForm.unit==='lbs' ? [18,20,22,23,24,25,26,27,28,30] : [8,9,10,11,12,13,14];
+  return vals.map(function(v){
+    return '<button type="button" class="chip '+(state.gearForm.tension===v?'on-pink':'')+'" onclick="gearSetTension('+v+')">'+v+'</button>';
+  }).join('');
+}
+function gearSetTension(v){ state.gearForm.tension=v; gearRefreshTension(); }
+function gearStep(d){
+  const step = state.gearForm.unit==='lbs'?1:0.5;
+  let v = state.gearForm.tension + d*step;
+  v = Math.max(0, Math.round(v*2)/2);
+  state.gearForm.tension = v;
+  gearRefreshTension();
+}
+function setGearUnit(u){
+  if (state.gearForm.unit!==u){
+    state.gearForm.tension = u==='kg' ? Math.round(state.gearForm.tension/2.2*2)/2 : Math.round(state.gearForm.tension*2.2);
+    state.gearForm.unit=u;
+  }
+  const lb=$('#g-unit-lbs'), kg=$('#g-unit-kg');
+  if (lb) lb.classList.toggle('active', u==='lbs');
+  if (kg) kg.classList.toggle('active', u==='kg');
+  gearRefreshTension();
+}
+function gearRefreshTension(){
+  const v=$('#g-ten-val'); if (v) v.textContent = state.gearForm.tension+' '+state.gearForm.unit;
+  const pills=$('#g-ten-pills'); if (pills) pills.innerHTML = gearTensionPillsHTML();
+}
+function gearDateChanged(which){
+  const el = $('#g-'+which);
+  if (!el) return;
+  if (which==='string') state.gearForm.stringDate = el.value;
+  else state.gearForm.gripDate = el.value;
+  gearUpdateMaintDays();
+}
+function gearSetToday(which){
+  const today = epochDayToInput(dateToEpochDay(new Date()));
+  const el = $('#g-'+which);
+  if (el) el.value = today;
+  gearDateChanged(which);
+}
+function gearOpenCal(which){
+  const el = $('#g-'+which);
+  if (!el) return;
+  if (el.showPicker) el.showPicker(); else el.focus();
+}
+function gearUpdateMaintDays(){
+  const now = Date.now();
+  const s = $('#g-last-days');
+  if (s){
+    if (state.gearForm.stringDate){
+      const ms = epochDayToDate(dateInputToEpochDay(state.gearForm.stringDate)).getTime();
+      s.textContent = fmtDate(dateInputToEpochDay(state.gearForm.stringDate))+' ('+daysBetween(ms, now)+jaEn('日経過',' days ago')+')';
+    } else s.textContent = '—';
+  }
+  const gr = $('#g-grip-days');
+  if (gr){
+    if (state.gearForm.gripDate){
+      const ms = epochDayToDate(dateInputToEpochDay(state.gearForm.gripDate)).getTime();
+      gr.textContent = fmtDate(dateInputToEpochDay(state.gearForm.gripDate))+' ('+daysBetween(ms, now)+jaEn('日経過',' days ago')+')';
+    } else gr.textContent = jaEn('未登録','Not set');
+  }
 }
 async function saveGear(gearId){
   const p = currentPlayer();
@@ -3352,17 +3997,24 @@ async function saveGear(gearId){
   if(!name) return;
   const now = Date.now();
   const prev = gearId?state.gears.find(function(g){return g.gearId===gearId;}):null;
-  const lastMs = dateInputToEpochDay($('#g-last').value)!=null
-    ? epochDayToDate(dateInputToEpochDay($('#g-last').value)).getTime() : now;
+  const f = state.gearForm||{};
+  const lastMs = f.stringDate ? epochDayToDate(dateInputToEpochDay(f.stringDate)).getTime() : now;
+  let items = [];
+  try{ items = JSON.parse(prev?prev.customItemsJson||'[]':'[]'); if(!Array.isArray(items)) items=[]; }catch(e){ items=[]; }
+  items = items.filter(function(x){ return !(x && x.name==='__grip_maintenance_at__'); });
+  if (f.gripDate){
+    items.push({name:'__grip_maintenance_at__', maintenanceAt: epochDayToDate(dateInputToEpochDay(f.gripDate)).getTime(), createdAt: now});
+  }
   const g = {
     gearId: prev?prev.gearId:uuid(), playerId:p.playerId, sportType:p.sportType,
     racketName:name, stringName:$('#g-string').value.trim()||null,
-    tensionValue:$('#g-tension').value===''?null:parseInt($('#g-tension').value,10),
-    tensionUnit:$('#g-unit').value, lastMaintenanceAt:lastMs,
-    customItemsJson:prev?prev.customItemsJson:'[]', isActive:prev?prev.isActive:true,
+    tensionValue:f.tension!=null?f.tension:null,
+    tensionUnit:f.unit||'lbs', lastMaintenanceAt:lastMs,
+    customItemsJson:JSON.stringify(items), isActive:prev?prev.isActive:true,
     createdAt:prev?prev.createdAt:now, updatedAt:now, isDeleted:false
   };
   await idbPut('gears', g);
+  if (f.photo){ try{ localStorage.setItem('ss-gear-photo-'+g.gearId, f.photo); }catch(e){} }
   await loadAll(); toast(t('saved')); render();
 }
 async function deleteGear(gearId){
@@ -3514,27 +4166,91 @@ function oppListHTML(){
   }).join('');
 }
 function csvList(s){ return s.split(/[,、]/).map(function(x){return x.trim();}).filter(function(x){return x;}); }
-function showOpponentForm(opponentId){
+/* 対戦相手編集：得意／苦手ショット・コースのチップ選択（スクショ3） */
+function oppShotsPreset(){ return LANG==='ja'?['スマッシュ','クリア','ドロップ','カット','ヘアピン','プッシュ','ドライブ','ロブ','ネット前','ショートサーブ']:['Smash','Clear','Drop','Cut','Hairpin','Push','Drive','Lob','Net','Short serve']; }
+function oppCoursesPreset(){ return LANG==='ja'?['フォア奥','バック奥','フォア前','バック前','フォアサイド','バックサイド','センター','ボディ']:['Deep forehand','Deep backhand','Front forehand','Front backhand','Forehand side','Backhand side','Center','Body']; }
+function oppChipConf(key){
+  if (key==='strong') return {cls:'green', title:'opp_strong', presets:oppShotsPreset()};
+  if (key==='weak') return {cls:'orange', title:'opp_weak', presets:oppShotsPreset()};
+  if (key==='strongC') return {cls:'blue', title:'opp_strong_course', presets:oppCoursesPreset()};
+  return {cls:'pink', title:'opp_weak_course', presets:oppCoursesPreset()};
+}
+function oppChipGridHTML(key){
+  const conf = oppChipConf(key);
+  const items = state.oppEdit[key]||[];
+  const all = conf.presets.concat(items.filter(function(x){ return conf.presets.indexOf(x)<0; }));
+  return all.map(function(x){
+    const on = items.indexOf(x)>=0;
+    const custom = conf.presets.indexOf(x)<0;
+    return '<button type="button" class="chip '+(on?'on-'+conf.cls:'')+'" onclick="toggleOppChip(\''+key+'\',\''+encodeURIComponent(x)+'\')">'+esc(x)+(on&&custom?'<span class="x">×</span>':'')+'</button>';
+  }).join('') + '<button type="button" class="chip add" onclick="oppAddStart(\''+key+'\')">'+esc(t('opp_add_item'))+'</button>';
+}
+function oppChipSectionHTML(key){
+  const conf = oppChipConf(key);
+  const items = state.oppEdit[key]||[];
+  return '<div class="chip-sec"><span class="sec-tag '+conf.cls+'">'+esc(t(conf.title))+'</span> <span class="cnt">('+(items.length)+')</span></div>'
+    + '<div class="chip-grid" id="oc-'+key+'">'+oppChipGridHTML(key)+'</div>';
+}
+function renderOppChipGrid(key){
+  const grid = $('#oc-'+key);
+  if (grid) grid.innerHTML = oppChipGridHTML(key);
+}
+function toggleOppChip(key, val){
+  toggleOppChipRaw(key, decodeURIComponent(val), false);
+}
+function toggleOppChipRaw(key, val, forceOn){
+  const arr = state.oppEdit[key];
+  const i = arr.indexOf(val);
+  if (i>=0 && !forceOn) arr.splice(i,1);
+  else if (i<0) arr.push(val);
+  renderOppChipGrid(key);
+}
+/* 「＋項目を追加」：その場で入力欄に変えてカスタム項目を追加する */
+function oppAddStart(key){
+  const grid = $('#oc-'+key);
+  if (!grid) return;
+  const btn = grid.querySelector('.chip.add');
+  if (!btn) return;
+  const inp = document.createElement('input');
+  inp.type='text'; inp.placeholder=t('opp_custom_ph');
+  inp.style.cssText='min-height:32px;font-size:13px;padding:4px 10px;border-radius:999px;width:150px';
+  btn.replaceWith(inp); inp.focus();
+  let done = false;
+  const commit = function(){
+    if (done) return; done = true;
+    const v = inp.value.trim();
+    if (v) toggleOppChipRaw(key, v, true);
+    else renderOppChipGrid(key);
+  };
+  inp.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); commit(); } });
+  inp.addEventListener('blur', function(){ commit(); });
+}
+function showOpponentForm(opponentId, defaultName){
   const o = opponentId ? (state.opponentProfiles||[]).find(function(x){ return x.opponentId===opponentId; }) : null;
-  const slot = $('#opponent-form-slot');
+  const slot = $('#opponent-form-slot') || $('#overlay-sheet');
   if (!slot) return;
-  const list = function(json){ try{ const a=JSON.parse(json||'[]'); return Array.isArray(a)?a.join('、'):''; }catch(e){ return ''; } };
+  const list = function(json){ try{ const a=JSON.parse(json||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } };
+  state.oppEdit = {
+    strong: o?list(o.strongShotsJson):[],
+    weak: o?list(o.weakShotsJson):[],
+    strongC: o?list(o.strongCoursesJson):[],
+    weakC: o?list(o.weakCoursesJson):[]
+  };
+  const inOverlay = slot.id==='overlay-sheet';
   slot.innerHTML = '<div class="card"><h3>'+esc(o?t('edit'):t('add_opponent'))+'</h3>'
-    + '<label>'+esc(t('opp_name'))+'</label><input id="o-name" type="text" value="'+esc(o?o.name:'')+'">'
+    + '<label>'+esc(t('opp_name'))+'</label><input id="o-name" type="text" value="'+esc(o?o.name:(defaultName||''))+'">'
     + '<label>'+esc(t('opp_team'))+'</label><input id="o-team" type="text" value="'+esc(o?o.teamName||'':'')+'">'
     + '<div class="row"><div><label>'+esc(t('sport'))+'</label><select id="o-sport">'
     + SPORTS.map(function(s){ return '<option value="'+s+'"'+(o&&o.sportType===s?' selected':'')+'>'+esc(sportLabel(s))+'</option>'; }).join('')+'</select></div>'
     + '<div><label>'+esc(t('opp_hand'))+'</label><select id="o-hand"><option value="">'+esc(t('unknown'))+'</option><option value="右"'+(o&&o.dominantHand==='右'?' selected':'')+'>'+esc(t('opp_hand_r'))+'</option><option value="左"'+(o&&o.dominantHand==='左'?' selected':'')+'>'+esc(t('opp_hand_l'))+'</option></select></div></div>'
-    + '<label>'+esc(t('opp_strong'))+'</label><input id="o-strong" type="text" value="'+esc(o?list(o.strongShotsJson):'')+'" placeholder="'+jaEn('スマッシュ、ドロップ','Smash, drop')+'">'
-    + '<label>'+esc(t('opp_weak'))+'</label><input id="o-weak" type="text" value="'+esc(o?list(o.weakShotsJson):'')+'" placeholder="'+jaEn('バックハンド','Backhand')+'">'
-    + '<label>'+esc(t('opp_strong_course'))+'</label><input id="o-strong-c" type="text" value="'+esc(o?list(o.strongCoursesJson):'')+'" placeholder="'+jaEn('フォア奥、ネット前','Deep forehand, net')+'">'
-    + '<label>'+esc(t('opp_weak_course'))+'</label><input id="o-weak-c" type="text" value="'+esc(o?list(o.weakCoursesJson):'')+'" placeholder="'+jaEn('バック奥','Deep backhand')+'">'
+    + oppChipSectionHTML('strong') + oppChipSectionHTML('weak') + oppChipSectionHTML('strongC') + oppChipSectionHTML('weakC')
     + '<label>'+esc(t('opp_memo'))+'</label><textarea id="o-memo">'+esc(o?o.tacticalMemo||'':'')+'</textarea>'
     + '<div style="height:10px"></div><div class="row">'
     + '<button type="button" class="primary" onclick="saveOpponent('+(o?'\''+esc(o.opponentId)+'\'':'null')+')">'+esc(t('save'))+'</button>'
-    + '<button type="button" onclick="render()">'+esc(t('cancel'))+'</button>'
-    + (o?'<button type="button" class="danger" onclick="deleteOpponent(\''+esc(o.opponentId)+'\')">'+esc(t('del'))+'</button>':'')
+    + '<button type="button" onclick="closeOverlay(); render()">'+esc(t('cancel'))+'</button>'
+    + (o?'<button type="button" class="danger" onclick="closeOverlay(); deleteOpponent(\''+esc(o.opponentId)+'\')">'+esc(t('del'))+'</button>':'')
     + '</div></div>';
+  if (inOverlay) $('#overlay').classList.add('show');
   const inp = $('#o-name'); if (inp) inp.focus();
 }
 async function saveOpponent(opponentId){
@@ -3542,18 +4258,20 @@ async function saveOpponent(opponentId){
   if (!name) return;
   const now = Date.now();
   const prev = opponentId ? (state.opponentProfiles||[]).find(function(o){ return o.opponentId===opponentId; }) : null;
+  const e = state.oppEdit || {strong:[],weak:[],strongC:[],weakC:[]};
   const row = {
     opponentId: prev?prev.opponentId:uuid(),
     name:name, teamName:$('#o-team').value.trim()||null, sportType:$('#o-sport').value,
     dominantHand:$('#o-hand').value||null,
-    strongShotsJson:JSON.stringify(csvList($('#o-strong').value)),
-    weakShotsJson:JSON.stringify(csvList($('#o-weak').value)),
-    strongCoursesJson:JSON.stringify(csvList($('#o-strong-c').value)),
-    weakCoursesJson:JSON.stringify(csvList($('#o-weak-c').value)),
+    strongShotsJson:JSON.stringify(e.strong),
+    weakShotsJson:JSON.stringify(e.weak),
+    strongCoursesJson:JSON.stringify(e.strongC),
+    weakCoursesJson:JSON.stringify(e.weakC),
     tacticalMemo:$('#o-memo').value.trim()||'', memoHistoryJson:prev?prev.memoHistoryJson:'[]',
     createdAt:prev?prev.createdAt:now, updatedAt:now, isDeleted:false
   };
   await idbPut('opponent_profiles', row);
+  closeOverlay();
   await loadAll(); toast(t('saved')); render();
 }
 async function deleteOpponent(opponentId){
@@ -3676,6 +4394,7 @@ function settingsHTML(){
     + '<button type="button" class="'+(LANG==='ja'?'primary':'')+'" onclick="setLang(\'ja\')">日本語</button>'
     + '<button type="button" class="'+(LANG==='en'?'primary':'')+'" onclick="setLang(\'en\')">English</button></div>'
     + '<h2 style="margin-top:16px">'+esc(t('theme'))+'</h2><div class="row">'
+    + '<button type="button" class="'+(THEME==='support_note'?'primary':'')+'" onclick="setTheme(\'support_note\')">'+esc(t('theme_support_note'))+'</button>'
     + '<button type="button" class="'+(THEME==='standard'?'primary':'')+'" onclick="setTheme(\'standard\')">'+esc(t('theme_standard'))+'</button>'
     + '<button type="button" class="'+(THEME==='mint_pale'?'primary':'')+'" onclick="setTheme(\'mint_pale\')">'+esc(t('theme_mint'))+'</button></div></div>';
   h += '<div class="card"><h2>'+esc(t('data_location'))+'</h2><p class="muted">'+esc(t('data_location_note'))+'</p>'
@@ -3714,7 +4433,7 @@ function settingsHTML(){
       ? '<button type="button" class="danger block" onclick="deleteDemo()">'+esc(t('demo_delete'))+'</button>'
       : '<button type="button" class="block" onclick="loadDemo()">'+esc(t('demo_load'))+'</button>')
     + '</div>';
-  h += '<div class="card"><p class="muted small">SmashStats Web 2.4.0 — UI再現（STANDARD）'+jaEn('',' (STANDARD UI)')+'<br>DB: smashstats-web'+jaEn('（IndexedDB）',' (IndexedDB)')+jaEn('・ schema v16相当',' · schema v16 equivalent')+'</p></div>';
+  h += '<div class="card"><p class="muted small">SmashStats Web 2.5.0 — UI再現（SUPPORT_NOTE・高密度）'+jaEn('',' (SUPPORT_NOTE UI)')+'<br>DB: smashstats-web'+jaEn('（IndexedDB）',' (IndexedDB)')+jaEn('・ schema v16相当',' · schema v16 equivalent')+'</p></div>';
   return h;
 }
 function setLang(l){ LANG=l; localStorage.setItem('ss-lang', l); render(); }
