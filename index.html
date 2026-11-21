@@ -1416,6 +1416,9 @@ function extractSpreadsheetId(input){
 /* ブリッジURLは https が原則。http はローカル検証用（127.0.0.1 / localhost）のみ許可。
    https の場合は /exec で終わるものだけ受け付ける（Safariで開いたときの転送先
    googleusercontent.com/macros/echo のURLを貼る間違いを防ぐ）。 */
+/* ブリッジは全ユーザー共通の1つのデプロイ。未設定時はこのURLを既定値とする
+   （入力欄は残し、別ブリッジを使いたい場合だけ書き換えられる）。 */
+const DEFAULT_BRIDGE_URL = 'https://script.google.com/macros/s/AKfycbznBONBGq2KOaypLoc3B4NAWwyaiNTrNUQgNyx0W4ZZ_QSGWQL7WKQbM4peSZmqnsLE/exec';
 function isBridgeUrlOk(url){
   if (!url) return false;
   if (url.indexOf('https://')===0) return url.replace(/\/+$/,'').endsWith('/exec');
@@ -1432,7 +1435,7 @@ async function syncSaveSettingsUI(quiet){
   const sheetEl = document.getElementById('sync-sheet');
   const secretEl = document.getElementById('sync-secret');
   if (!bridgeEl || !sheetEl || !secretEl) return false;
-  const bridgeUrl = bridgeEl.value.trim();
+  const bridgeUrl = bridgeEl.value.trim() || DEFAULT_BRIDGE_URL;
   const sheetUrl = sheetEl.value.trim();
   const secretInput = secretEl.value;
   if (!bridgeUrl || !isBridgeUrlOk(bridgeUrl)){
@@ -2092,7 +2095,7 @@ async function loadAll(){
   state.license.lastVerifiedAt = await metaGet('licenseLastVerifiedAt');
   state.license.devices = (await metaGet('licenseDevices'))||0;
   // 同期設定（合言葉を含む。_meta は書き出し・同期の対象外）
-  state.sync.bridgeUrl = (await metaGet('syncBridgeUrl'))||'';
+  state.sync.bridgeUrl = (await metaGet('syncBridgeUrl'))||DEFAULT_BRIDGE_URL;
   state.sync.spreadsheetUrl = (await metaGet('syncSpreadsheetUrl'))||'';
   state.sync.spreadsheetId = (await metaGet('syncSpreadsheetId'))||'';
   state.sync.secret = (await metaGet('syncSecret'))||'';
@@ -4482,7 +4485,7 @@ function settingsHTML(){
       ? '<button type="button" class="danger block" onclick="deleteDemo()">'+esc(t('demo_delete'))+'</button>'
       : '<button type="button" class="block" onclick="loadDemo()">'+esc(t('demo_load'))+'</button>')
     + '</div>';
-  h += '<div class="card"><p class="muted small">SmashStats Web 2.6.0 — 写真保存改善・高密度レイアウト'+jaEn('',' (SUPPORT_NOTE UI)')+'<br>DB: smashstats-web'+jaEn('（IndexedDB）',' (IndexedDB)')+jaEn('・ schema v16相当',' · schema v16 equivalent')+'</p></div>';
+  h += '<div class="card"><p class="muted small">SmashStats Web 2.6.1 — ブリッジURL既定値'+jaEn('',' (SUPPORT_NOTE UI)')+'<br>DB: smashstats-web'+jaEn('（IndexedDB）',' (IndexedDB)')+jaEn('・ schema v16相当',' · schema v16 equivalent')+'</p></div>';
   return h;
 }
 function setLang(l){ LANG=l; localStorage.setItem('ss-lang', l); render(); }

@@ -2,7 +2,7 @@
    アプリの殻（HTML/CSS/JS・マニフェスト・アイコン）だけをキャッシュする。
    試合データはキャッシュしない。IndexedDB（smashstats-web）が正。 */
 'use strict';
-const CACHE_NAME = 'smashstats-shell-v8'; // 版を上げると全端末の殻が新しいものに入れ替わる
+const CACHE_NAME = 'smashstats-shell-v9'; // 版を上げると全端末の殻が新しいものに入れ替わる
 const SHELL = [
   './',
   './index.html',
