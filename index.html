@@ -65,21 +65,21 @@ body.kb #app{padding-bottom:12px;}
 header{
   position:sticky; top:0; z-index:20;
   background:var(--bg);
-  padding:calc(6px + env(safe-area-inset-top)) 12px 6px;
+  padding:calc(4px + env(safe-area-inset-top)) 12px 4px;
   display:flex; align-items:center; gap:8px;
 }
 .app-icon{
-  flex:0 0 auto; width:44px; height:44px; border-radius:50%; padding:0;
+  flex:0 0 auto; width:40px; height:40px; border-radius:50%; padding:0;
   border:2px solid transparent;
   background:linear-gradient(#fff,#fff) padding-box,
     linear-gradient(135deg,#FABE0F,#FF8EAC,#E85D7F) border-box;
-  font-size:20px; line-height:1; cursor:pointer; overflow:hidden;
+  font-size:18px; line-height:1; cursor:pointer; overflow:hidden;
   display:flex; align-items:center; justify-content:center;
 }
 .app-icon img{width:100%; height:100%; object-fit:cover; border-radius:50%;}
 .hdr-titles{flex:1; min-width:0;}
 .hdr-row1{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
-header h1{font-size:17px; margin:0; letter-spacing:.5px; white-space:nowrap; color:var(--rose); font-weight:800; font-style:italic;}
+header h1{font-size:16px; margin:0; letter-spacing:.5px; white-space:nowrap; color:var(--rose); font-weight:800; font-style:italic;}
 .pro-pill{
   background:linear-gradient(135deg,#E8C87A,#D9A441); color:#4A3600;
   font-size:11px; font-weight:800; padding:3px 8px; border-radius:999px; white-space:nowrap;
@@ -88,12 +88,12 @@ header h1{font-size:17px; margin:0; letter-spacing:.5px; white-space:nowrap; col
   background:var(--primary-container); color:var(--navy);
   font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px; white-space:nowrap;
 }
-.hdr-row2{margin-top:4px;}
+.hdr-row2{margin-top:2px;}
 .player-pill{
   display:inline-flex; align-items:center; gap:6px; max-width:100%;
   background:var(--surface); border:1px solid var(--border); border-radius:999px;
-  padding:3px 10px 3px 3px; font-size:12px; font-weight:700; color:var(--text);
-  min-height:28px; cursor:pointer; font-family:inherit;
+  padding:2px 10px 2px 2px; font-size:12px; font-weight:700; color:var(--text);
+  min-height:26px; cursor:pointer; font-family:inherit;
 }
 .player-pill .ph{width:24px; height:24px; border-radius:50%; background:var(--primary-container);
   display:inline-flex; align-items:center; justify-content:center; font-size:13px; overflow:hidden; flex:0 0 auto;}
@@ -104,9 +104,9 @@ header h1{font-size:17px; margin:0; letter-spacing:.5px; white-space:nowrap; col
 }
 .hdr-icons{display:flex; gap:6px; flex:0 0 auto;}
 .hdr-icon-btn{
-  width:38px; height:38px; min-width:38px; min-height:38px; border-radius:50%;
+  width:34px; height:34px; min-width:34px; min-height:34px; border-radius:50%;
   border:1px solid var(--border); background:var(--surface); color:var(--rose);
-  font-size:16px; cursor:pointer; padding:0;
+  font-size:15px; cursor:pointer; padding:0;
   display:flex; align-items:center; justify-content:center;
   box-shadow:var(--shadow-card);
 }
@@ -123,13 +123,13 @@ header h1{font-size:17px; margin:0; letter-spacing:.5px; white-space:nowrap; col
 }
 #install-banner.show{display:block;}
 #install-banner button{margin-top:8px;}
-main{padding:12px;}
+main{padding:10px 12px;}
 .card{
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-card);
-  padding:10px; margin-bottom:8px; box-shadow:var(--shadow-card);
+  padding:9px 10px; margin-bottom:7px; box-shadow:var(--shadow-card);
 }
-.card h2{font-size:15px; margin:0 0 6px;}
-.card h3{font-size:12px; margin:10px 0 4px;}
+.card h2{font-size:15px; margin:0 0 5px;}
+.card h3{font-size:12px; margin:8px 0 4px;}
 .muted{color:var(--muted); font-size:11px;}
 .small{font-size:10px;}
 .badge{
@@ -154,7 +154,7 @@ button.danger{background:#fff; border-color:var(--danger); color:var(--danger);}
 button.gold{background:var(--gold); border-color:var(--gold); color:#4A3600; font-weight:700;}
 button:disabled{opacity:.45; cursor:default;}
 button.block{width:100%;}
-label{display:block; font-size:11px; font-weight:700; margin:10px 0 3px;}
+label{display:block; font-size:11px; font-weight:700; margin:8px 0 3px;}
 input, select, textarea{
   width:100%; font-size:14px; padding:9px 10px; border-radius:var(--radius-input);
   border:1px solid var(--border); background:var(--surface); color:var(--text);
@@ -177,7 +177,7 @@ textarea{min-height:64px; resize:vertical;}
 .match-card .score{font-size:14px; font-weight:700; white-space:nowrap;}
 .match-card .sub{font-size:11px; color:var(--muted); margin-top:4px;}
 .stat-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center;}
-.stat-grid .stat{background:var(--surface-muted); border-radius:12px; padding:8px 4px;}
+.stat-grid .stat{background:var(--surface-muted); border-radius:12px; padding:6px 4px;}
 .stat-grid .num{font-size:24px; font-weight:800;}
 .stat-grid .lbl{font-size:10px; color:var(--muted);}
 .bar-row{display:flex; align-items:center; gap:8px; font-size:11px; margin:5px 0;}
@@ -229,7 +229,7 @@ textarea{min-height:64px; resize:vertical;}
 .kv:last-child{border-bottom:none;}
 .kv span{text-wrap:balance;}
 .kv b{text-align:right; text-wrap:balance;}
-.tabs-inline{display:flex; gap:8px; margin-bottom:10px; overflow-x:auto; scrollbar-width:none;}
+.tabs-inline{display:flex; gap:8px; margin-bottom:8px; overflow-x:auto; scrollbar-width:none;}
 .tabs-inline::-webkit-scrollbar{display:none;}
 .tabs-inline button{flex:0 0 auto; min-height:32px; font-size:12px; white-space:nowrap;}
 .tabs-inline.compact{gap:6px;}
@@ -237,35 +237,29 @@ textarea{min-height:64px; resize:vertical;}
 .tabs-inline button.active{background:var(--accent); color:#fff; border-color:var(--accent); font-weight:700;}
 /* ---- Android版の部品 ---- */
 /* Focusカード：タイトル行（競技ノート＋管理ピル）、中の薄ピンクパネル */
-.focus-title{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;}
+.focus-title{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;}
 .focus-title h2{margin:0; color:var(--navy); font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .focus-title button{flex:0 0 auto; white-space:nowrap; font-size:11px; min-height:30px; padding:6px 10px;}
 .focus-title h2 .sport-emoji{font-size:13px;}
-.focus-who{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
-.focus-photo{width:44px; height:44px; border-radius:50%; flex:0 0 auto; overflow:hidden;
-  background:var(--primary-container); border:2px solid var(--border);
-  display:flex; align-items:center; justify-content:center; font-size:22px;}
-.focus-photo img{width:100%; height:100%; object-fit:cover;}
-.focus-name{font-size:18px; font-weight:800; line-height:1.2;}
 .focus-panel{
   background:var(--primary-container); border-radius:var(--radius-card);
-  padding:10px; display:flex; gap:10px; align-items:flex-start;
+  padding:8px 10px; display:flex; gap:8px; align-items:flex-start;
 }
 .focus-heart{
-  flex:0 0 auto; width:38px; height:38px; border-radius:50%; background:var(--accent);
-  color:#fff; font-size:17px; display:flex; align-items:center; justify-content:center;
+  flex:0 0 auto; width:30px; height:30px; border-radius:50%; background:var(--accent);
+  color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center;
 }
-.focus-panel .lbl{font-size:12px; font-weight:700; color:var(--navy); margin-bottom:4px;}
+.focus-panel .lbl{font-size:12px; font-weight:700; color:var(--navy); margin-bottom:2px;}
 .focus-panel .txt{font-size:14px; font-weight:700; line-height:1.45;}
 .focus-panel .edit{margin-left:auto; flex:0 0 auto; min-width:36px; min-height:36px; padding:6px 10px; font-size:14px;}
 /* タイムライン見出し */
-.tl-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin:8px 2px 6px;}
+.tl-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin:6px 2px 4px;}
 .tl-head h2{font-size:16px; margin:0; font-weight:800;}
 .tl-head .count{font-size:11px; color:var(--muted); font-weight:700; white-space:nowrap;}
 /* タイムラインの試合カード：緑の枠、WINバッジは緑ベタ、スコアは緑 */
 .tl-card{border:1.5px solid #BFE3C8;}
 .tl-card .tl-top{display:flex; align-items:center; gap:6px;}
-.tl-card .tl-top .tname{font-size:14px; font-weight:800; flex:1; min-width:0;}
+.tl-card .tl-top .tname{font-size:14px; font-weight:800; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .tl-card .tl-top .date{font-size:11px; color:var(--muted); white-space:nowrap;}
 .win-badge, .loss-badge{
   display:inline-block; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:800;
@@ -273,11 +267,11 @@ textarea{min-height:64px; resize:vertical;}
 }
 .win-badge{background:var(--win-badge);}
 .loss-badge{background:var(--loss-badge);}
-.tl-card .tl-vs{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-top:8px;}
-.tl-card .tl-vs .opp{font-size:14px; font-weight:700;}
+.tl-card .tl-vs{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-top:6px;}
+.tl-card .tl-vs .opp{font-size:14px; font-weight:700; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .tl-card .tl-vs .score{font-size:14px; font-weight:800; color:var(--win); white-space:nowrap;}
-.tl-card .tl-foot{display:flex; justify-content:flex-end; margin-top:8px;}
-.tl-card .tl-foot button{min-height:30px; font-size:12px; padding:6px 12px;}
+.tl-card .tl-foot{display:flex; justify-content:flex-end; margin-top:6px;}
+.tl-card .tl-foot button{min-height:28px; font-size:12px; padding:6px 12px;}
 .note-card{border:1.5px solid var(--border);}
 .note-card .nc-head{display:flex; gap:8px; align-items:baseline;}
 .note-card .nc-head .date{margin-left:auto; font-size:11px; color:var(--muted); white-space:nowrap;}
@@ -305,7 +299,7 @@ textarea{min-height:64px; resize:vertical;}
 .step-sec{scroll-margin-top:150px;}
 .step-sec>h3{color:var(--navy);}
 /* 分析画面：タイトル＋全て/単/複ピル＋レイヤータブ */
-.an-head{display:flex; align-items:baseline; gap:10px; margin:4px 2px 8px; flex-wrap:wrap;}
+.an-head{display:flex; align-items:baseline; gap:10px; margin:2px 2px 6px; flex-wrap:wrap;}
 .an-head h2{font-size:17px; margin:0; font-weight:800; flex:1;}
 .an-pills{display:flex; gap:6px; background:var(--surface-muted); border-radius:999px; padding:4px;}
 .an-pills button{flex:0 0 auto; min-height:30px; font-size:12px; font-weight:700; border:none; background:transparent; padding:4px 12px; color:var(--muted);}
@@ -342,7 +336,7 @@ textarea{min-height:64px; resize:vertical;}
 /* 小さいフィルタピル（タイムライン用） */
 .mini-pills{display:flex; gap:6px; overflow-x:auto; padding:2px 2px 6px; scrollbar-width:none;}
 .mini-pills::-webkit-scrollbar{display:none;}
-.mini-pills button{flex:0 0 auto; min-height:30px; font-size:11px; font-weight:700; padding:4px 14px;}
+.mini-pills button{flex:0 0 auto; min-height:28px; font-size:11px; font-weight:700; padding:3px 12px;}
 .mini-pills button.active{background:var(--accent); color:#fff; border-color:var(--accent);}
 /* チップ選択（対戦相手編集・用具テンション） */
 .chip-grid{display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 4px;}
@@ -407,11 +401,11 @@ textarea{min-height:64px; resize:vertical;}
 .list-card{cursor:pointer;}
 .list-card .tags-row{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
 .list-card .tags-row .date{margin-left:auto; font-size:11px; color:var(--muted); white-space:nowrap;}
-.list-card .names{display:flex; align-items:center; gap:8px; margin-top:8px;}
+.list-card .names{display:flex; align-items:center; gap:8px; margin-top:6px;}
 .list-card .names .nm{flex:1; min-width:0; font-size:14px; font-weight:700; line-height:1.35;}
 .list-card .names .nm .club{font-size:10px; font-weight:400; color:var(--muted); display:block;}
 .score-box{flex:0 0 auto; min-width:96px; background:var(--surface-muted); border:1px solid var(--border);
-  border-radius:12px; padding:6px 10px; text-align:center;}
+  border-radius:12px; padding:5px 8px; text-align:center;}
 .score-box .sl{font-size:13px; font-weight:700; line-height:1.5;}
 .score-box .sl b{color:var(--rose);}
 .score-box .sl .muted{color:var(--muted); font-weight:400;}
@@ -454,33 +448,33 @@ textarea{min-height:64px; resize:vertical;}
 .sum-card .sum-title{display:flex; justify-content:space-between; align-items:center; gap:8px;}
 .sum-card .sum-title h3{font-size:15px; margin:0;}
 .sum-card .sum-chip{font-size:10px; font-weight:700; background:var(--surface-muted); border-radius:8px; padding:3px 8px; color:var(--rose); white-space:nowrap;}
-.sum-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center; margin-top:10px;}
+.sum-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center; margin-top:8px;}
 .sum-3 .n{font-size:26px; font-weight:800; line-height:1.1;}
 .sum-3 .n.pink{color:var(--rose);}
 .sum-3 .l{font-size:10px; color:var(--muted); margin-top:2px;}
 .mini-2{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
-.mini-2 .cell{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:10px;}
+.mini-2 .cell{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:8px;}
 .mini-2 .cell h4{margin:0 0 6px; font-size:12px; font-weight:700;}
 .mini-2 .cell .big{font-size:19px; font-weight:800; color:var(--rose);}
 .mini-2 .cell .big .up{font-size:11px; background:#DDF2E3; color:var(--win); border-radius:6px; padding:2px 6px; font-weight:700; vertical-align:middle;}
 .mini-2 .cell p{margin:6px 0 0; font-size:11px; color:var(--text);}
 /* 用具登録ダイアログ（スクショ1） */
 .gear-photo-row{display:flex; gap:12px; align-items:stretch;}
-.gear-photo{flex:0 0 auto; width:96px; min-height:96px; border:1.5px solid var(--border); border-radius:16px;
+.gear-photo{flex:0 0 auto; width:80px; min-height:80px; border:1.5px solid var(--border); border-radius:16px;
   background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
   font-size:20px; color:var(--rose); cursor:pointer; position:relative; overflow:hidden; padding:6px;}
 .gear-photo .cap{font-size:11px; font-weight:700;}
 .gear-photo .plus{position:absolute; right:4px; bottom:4px; width:22px; height:22px; border-radius:50%;
   background:var(--accent); color:#fff; font-size:13px; display:flex; align-items:center; justify-content:center;}
 .gear-photo img{width:100%; height:100%; object-fit:cover; position:absolute; inset:0;}
-.maint-row{display:flex; align-items:center; gap:6px; padding:8px 0; border-bottom:1px solid var(--surface-muted);}
+.maint-row{display:flex; align-items:center; gap:6px; padding:6px 0; border-bottom:1px solid var(--surface-muted);}
 .maint-row:last-child{border-bottom:none;}
 .maint-row .ml{flex:1; min-width:0;}
 .maint-row .ml .l{font-size:11px; color:var(--muted);}
 .maint-row .ml .v{font-size:12px; font-weight:700;}
 .maint-row .today-btn{min-height:32px; font-size:11px; padding:4px 10px; color:var(--rose);}
 .maint-row .cal-btn{width:32px; height:32px; min-width:32px; border-radius:50%; border:none; background:var(--secondary-container); color:var(--win); font-size:16px; padding:0;}
-.sec-h{color:var(--rose); font-size:13px; font-weight:800; margin:12px 0 4px;}
+.sec-h{color:var(--rose); font-size:13px; font-weight:800; margin:10px 0 4px;}
 </style>
 </head>
 <body data-theme="support_note">
@@ -569,6 +563,7 @@ const I18N = {
     plan:'プラン', free_plan:'無料プラン', pro_plan:'Pro',
     pro_soon:'Pro（買い切り）は選手・試合の登録が無制限になります。過去のデータはそのまま使えます。',
     data_location:'データの置き場所', data_location_note:'試合データはこの端末と、自分のスプレッドシートの両方に保存します。同期は手動または起動時に行います。',
+    sync_photo_note:'写真（選手・用具）はこの端末内にだけ保存され、スプレッドシートへは同期されません。JSONバックアップには含まれます。',
     sync_bridge_url:'ブリッジURL（Apps Script）', sync_sheet_url:'スプレッドシートのURL', sync_secret:'合言葉',
     sync_secret_ph:'自分で決めた合言葉（8文字以上）を入力', sync_secret_set:'設定済み（変更時のみ再入力）',
     sync_secret_hint:'合言葉はこのスプレッドシートの鍵です。初めて接続するときに決めたものが使われます。忘れると同期できなくなるので控えておいてください。この端末内にだけ保存し、書き出しや同期の対象にはしません。スプレッドシートはブリッジ用アカウントと編集者として共有しておく必要があります。',
@@ -793,6 +788,7 @@ const I18N = {
     plan:'Plan', free_plan:'Free plan', pro_plan:'Pro',
     pro_soon:'Pro (one-time purchase) removes the player and match limits. Your existing data stays as is.',
     data_location:'Where data lives', data_location_note:'Match data is kept on this device and in your own spreadsheet. Sync runs manually or at startup.',
+    sync_photo_note:'Photos (player and gear) stay on this device and are not synced to the spreadsheet. They are included in JSON backups.',
     sync_bridge_url:'Bridge URL (Apps Script)', sync_sheet_url:'Spreadsheet URL', sync_secret:'Passphrase',
     sync_secret_ph:'Choose a passphrase (8+ characters)', sync_secret_set:'Set (re-enter only to change)',
     sync_secret_hint:'The passphrase is the key to this spreadsheet. The one you choose on first connection is used from then on. Keep it somewhere safe; without it syncing stops. It is stored only on this device and is never exported or synced. Share the spreadsheet with the bridge account (editor).',
@@ -990,18 +986,66 @@ function sportLabel(code){ return (SPORT_LABEL[LANG]||SPORT_LABEL.ja)[code] || c
 const SPORT_EMOJI = {BADMINTON:'🏸', TENNIS:'🎾', SOFT_TENNIS:'🎾', TABLE_TENNIS:'🏓', PICKLEBALL:'🏓'};
 function sportEmoji(code){ return SPORT_EMOJI[code] || '🏸'; }
 
-/* ---------------- 選手写真（端末内だけ。localStorageに160pxへ縮小して保存） ---------------- */
-function playerPhotoKey(pid){ return 'ss-photo-' + pid; }
+/* ---------------- 写真（IndexedDB _photos。同期しない・JSONバックアップには含む） ----------------
+   選手写真: 160px正方形・JPEG 0.85。 用具写真: 長辺800px以下・JPEG 0.85。
+   写真はスプレッドシートへ同期しない（バイナリが重いため）。idbPut は _outbox へ積むため
+   写真の読み書きには idbRawPut / idbRawDelete / idbGet を使う。表示は state.photos の
+   メモリキャッシュから行う（render は同期関数のため）。キー: player:<選手ID> / gear:<用具ID>。
+   値は {photoId, dataUrl, updatedAt}。 */
+function photoPut(photoId, dataUrl){
+  state.photos[photoId] = dataUrl;
+  return idbRawPut('_photos', {photoId:photoId, dataUrl:dataUrl, updatedAt:Date.now()});
+}
+function photoDelete(photoId){
+  delete state.photos[photoId];
+  return idbRawDelete('_photos', photoId);
+}
+function photoURL(photoId){ return (state.photos && state.photos[photoId]) || null; }
 function playerPhotoURL(pid){
   if (!pid) return null;
-  try{ return localStorage.getItem(playerPhotoKey(pid)) || null; }catch(e){ return null; }
+  return photoURL('player:'+pid);
 }
-function playerPhotoHTML(pid, cls){
-  const url = playerPhotoURL(pid);
-  const p = (state.players||[]).find(function(x){ return x.playerId===pid; });
-  const initial = p ? esc(p.playerName.slice(0,1)) : '🏸';
-  if (url) return '<span class="'+cls+'"><img src="'+url+'" alt=""></span>';
-  return '<span class="'+cls+'">'+initial+'</span>';
+/* 画像の縮小。square が指定されれば中央を正方形に切り抜いて square px に、
+   そうでなければ長辺が maxEdge 以下になるよう縮小する（拡大はしない）。JPEG 0.85。 */
+function downscaleImageDataURL(src, maxEdge, square, done){
+  const img = new Image();
+  img.onload = function(){
+    let w, h, sx, sy, sw, sh;
+    if (square){
+      const s = Math.min(img.width, img.height);
+      sx = (img.width-s)/2; sy = (img.height-s)/2; sw = s; sh = s; w = square; h = square;
+    } else {
+      const scale = Math.min(1, maxEdge/Math.max(img.width, img.height));
+      w = Math.max(1, Math.round(img.width*scale)); h = Math.max(1, Math.round(img.height*scale));
+      sx = 0; sy = 0; sw = img.width; sh = img.height;
+    }
+    const cv = document.createElement('canvas');
+    cv.width = w; cv.height = h;
+    cv.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
+    done(cv.toDataURL('image/jpeg', 0.85));
+  };
+  img.onerror = function(){ done(null); };
+  img.src = src;
+}
+/* 初回起動時に旧localStorageの写真を _photos へ移行し、移行後にキーを削除する。
+   _photos に既にあるものは上書きせず、localStorage のキーだけ消す。 */
+async function migratePhotos(){
+  try{
+    const keys = [];
+    for (let i=0; i<localStorage.length; i++){ const k = localStorage.key(i); if (k) keys.push(k); }
+    for (const k of keys){
+      let pid = null;
+      if (k.indexOf('ss-photo-')===0) pid = 'player:' + k.slice(9);
+      else if (k.indexOf('ss-gear-photo-')===0) pid = 'gear:' + k.slice(14);
+      else continue;
+      const v = localStorage.getItem(k);
+      if (v && !state.photos[pid]){
+        state.photos[pid] = v;
+        await idbRawPut('_photos', {photoId:pid, dataUrl:v, updatedAt:Date.now()});
+      }
+      try{ localStorage.removeItem(k); }catch(e){}
+    }
+  }catch(e){ /* 移行失敗は無視（次回起動時に再試行） */ }
 }
 function openPhotoPicker(){
   if (!currentPlayer()){ toast(t('no_player')); return; }
@@ -1012,18 +1056,11 @@ function onPhotoChosen(file){
   if (!file || !currentPlayer()) return;
   const rd = new FileReader();
   rd.onload = function(){
-    const img = new Image();
-    img.onload = function(){
-      const size = 160;
-      const cv = document.createElement('canvas');
-      cv.width = size; cv.height = size;
-      const ctx = cv.getContext('2d');
-      const s = Math.min(img.width, img.height);
-      ctx.drawImage(img, (img.width-s)/2, (img.height-s)/2, s, s, 0, 0, size, size);
-      try{ localStorage.setItem(playerPhotoKey(state.currentPlayerId), cv.toDataURL('image/jpeg', 0.85)); }catch(e){}
+    downscaleImageDataURL(rd.result, 0, 160, function(dataUrl){
+      if (!dataUrl) return;
+      photoPut('player:'+state.currentPlayerId, dataUrl);
       render();
-    };
-    img.src = rd.result;
+    });
   };
   rd.readAsDataURL(file);
 }
@@ -1220,7 +1257,7 @@ function deriveMatch(m){
 /* =====================================================================
    IndexedDB（DB名 smashstats-web）— 生の IndexedDB API のみで実装
    ===================================================================== */
-const DB_NAME='smashstats-web', DB_VERSION=1;
+const DB_NAME='smashstats-web', DB_VERSION=2;
 const STORES=[
   {name:'players', key:'playerId'},
   {name:'matches', key:'matchId'},
@@ -1231,6 +1268,7 @@ const STORES=[
   {name:'opponent_custom_items', key:'id'},
   {name:'focuses', key:'focusId'},
   {name:'notes', key:'noteId'},
+  {name:'_photos', key:'photoId'}, // 写真専用。idbPut は _outbox へ積むため写真には使わないこと
   {name:'_outbox', key:'outboxId', auto:true},
   {name:'_meta', key:'key'}
 ];
@@ -2016,7 +2054,7 @@ function licenseHTML(){
 const state = {
   tab:'home', view:'tab', // view: 'tab' | 'settings'
   currentPlayerId: localStorage.getItem('ss-player') || null,
-  players:[], matches:[], gears:[], maintenances:[], focuses:[], notes:[],
+  players:[], matches:[], gears:[], maintenances:[], focuses:[], notes:[], photos:{},
   outboxCount:0, isPro:false, persisted:null, demo:false,
   license:{workerUrl:'', keyHash:'', email:'', lastVerifiedAt:null, devices:0, justIssued:'', restoreHint:''},
   sync:{bridgeUrl:'', spreadsheetUrl:'', spreadsheetId:'', secret:'', lastSyncAt:null, lastError:null, conflictCount:0, syncing:false, statusText:'', phase:null, startedAt:null},
@@ -2040,6 +2078,11 @@ async function loadAll(){
   state.venues = (await idbAll('venues')).filter(function(x){return !x.isDeleted;});
   state.opponentProfiles = (await idbAll('opponent_profiles')).filter(function(x){return !x.isDeleted;});
   state.outboxCount = (await idbAll('_outbox')).length;
+  // 写真：_photos をメモリに読み、旧localStorageの写真を移行する
+  const ph = await idbAll('_photos');
+  state.photos = {};
+  ph.forEach(function(r){ if (r && r.photoId && r.dataUrl) state.photos[r.photoId] = r.dataUrl; });
+  await migratePhotos();
   state.isPro = (await metaGet('isPro'))===true;
   state.demo = (await metaGet('demo'))===true;
   // ライセンス（キーそのものは保存しない。ハッシュだけ）
@@ -2156,20 +2199,18 @@ function homeHTML(){
     h += '<div class="card"><p>'+esc(t('no_player'))+'</p>'
       + '<button type="button" class="primary block" onclick="showPlayerForm()">'+esc(t('add_player'))+'</button></div>';
   } else {
-    /* Focusカード：競技ノート＋試合数・メモ数、選手、今のテーマ＋管理 */
+    /* Focusカード：競技ノート＋試合数・メモ数、今のテーマ＋管理（選手名・写真はヘッダーの選手ピルに集約。見本のAndroid版と同じ構成） */
     h += '<div class="card"><div class="focus-title"><h2><span class="sport-emoji">'+sportEmoji(p.sportType)+'</span> '
       + esc(sportLabel(p.sportType)) + jaEn('ノート',' Notes') + '</h2>'
       + '<span class="count">'+esc(tf('tl_counts',{m:ms.length,n:notes.length}))+'</span></div>'
-      + '<div class="focus-who">' + playerPhotoHTML(p.playerId, 'focus-photo')
-      + '<div class="focus-name">'+esc(p.playerName)+'</div></div>'
       + '<div class="focus-panel"><span class="focus-heart">♥</span><div style="flex:1;min-width:0">'
       + '<div class="lbl">'+esc(t('focus_theme_now'))+'</div>'
       + (focus?'<div class="txt">'+esc(focus.title)+'</div>':'<div class="txt muted">'+esc(t('no_focus'))+'</div>')
       + '</div><button type="button" class="edit" onclick="showFocusForm()" aria-label="'+esc(t('edit'))+'">'+jaEn('管理','Manage')+' ✏️</button></div></div>';
     /* 記録ボタン2つ */
-    h += '<div class="row"><button type="button" class="primary" style="min-height:44px" onclick="newDraft(); setTab(\'register\')">＋ '+esc(t('record_match_btn'))+'</button>'
-      + '<button type="button" style="min-height:44px" onclick="showNoteForm()">✏️ '+esc(t('add_note_btn'))+'</button></div>'
-      + '<div style="height:6px"></div>';
+    h += '<div class="row"><button type="button" class="primary" style="min-height:40px" onclick="newDraft(); setTab(\'register\')">＋ '+esc(t('record_match_btn'))+'</button>'
+      + '<button type="button" style="min-height:40px" onclick="showNoteForm()">✏️ '+esc(t('add_note_btn'))+'</button></div>'
+      + '<div style="height:4px"></div>';
     /* タイムライン：試合＋気づき＋Focusを日付順に（フィルタ付き） */
     const items = [];
     ms.forEach(function(m){ items.push({d:m.matchDateEpochDay, c:m.createdAt, k:'m', html:matchCardHTML(m)}); });
@@ -2204,7 +2245,7 @@ function noteCardHTML(n){
   return '<div class="card note-card"><div class="nc-head"><span>✏️</span><b>'+esc(t('notes'))+'</b><span class="date">'+esc(fmtDate(n.noteDate||0))+'</span>'
     + '<button type="button" style="min-height:28px;padding:2px 8px;font-size:12px" onclick="showNoteForm(\''+esc(n.noteId)+'\')">✏️</button>'
     + '<button type="button" style="min-height:28px;padding:2px 8px;font-size:12px" onclick="deleteNote(\''+esc(n.noteId)+'\')">🗑</button></div>'
-    + '<p style="margin:8px 0 0">'+esc(n.content||'')+'</p></div>';
+    + '<p style="margin:6px 0 0">'+esc(n.content||'')+'</p></div>';
 }
 async function deleteNote(noteId){
   if (!confirm(t('confirm_delete'))) return;
@@ -2256,7 +2297,7 @@ function matchCardHTML(m){
     + '<span class="date">'+esc(fmtDate(m.matchDateEpochDay))+'</span></div>'
     + '<div class="tl-vs"><span class="opp">vs '+esc(m.opponentDisplayName)+(m.opponentTeamNameSnapshot?' ('+esc(m.opponentTeamNameSnapshot)+')':'')+'</span>'
     + '<span class="score">'+esc(scoreText(sets))+'</span></div>'
-    + (m.matchNote?'<div class="sub muted" style="margin-top:6px">'+esc(m.matchNote)+'</div>':'')
+    + (m.matchNote?'<div class="sub muted" style="margin-top:4px">'+esc(m.matchNote)+'</div>':'')
     + '<div class="tl-foot"><button type="button" onclick="event.stopPropagation(); showMatchScoreSheet(\''+esc(m.matchId)+'\')">☰ '+esc(t('scoresheet'))+'</button> '
     + '<button type="button" onclick="event.stopPropagation(); goAiImage()">↗ '+esc(t('img_prompt_btn'))+'</button></div>'
     + '</div>';
@@ -3848,7 +3889,7 @@ function gearHTML(){
     const gr = gearRates.find(function(r){ return r.gearId===g.gearId; });
     const photo = gearPhotoGet(g.gearId);
     const gripAt = gearGripAt(g);
-    h += '<div class="card" style="margin-bottom:8px"><div class="top" style="display:flex;justify-content:space-between;gap:8px">'
+    h += '<div class="card" style="margin-bottom:6px"><div class="top" style="display:flex;justify-content:space-between;gap:8px">'
       + (photo?'<img src="'+photo+'" style="width:64px;height:64px;object-fit:cover;border-radius:12px;flex:0 0 auto">':'')
       + '<div style="flex:1;min-width:0"><b>'+esc(g.racketName)+'</b><div class="sub muted">'+esc(g.stringName||'')+' ・ '+esc(String(g.tensionValue==null?'':g.tensionValue))+' '+esc(g.tensionUnit||'')+'</div>'
       + '<div class="sub muted">'+esc(t('last_maintenance'))+': '+esc(fmtDateTime(g.lastMaintenanceAt))+'</div>'
@@ -3863,8 +3904,8 @@ function gearHTML(){
   h += '<div id="gear-form-slot"></div>';
   return h;
 }
-/* 用具の写真（端末内のみ。選手写真と同じ localStorage 方式） */
-function gearPhotoGet(gearId){ try{ return localStorage.getItem('ss-gear-photo-'+gearId); }catch(e){ return null; } }
+/* 用具の写真（IndexedDB _photos。端末内のみ・同期なし） */
+function gearPhotoGet(gearId){ return photoURL('gear:'+gearId); }
 /* 用具のグリップ最終交換日（Android版と同じく customItemsJson の __grip_maintenance_at__） */
 function gearGripAt(g){
   try{
@@ -3923,7 +3964,13 @@ function showGearForm(gearId){
     const f = pi.files && pi.files[0];
     if (!f) return;
     const r = new FileReader();
-    r.onload = function(){ state.gearForm.photo = r.result; const box=$('#g-photo-box'); if(box) box.innerHTML='<img src="'+r.result+'"><span class="plus">＋</span>'; };
+    r.onload = function(){
+      downscaleImageDataURL(r.result, 800, 0, function(dataUrl){
+        if (!dataUrl) return;
+        state.gearForm.photo = dataUrl;
+        const box=$('#g-photo-box'); if(box) box.innerHTML='<img src="'+dataUrl+'"><span class="plus">＋</span>';
+      });
+    };
     r.readAsDataURL(f);
   });
   $('#g-racket').focus();
@@ -4014,13 +4061,14 @@ async function saveGear(gearId){
     createdAt:prev?prev.createdAt:now, updatedAt:now, isDeleted:false
   };
   await idbPut('gears', g);
-  if (f.photo){ try{ localStorage.setItem('ss-gear-photo-'+g.gearId, f.photo); }catch(e){} }
+  if (f.photo) await photoPut('gear:'+g.gearId, f.photo);
   await loadAll(); toast(t('saved')); render();
 }
 async function deleteGear(gearId){
   if(!confirm(t('confirm_delete'))) return;
   const g = state.gears.find(function(x){return x.gearId===gearId;});
   if(g){ g.isDeleted=true; g.updatedAt=Date.now(); await idbPut('gears', g); }
+  await photoDelete('gear:'+gearId);
   await loadAll(); toast(t('deleted')); render();
 }
 async function recordMaintenance(gearId){
@@ -4412,7 +4460,8 @@ function settingsHTML(){
     + '<button type="button" class="primary" onclick="syncNowUI()">'+esc(t('sync_now'))+'</button>'
     + '<button type="button" onclick="syncRestoreUI()">'+esc(t('sync_restore'))+'</button></div>'
     + '<div id="sync-status" style="margin-top:10px">'+syncStatusHTML()+'</div>'
-    + '<div class="kv"><span>'+esc(t('storage'))+'</span><b>'+esc(state.persisted===true?t('storage_persisted'):state.persisted===false?t('storage_not_persisted'):'—')+'</b></div></div>';
+    + '<div class="kv"><span>'+esc(t('storage'))+'</span><b>'+esc(state.persisted===true?t('storage_persisted'):state.persisted===false?t('storage_not_persisted'):'—')+'</b></div>'
+    + '<p class="muted small">'+esc(t('sync_photo_note'))+'</p></div>';
   h += '<div class="card" id="set-venue"><h2>'+esc(t('venue_list'))+'</h2>'+venueListHTML()
     + '<div style="height:8px"></div><button type="button" class="primary block" onclick="showVenueForm(null)">＋ '+esc(t('add_venue'))+'</button>'
     + '<div id="venue-form-slot"></div></div>';
@@ -4433,7 +4482,7 @@ function settingsHTML(){
       ? '<button type="button" class="danger block" onclick="deleteDemo()">'+esc(t('demo_delete'))+'</button>'
       : '<button type="button" class="block" onclick="loadDemo()">'+esc(t('demo_load'))+'</button>')
     + '</div>';
-  h += '<div class="card"><p class="muted small">SmashStats Web 2.5.1 — 文字サイズ縮小'+jaEn('',' (SUPPORT_NOTE UI)')+'<br>DB: smashstats-web'+jaEn('（IndexedDB）',' (IndexedDB)')+jaEn('・ schema v16相当',' · schema v16 equivalent')+'</p></div>';
+  h += '<div class="card"><p class="muted small">SmashStats Web 2.6.0 — 写真保存改善・高密度レイアウト'+jaEn('',' (SUPPORT_NOTE UI)')+'<br>DB: smashstats-web'+jaEn('（IndexedDB）',' (IndexedDB)')+jaEn('・ schema v16相当',' · schema v16 equivalent')+'</p></div>';
   return h;
 }
 function setLang(l){ LANG=l; localStorage.setItem('ss-lang', l); render(); }
@@ -4450,7 +4499,8 @@ async function exportJSON(){
     opponentProfiles: await idbAll('opponent_profiles'),
     opponentCustomItems: await idbAll('opponent_custom_items'),
     focuses: await idbAll('focuses'),
-    notes: await idbAll('notes')
+    notes: await idbAll('notes'),
+    photos: await idbAll('_photos')
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const a = document.createElement('a');
@@ -4474,6 +4524,12 @@ async function importJSONFile(file){
       for (const row of arr){
         if (k==='matches') deriveMatch(row);
         await idbPut(map[k], row);
+      }
+    }
+    // 写真：_photos へ復元する（outbox には積まない）。写真なしの旧バックアップはそのまま通る。
+    if (Array.isArray(data.photos)){
+      for (const ph of data.photos){
+        if (ph && ph.photoId && ph.dataUrl) await idbRawPut('_photos', {photoId:ph.photoId, dataUrl:ph.dataUrl, updatedAt:ph.updatedAt||Date.now()});
       }
     }
     await loadAll(); toast(t('imported')); render();
