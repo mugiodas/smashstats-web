@@ -224,7 +224,22 @@ const I18N = {
     language:'言語', theme:'テーマ', theme_standard:'スタンダード', theme_mint:'ミントペール',
     plan:'プラン', free_plan:'無料プラン', pro_plan:'Pro（準備中）',
     pro_soon:'Pro（買い切り）は Phase 4 で提供予定です。今は無料プランの範囲で使えます。',
-    data_location:'データの置き場所', data_location_note:'Phase 2 で自分のスプレッドシートへの接続を追加予定です。今はこの端末内にだけ保存されます。',
+    data_location:'データの置き場所', data_location_note:'試合データはこの端末と、自分のスプレッドシートの両方に保存します。同期は手動または起動時に行います。',
+    sync_bridge_url:'ブリッジURL（Apps Script）', sync_sheet_url:'スプレッドシートのURL', sync_secret:'合言葉',
+    sync_secret_ph:'自分で決めた合言葉（8文字以上）を入力', sync_secret_set:'設定済み（変更時のみ再入力）',
+    sync_secret_hint:'合言葉はこのスプレッドシートの鍵です。初めて接続するときに決めたものが使われます。忘れると同期できなくなるので控えておいてください。この端末内にだけ保存し、書き出しや同期の対象にはしません。スプレッドシートはブリッジ用アカウントと編集者として共有しておく必要があります。',
+    sync_test:'接続テスト', sync_now:'今すぐ同期', sync_restore:'復元する',
+    sync_last:'最終同期', sync_conflicts:'競合（シート側が勝った件数）',
+    sync_need_config:'ブリッジURL・スプレッドシート・合言葉を入力して保存してください。',
+    sync_bad_url:'ブリッジURLは https:// から始まる Apps Script の /exec URL を入力してください。',
+    sync_bad_sheet:'スプレッドシートのURLまたはIDが読み取れませんでした。',
+    sync_need_secret:'合言葉を入力してください。',
+    sync_secret_short:'合言葉は8文字以上で入力してください。',
+    sync_offline:'オフラインです。オンラインになってから再度お試しください。',
+    sync_syncing:'同期中…', sync_done:'同期しました。', sync_test_ok:'接続できました。シート構成と schemaVersion を確認しました。',
+    sync_restore_confirm:'スプレッドシートから復元します。端末内のデータは更新日時が新しいものだけ残り、シート側が新しい行はシートの内容で更新されます。よろしいですか？',
+    sync_restored:'復元しました。', sync_conflict_note:'競合がありました。シート側の新しい内容を採用しました。',
+    sync_push_failed:'送信に失敗しました。未同期の変更は端末内に残っています。',
     export_json:'JSONで全量書き出し', import_json:'JSONで取り込み（Android版と同じ形式）',
     demo_load:'デモデータを入れる', demo_delete:'デモデータを消す',
     demo_note:'デモデータはAndroid版バックアップのサンプル（架空の選手）です。',
@@ -241,7 +256,7 @@ const I18N = {
     game_over:'ゲーム終了', server:'サーバー', need_player:'先に選手を登録してください。',
     need_opponent:'対戦相手を入力してください。', need_date:'試合日を入力してください。',
     export_done:'書き出しファイルを作成しました。', import_error:'取り込みに失敗しました。JSONファイルを確認してください。',
-    outbox_pending:'未同期の変更', sync_pending_note:'Phase 2 の同期でスプレッドシートへ送られます。',
+    outbox_pending:'未同期の変更', sync_pending_note:'「設定 → データの置き場所」から同期すると、スプレッドシートへ送られます。',
     notes:'ノート', add_note:'ノートを追加', note_content:'内容',
     venue:'会場', night_match:'ナイトマッチ', weather:'天候', ball:'ボール / シャトル',
     all:'すべて', filter_win:'勝ちのみ', filter_loss:'負けのみ',
@@ -272,7 +287,22 @@ const I18N = {
     language:'Language', theme:'Theme', theme_standard:'Standard', theme_mint:'Mint Pale',
     plan:'Plan', free_plan:'Free plan', pro_plan:'Pro (coming soon)',
     pro_soon:'Pro (one-time purchase) will be available in Phase 4. Free plan limits apply for now.',
-    data_location:'Where data lives', data_location_note:'Connecting your own spreadsheet arrives in Phase 2. For now data is stored only on this device.',
+    data_location:'Where data lives', data_location_note:'Match data is kept on this device and in your own spreadsheet. Sync runs manually or at startup.',
+    sync_bridge_url:'Bridge URL (Apps Script)', sync_sheet_url:'Spreadsheet URL', sync_secret:'Passphrase',
+    sync_secret_ph:'Choose a passphrase (8+ characters)', sync_secret_set:'Set (re-enter only to change)',
+    sync_secret_hint:'The passphrase is the key to this spreadsheet. The one you choose on first connection is used from then on. Keep it somewhere safe; without it syncing stops. It is stored only on this device and is never exported or synced. Share the spreadsheet with the bridge account (editor).',
+    sync_test:'Test connection', sync_now:'Sync now', sync_restore:'Restore',
+    sync_last:'Last sync', sync_conflicts:'Conflicts (sheet won)',
+    sync_need_config:'Enter and save the bridge URL, spreadsheet and secret first.',
+    sync_bad_url:'Enter the Apps Script /exec URL starting with https://.',
+    sync_bad_sheet:'Could not read the spreadsheet URL or ID.',
+    sync_need_secret:'Please enter the passphrase.',
+    sync_secret_short:'The passphrase must be at least 8 characters.',
+    sync_offline:'You are offline. Try again when online.',
+    sync_syncing:'Syncing…', sync_done:'Sync complete.', sync_test_ok:'Connected. Sheet structure and schemaVersion confirmed.',
+    sync_restore_confirm:'Restore from the spreadsheet? Local rows win only when newer; newer sheet rows will overwrite local ones. Continue?',
+    sync_restored:'Restored.', sync_conflict_note:'There were conflicts. The newer sheet content was kept.',
+    sync_push_failed:'Upload failed. Pending changes remain on this device.',
     export_json:'Export all as JSON', import_json:'Import JSON (same format as Android)',
     demo_load:'Load demo data', demo_delete:'Delete demo data',
     demo_note:'Demo data is the sample from the Android backup (fictional players).',
@@ -289,7 +319,7 @@ const I18N = {
     game_over:'Game over', server:'Server', need_player:'Please add a player first.',
     need_opponent:'Please enter the opponent.', need_date:'Please enter the date.',
     export_done:'Export file created.', import_error:'Import failed. Please check the JSON file.',
-    outbox_pending:'Pending changes', sync_pending_note:'These will be sent to your spreadsheet by Phase 2 sync.',
+    outbox_pending:'Pending changes', sync_pending_note:'Sync from Settings → Where data lives to send them to your spreadsheet.',
     notes:'Notes', add_note:'Add note', note_content:'Content',
     venue:'Venue', night_match:'Night match', weather:'Weather', ball:'Ball / shuttle',
     all:'All', filter_win:'Wins only', filter_loss:'Losses only',
@@ -562,12 +592,405 @@ function idbClear(store){
 function metaGet(key){ return idbGet('_meta', key).then(function(r){ return r?r.value:null; }); }
 function metaSet(key, value){ return idbPut('_meta', {key:key, value:value}); }
 
+/* _outbox を経由しない生の読み書き（同期エンジン用）。
+   サーバーから受け取った行をそのまま入れる・outboxの掃除に使う。
+   idbPut/idbDelete は使うと新たに outbox へ積んでしまうため、同期では使わない。 */
+function idbRawPut(store, value){
+  return openDB().then(function(db){
+    return new Promise(function(resolve, reject){
+      const tx = db.transaction(store, 'readwrite');
+      const req = tx.objectStore(store).put(value);
+      req.onsuccess = function(){ resolve(req.result); };
+      req.onerror = function(){ reject(req.error); };
+      tx.onerror = function(){ reject(tx.error); };
+    });
+  });
+}
+function idbRawDelete(store, key){
+  return openDB().then(function(db){
+    return new Promise(function(resolve, reject){
+      const tx = db.transaction(store, 'readwrite');
+      const req = tx.objectStore(store).delete(key);
+      req.onsuccess = function(){ resolve(true); };
+      req.onerror = function(){ reject(req.error); };
+      tx.onerror = function(){ reject(tx.error); };
+    });
+  });
+}
+
+/* =====================================================================
+   同期エンジン（Phase 2: 共通Apps Scriptブリッジ）
+   書き込みは常に IndexedDB が先。_outbox に溜めた変更を push し、
+   pull でシート側の行を updatedAt 比較で取り込む。競合は最終書き込み勝ち。
+   設計書 DESIGN.md §5・付録A、Code.gs（apps-script/）と対になる実装。
+   ===================================================================== */
+const SYNC_TABLES = ['players','matches','gears','gear_maintenances','venues','opponent_profiles','opponent_custom_items','focuses','notes'];
+const SYNC_ID_FIELD = {players:'playerId', matches:'matchId', gears:'gearId', gear_maintenances:'maintenanceId', venues:'id', opponent_profiles:'opponentId', opponent_custom_items:'id', focuses:'focusId', notes:'noteId'};
+const SYNC_HAS_UPDATED_AT = {players:true, matches:true, gears:true, gear_maintenances:false, venues:true, opponent_profiles:true, opponent_custom_items:false, focuses:true, notes:true};
+const SYNC_PUSH_CHUNK = 300; // 1回の push に入れる行数
+const SYNC_PULL_LIMIT = 2000; // 1回の pull で受け取る行数（テーブルごと）
+
+function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+function extractSpreadsheetId(input){
+  if (!input) return null;
+  const s = String(input).trim();
+  const m = s.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if (m) return m[1];
+  if (/^[a-zA-Z0-9-_]{20,}$/.test(s)) return s;
+  return null;
+}
+
+/* ブリッジURLは https が原則。http はローカル検証用（127.0.0.1 / localhost）のみ許可。 */
+function isBridgeUrlOk(url){
+  if (!url) return false;
+  if (url.indexOf('https://')===0) return true;
+  return url.indexOf('http://127.0.0.1')===0 || url.indexOf('http://localhost')===0;
+}
+function syncConfigured(){
+  const s = state.sync;
+  return !!(s.bridgeUrl && isBridgeUrlOk(s.bridgeUrl) && s.spreadsheetId && s.secret);
+}
+
+/* 設定欄の入力値を読み、_meta へ保存する。空の合言葉欄は「現状維持」とする。 */
+async function syncSaveSettingsUI(quiet){
+  const bridgeEl = document.getElementById('sync-bridge');
+  const sheetEl = document.getElementById('sync-sheet');
+  const secretEl = document.getElementById('sync-secret');
+  if (!bridgeEl || !sheetEl || !secretEl) return false;
+  const bridgeUrl = bridgeEl.value.trim();
+  const sheetUrl = sheetEl.value.trim();
+  const secretInput = secretEl.value;
+  if (!bridgeUrl || !isBridgeUrlOk(bridgeUrl)){
+    updateSyncStatus(t('sync_bad_url')); return false;
+  }
+  const sheetId = extractSpreadsheetId(sheetUrl);
+  if (!sheetId){
+    updateSyncStatus(t('sync_bad_sheet')); return false;
+  }
+  const secret = secretInput ? secretInput : state.sync.secret;
+  if (!secret){
+    updateSyncStatus(t('sync_need_secret')); return false;
+  }
+  if (secret.length < 8){
+    updateSyncStatus(t('sync_secret_short')); return false;
+  }
+  state.sync.bridgeUrl = bridgeUrl;
+  state.sync.spreadsheetUrl = sheetUrl;
+  state.sync.spreadsheetId = sheetId;
+  state.sync.secret = secret;
+  await metaSet('syncBridgeUrl', bridgeUrl);
+  await metaSet('syncSpreadsheetUrl', sheetUrl);
+  await metaSet('syncSpreadsheetId', sheetId);
+  await metaSet('syncSecret', secret);
+  secretEl.value = '';
+  secretEl.placeholder = t('sync_secret_set');
+  if (!quiet){ toast(t('saved')); updateSyncStatus(''); }
+  return true;
+}
+
+/* ブリッジ呼び出し。Apps Script は Content-Type: text/plain で送ると
+   プリフライト無しで呼べる。応答は常に JSON {ok:true/false,...}。 */
+async function syncCall(action, body){
+  const payload = Object.assign({action:action, secret:state.sync.secret}, body||{});
+  let res;
+  try {
+    res = await fetch(state.sync.bridgeUrl, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+  } catch (e){
+    const err = new Error('network_error');
+    err.isNetwork = true;
+    throw err;
+  }
+  let data = null;
+  try { data = await res.json(); } catch (e){ throw new Error('bad_response'); }
+  if (!data || data.ok !== true){
+    const err = new Error((data && data.message) || (data && data.error) || 'bridge_error');
+    err.data = data;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
+/* 429 / LOCKED 時は1分待って指数バックオフで再試行する（最大3回）。 */
+async function syncCallWithRetry(action, body){
+  let delay = 60000;
+  for (let attempt=0; attempt<4; attempt++){
+    try {
+      return await syncCall(action, body);
+    } catch (err){
+      const code = (err && err.data && err.data.error) || (err && err.message) || '';
+      const isRate = code==='RATE_LIMIT' || code==='LOCKED' || err.status===429;
+      if (!isRate || attempt===3) throw err;
+      updateSyncStatus('制限中のため ' + Math.round(delay/1000) + '秒後に再試行します…');
+      await sleep(delay);
+      delay *= 2;
+    }
+  }
+  throw new Error('retry_exhausted');
+}
+
+/* _outbox をテーブルごとにまとめて push する。成功した分だけ outbox から消す。 */
+async function syncPush(){
+  const entries = (await idbAll('_outbox')).sort(function(a,b){ return a.createdAt-b.createdAt; });
+  if (!entries.length) return {pushed:0, conflicts:[]};
+  const byTable = {};
+  entries.forEach(function(e){ (byTable[e.table] = byTable[e.table] || []).push(e); });
+  const deviceId = await metaGet('deviceId');
+  let pushed = 0;
+  const conflicts = [];
+  for (const table of Object.keys(byTable)){
+    const list = byTable[table];
+    const rows = [];
+    const rowEntryIds = [];
+    for (const e of list){
+      if (e.op === 'delete'){
+        // 論理削除の墓標行（isDeleted=true）。updatedAt には削除時刻を使う。
+        const idField = SYNC_ID_FIELD[table];
+        const row = {};
+        row[idField] = (table==='venues') ? Number(e.rowId) : e.rowId;
+        row.isDeleted = true;
+        row.updatedAt = e.createdAt;
+        rows.push(row);
+        rowEntryIds.push(e.outboxId);
+      } else {
+        try {
+          rows.push(JSON.parse(e.payload));
+          rowEntryIds.push(e.outboxId);
+        } catch (err){
+          await idbRawDelete('_outbox', e.outboxId); // 壊れたエントリは捨てる
+        }
+      }
+    }
+    for (let i=0; i<rows.length; i+=SYNC_PUSH_CHUNK){
+      const chunk = rows.slice(i, i+SYNC_PUSH_CHUNK);
+      const chunkIds = rowEntryIds.slice(i, i+SYNC_PUSH_CHUNK);
+      const body = {spreadsheetId: state.sync.spreadsheetId, deviceId: deviceId, rows: {}};
+      body.rows[table] = chunk;
+      let data;
+      try {
+        data = await syncCallWithRetry('push', body);
+      } catch (err){
+        for (const id of chunkIds){
+          const en = await idbGet('_outbox', id);
+          if (en){ en.tryCount = (en.tryCount||0)+1; en.lastError = String((err && err.message) || err); await idbRawPut('_outbox', en); }
+        }
+        throw err;
+      }
+      // サーバー側の処理上限で残りが出た場合は、続きをそのまま再送する。
+      let remaining = data.remaining && data.remaining[table];
+      let guard = 0;
+      while (remaining && remaining.length && guard++ < 20){
+        const body2 = {spreadsheetId: state.sync.spreadsheetId, deviceId: deviceId, rows: {}};
+        body2.rows[table] = remaining;
+        const d2 = await syncCallWithRetry('push', body2);
+        if (d2.conflicts) conflicts.push.apply(conflicts, d2.conflicts);
+        pushed += (d2.applied && d2.applied[table]) || 0;
+        remaining = d2.remaining && d2.remaining[table];
+      }
+      if (data.conflicts) conflicts.push.apply(conflicts, data.conflicts);
+      pushed += (data.applied && data.applied[table]) || 0;
+      // 反映済み（競合でシート側が勝った行を含む）は outbox から消す。
+      // 競合した行のローカル側は、このあとの pull でシートの内容に更新される。
+      for (const id of chunkIds) await idbRawDelete('_outbox', id);
+    }
+  }
+  return {pushed: pushed, conflicts: conflicts};
+}
+
+/* pull で受け取った行を、updatedAt 比較で IndexedDB へ取り込む。 */
+function normalizePulledRow(table, srv){
+  const row = Object.assign({}, srv);
+  // JSON文字列の列が万一オブジェクトで来た場合は文字列化する。
+  ['scoresJson','opponentMembersJson','customItemsJson','photoUrisJson','strongShotsJson','weakShotsJson','strongCoursesJson','weakCoursesJson'].forEach(function(k){
+    if (row[k] !== undefined && row[k] !== null && typeof row[k] !== 'string') row[k] = JSON.stringify(row[k]);
+  });
+  if (table==='matches' && (row.scoresJson === undefined || row.scoresJson === null)) row.scoresJson = '[]';
+  if (row.isDeleted === undefined || row.isDeleted === null) row.isDeleted = false;
+  return row;
+}
+
+async function syncPull(){
+  let offset = {};
+  let inserted = 0, updated = 0, keptLocal = 0;
+  for (let round=0; round<50; round++){
+    const data = await syncCallWithRetry('pull', {spreadsheetId: state.sync.spreadsheetId, offset: offset, limit: SYNC_PULL_LIMIT});
+    const rows = data.rows || {};
+    for (const table of SYNC_TABLES){
+      const list = rows[table] || [];
+      for (const srv of list){
+        const idField = SYNC_ID_FIELD[table];
+        const id = srv[idField];
+        if (id === undefined || id === null || id === '') continue;
+        const local = await idbGet(table, id);
+        if (!local){
+          await idbRawPut(table, normalizePulledRow(table, srv));
+          inserted++;
+        } else if (SYNC_HAS_UPDATED_AT[table]){
+          const sUp = Number(srv.updatedAt)||0, lUp = Number(local.updatedAt)||0;
+          if (sUp > lUp){
+            await idbRawPut(table, normalizePulledRow(table, srv));
+            updated++;
+          } else if (lUp > sUp){
+            keptLocal++;
+            // ローカルの方が新しいのに outbox に無ければ、次回 push できるよう積む。
+            const pending = (await idbAll('_outbox')).some(function(e){ return e.table===table && String(e.rowId)===String(id); });
+            if (!pending) await idbPut(table, local);
+          }
+        } else {
+          // updatedAt が無いテーブル（張り替え履歴・対戦相手カスタム項目）はローカル優先。
+          keptLocal++;
+        }
+      }
+    }
+    const hasMore = data.hasMore || {};
+    const next = data.nextOffset || {};
+    let more = false;
+    offset = {};
+    for (const table of SYNC_TABLES){
+      if (hasMore[table]){ more = true; offset[table] = next[table] || 0; }
+    }
+    if (!more) break;
+    if (round===49) throw new Error('pull_too_many_rounds');
+  }
+  return {inserted: inserted, updated: updated, keptLocal: keptLocal, serverTime: Date.now()};
+}
+
+/* 同期の現在状態を #sync-status へ描く（入力欄には触らない）。 */
+function syncStatusHTML(){
+  const s = state.sync;
+  let h = '';
+  if (s.statusText) h += '<div class="notice info" style="margin-bottom:8px">'+esc(s.statusText)+'</div>';
+  h += '<div class="kv"><span>'+esc(t('sync_last'))+'</span><b>'+(s.lastSyncAt?esc(fmtDateTime(s.lastSyncAt)):'—')+'</b></div>';
+  h += '<div class="kv"><span>'+esc(t('outbox_pending'))+'</span><b>'+state.outboxCount+'</b></div>';
+  if (s.conflictCount>0) h += '<div class="kv"><span>'+esc(t('sync_conflicts'))+'</span><b>'+s.conflictCount+'</b></div>';
+  if (s.lastError) h += '<div class="notice error" style="margin-top:8px">'+esc(s.lastError)+'</div>';
+  return h;
+}
+function updateSyncStatus(msg){
+  if (msg !== undefined) state.sync.statusText = msg;
+  const el = document.getElementById('sync-status');
+  if (el) el.innerHTML = syncStatusHTML();
+}
+
+/* 同期1回分（push → pull）。auto時は失敗しても画面を再描画しない。 */
+async function syncNow(opts){
+  opts = opts || {};
+  if (state.sync.syncing){ updateSyncStatus(t('sync_syncing')); return null; }
+  if (!syncConfigured()){
+    updateSyncStatus(t('sync_need_config'));
+    return null;
+  }
+  state.sync.syncing = true;
+  updateSyncStatus(t('sync_syncing'));
+  let pushRes = {pushed:0, conflicts:[]};
+  let pullRes = null;
+  let pushErr = null, pullErr = null;
+  try {
+    if (navigator.onLine === false) throw new Error('offline');
+    pushRes = await syncPush();
+  } catch (err){ pushErr = err; }
+  try {
+    pullRes = await syncPull();
+  } catch (err){ pullErr = err; }
+  state.sync.syncing = false;
+  const conflicts = pushRes.conflicts || [];
+  if (conflicts.length){
+    state.sync.conflictCount = (state.sync.conflictCount||0) + conflicts.length;
+    await metaSet('syncConflictCount', state.sync.conflictCount);
+  }
+  const firstErr = pushErr || pullErr;
+  if (!firstErr || pullRes){
+    // pull が成功した、または push が成功した場合は同期時刻を更新する。
+    state.sync.lastSyncAt = pullRes ? (pullRes.serverTime || Date.now()) : Date.now();
+    await metaSet('lastSyncAt', state.sync.lastSyncAt);
+  }
+  if (firstErr){
+    const msg = firstErr.message==='offline' ? t('sync_offline')
+      : firstErr.message==='network_error' ? t('sync_push_failed')
+      : (firstErr.data && firstErr.data.message) ? String(firstErr.data.message)
+      : t('sync_push_failed');
+    state.sync.lastError = msg;
+    await metaSet('syncLastError', msg);
+    state.sync.statusText = '';
+    updateSyncStatus();
+    if (!opts.silent) proNotice(msg);
+    await afterSyncRefresh(opts);
+    return {ok:false, error:msg, pushed:pushRes.pushed, conflicts:conflicts};
+  }
+  state.sync.lastError = null;
+  await metaSet('syncLastError', null);
+  state.sync.statusText = t('sync_done')
+    + (conflicts.length ? ' ' + t('sync_conflict_note') : '')
+    + '（送信 ' + pushRes.pushed + '件 / 新規 ' + (pullRes?pullRes.inserted:0) + '件 / 更新 ' + (pullRes?pullRes.updated:0) + '件）';
+  updateSyncStatus();
+  if (!opts.silent && !opts.auto) toast(t('sync_done'));
+  await afterSyncRefresh(opts);
+  return {ok:true, pushed:pushRes.pushed, pull:pullRes, conflicts:conflicts};
+}
+
+/* 同期後の画面更新。自動同期では、同期設定の入力欄にフォーカスがある間は
+   再描画しない（入力中の文字が消えるのを防ぐ）。 */
+async function afterSyncRefresh(opts){
+  if (opts.auto){
+    const ae = document.activeElement;
+    const typingSync = ae && (ae.id==='sync-bridge' || ae.id==='sync-sheet' || ae.id==='sync-secret');
+    if (typingSync) return;
+  }
+  await loadAll();
+  render();
+  updateSyncStatus();
+}
+
+async function syncTestUI(){
+  if (!await syncSaveSettingsUI(true)) return;
+  updateSyncStatus(t('sync_syncing'));
+  try {
+    if (navigator.onLine === false) throw new Error('offline');
+    const data = await syncCallWithRetry('init', {spreadsheetId: state.sync.spreadsheetId});
+    state.sync.lastError = null;
+    await metaSet('syncLastError', null);
+    const made = (data.created||[]).join(', ') || '—';
+    state.sync.statusText = t('sync_test_ok') + ' schemaVersion=' + data.schemaVersion + ' / 新規作成: ' + made;
+    updateSyncStatus();
+  } catch (err){
+    const msg = err.message==='offline' ? t('sync_offline')
+      : (err.data && err.data.message) ? String(err.data.message)
+      : t('sync_push_failed');
+    state.sync.lastError = msg;
+    await metaSet('syncLastError', msg);
+    state.sync.statusText = '';
+    updateSyncStatus();
+  }
+}
+
+async function syncNowUI(){
+  if (!await syncSaveSettingsUI(true)) return;
+  await syncNow({});
+}
+
+async function syncRestoreUI(){
+  if (!await syncSaveSettingsUI(true)) return;
+  if (!confirm(t('sync_restore_confirm'))) return;
+  const res = await syncNow({restore:true});
+  if (res && res.ok){
+    state.sync.statusText = t('sync_restored') + '（新規 ' + (res.pull?res.pull.inserted:0) + '件 / 更新 ' + (res.pull?res.pull.updated:0) + '件）';
+    updateSyncStatus();
+  }
+}
+
+
 /* ---------------- 状態 ---------------- */
 const state = {
   tab:'home', view:'tab', // view: 'tab' | 'settings'
   currentPlayerId: localStorage.getItem('ss-player') || null,
   players:[], matches:[], gears:[], maintenances:[], focuses:[], notes:[],
   outboxCount:0, isPro:false, persisted:null, demo:false,
+  sync:{bridgeUrl:'', spreadsheetUrl:'', spreadsheetId:'', secret:'', lastSyncAt:null, lastError:null, conflictCount:0, syncing:false, statusText:''},
   search:'', filter:'all',
   editingMatchId:null, editingGearId:null,
   draft:null, // 試合フォームの下書き（メモリ上のみ）
@@ -585,6 +1008,14 @@ async function loadAll(){
   state.outboxCount = (await idbAll('_outbox')).length;
   state.isPro = (await metaGet('isPro'))===true;
   state.demo = (await metaGet('demo'))===true;
+  // 同期設定（合言葉を含む。_meta は書き出し・同期の対象外）
+  state.sync.bridgeUrl = (await metaGet('syncBridgeUrl'))||'';
+  state.sync.spreadsheetUrl = (await metaGet('syncSpreadsheetUrl'))||'';
+  state.sync.spreadsheetId = (await metaGet('syncSpreadsheetId'))||'';
+  state.sync.secret = (await metaGet('syncSecret'))||'';
+  state.sync.lastSyncAt = await metaGet('lastSyncAt');
+  state.sync.lastError = await metaGet('syncLastError');
+  state.sync.conflictCount = (await metaGet('syncConflictCount'))||0;
   if (!state.currentPlayerId || !state.players.some(function(x){return x.playerId===state.currentPlayerId;})){
     state.currentPlayerId = state.players.length?state.players[0].playerId:null;
     if (state.currentPlayerId) localStorage.setItem('ss-player', state.currentPlayerId);
@@ -1173,8 +1604,21 @@ function settingsHTML(){
     + '<button type="button" class="'+(THEME==='standard'?'primary':'')+'" onclick="setTheme(\'standard\')">'+esc(t('theme_standard'))+'</button>'
     + '<button type="button" class="'+(THEME==='mint_pale'?'primary':'')+'" onclick="setTheme(\'mint_pale\')">'+esc(t('theme_mint'))+'</button></div></div>';
   h += '<div class="card"><h2>'+esc(t('data_location'))+'</h2><p class="muted">'+esc(t('data_location_note'))+'</p>'
-    + '<div class="kv"><span>'+esc(t('storage'))+'</span><b>'+esc(state.persisted===true?t('storage_persisted'):state.persisted===false?t('storage_not_persisted'):'—')+'</b></div>'
-    + '<div class="kv"><span>'+esc(t('outbox_pending'))+'</span><b>'+state.outboxCount+'</b></div></div>';
+    + '<label>'+esc(t('sync_bridge_url'))+'</label>'
+    + '<input id="sync-bridge" type="url" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec" value="'+esc(state.sync.bridgeUrl)+'">'
+    + '<label>'+esc(t('sync_sheet_url'))+'</label>'
+    + '<input id="sync-sheet" type="text" inputmode="url" autocomplete="off" placeholder="https://docs.google.com/spreadsheets/d/…" value="'+esc(state.sync.spreadsheetUrl)+'">'
+    + '<label>'+esc(t('sync_secret'))+'</label>'
+    + '<input id="sync-secret" type="password" autocomplete="off" placeholder="'+esc(state.sync.secret?t('sync_secret_set'):t('sync_secret_ph'))+'">'
+    + '<p class="muted small">'+esc(t('sync_secret_hint'))+'</p>'
+    + '<div style="height:8px"></div><div class="row">'
+    + '<button type="button" class="primary" onclick="syncSaveSettingsUI()">'+esc(t('save'))+'</button>'
+    + '<button type="button" onclick="syncTestUI()">'+esc(t('sync_test'))+'</button></div>'
+    + '<div style="height:8px"></div><div class="row">'
+    + '<button type="button" class="primary" onclick="syncNowUI()">'+esc(t('sync_now'))+'</button>'
+    + '<button type="button" onclick="syncRestoreUI()">'+esc(t('sync_restore'))+'</button></div>'
+    + '<div id="sync-status" style="margin-top:10px">'+syncStatusHTML()+'</div>'
+    + '<div class="kv"><span>'+esc(t('storage'))+'</span><b>'+esc(state.persisted===true?t('storage_persisted'):state.persisted===false?t('storage_not_persisted'):'—')+'</b></div></div>';
   h += '<div class="card"><h2>JSON</h2>'
     + '<button type="button" class="block" onclick="exportJSON()">'+esc(t('export_json'))+'</button>'
     + '<div style="height:8px"></div>'
@@ -1185,7 +1629,7 @@ function settingsHTML(){
       ? '<button type="button" class="danger block" onclick="deleteDemo()">'+esc(t('demo_delete'))+'</button>'
       : '<button type="button" class="block" onclick="loadDemo()">'+esc(t('demo_load'))+'</button>')
     + '</div>';
-  h += '<div class="card"><p class="muted small">SmashStats Web — Phase 1<br>DB: smashstats-web（IndexedDB）・ schema v16相当<br>Phase 2: スプレッドシート同期 / Phase 4: Pro（買い切り）</p></div>';
+  h += '<div class="card"><p class="muted small">SmashStats Web — Phase 2（スプレッドシート同期）<br>DB: smashstats-web（IndexedDB）・ schema v16相当<br>Phase 4: Pro（買い切り）</p></div>';
   return h;
 }
 function setLang(l){ LANG=l; localStorage.setItem('ss-lang', l); render(); }
@@ -1308,6 +1752,10 @@ async function init(){
   await metaSet('schemaVersion', 16);
   if (!await metaGet('deviceId')) await metaSet('deviceId', uuid());
   render();
+  // 起動時の自動同期（設定済み・オンラインのときだけ。失敗しても黙って残す）。
+  if (syncConfigured() && navigator.onLine !== false){
+    syncNow({auto:true, silent:true}).catch(function(){ /* 状態は設定画面に残る */ });
+  }
   if ('serviceWorker' in navigator && (location.protocol==='http:' || location.protocol==='https:')){
     navigator.serviceWorker.register('sw.js').catch(function(){ /* オフライン時は無視 */ });
   }
