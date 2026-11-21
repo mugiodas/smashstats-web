@@ -236,7 +236,9 @@ const I18N = {
     sync_need_secret:'合言葉を入力してください。',
     sync_secret_short:'合言葉は8文字以上で入力してください。',
     sync_offline:'オフラインです。オンラインになってから再度お試しください。',
-    sync_syncing:'同期中…', sync_done:'同期しました。', sync_test_ok:'接続できました。シート構成と schemaVersion を確認しました。',
+    sync_syncing:'同期中…', sync_phase_push:'送信中…', sync_phase_pull:'受信中…',
+    sync_timeout:'ブリッジからの応答がありませんでした。時間をおいて再度お試しください。',
+    sync_done:'同期しました。', sync_test_ok:'接続できました。シート構成と schemaVersion を確認しました。',
     sync_restore_confirm:'スプレッドシートから復元します。端末内のデータは更新日時が新しいものだけ残り、シート側が新しい行はシートの内容で更新されます。よろしいですか？',
     sync_restored:'復元しました。', sync_conflict_note:'競合がありました。シート側の新しい内容を採用しました。',
     sync_push_failed:'送信に失敗しました。未同期の変更は端末内に残っています。',
@@ -299,7 +301,9 @@ const I18N = {
     sync_need_secret:'Please enter the passphrase.',
     sync_secret_short:'The passphrase must be at least 8 characters.',
     sync_offline:'You are offline. Try again when online.',
-    sync_syncing:'Syncing…', sync_done:'Sync complete.', sync_test_ok:'Connected. Sheet structure and schemaVersion confirmed.',
+    sync_syncing:'Syncing…', sync_phase_push:'Sending…', sync_phase_pull:'Receiving…',
+    sync_timeout:'No response from the bridge. Please wait a while and try again.',
+    sync_done:'Sync complete.', sync_test_ok:'Connected. Sheet structure and schemaVersion confirmed.',
     sync_restore_confirm:'Restore from the spreadsheet? Local rows win only when newer; newer sheet rows will overwrite local ones. Continue?',
     sync_restored:'Restored.', sync_conflict_note:'There were conflicts. The newer sheet content was kept.',
     sync_push_failed:'Upload failed. Pending changes remain on this device.',
@@ -629,6 +633,7 @@ const SYNC_ID_FIELD = {players:'playerId', matches:'matchId', gears:'gearId', ge
 const SYNC_HAS_UPDATED_AT = {players:true, matches:true, gears:true, gear_maintenances:false, venues:true, opponent_profiles:true, opponent_custom_items:false, focuses:true, notes:true};
 const SYNC_PUSH_CHUNK = 300; // 1回の push に入れる行数
 const SYNC_PULL_LIMIT = 2000; // 1回の pull で受け取る行数（テーブルごと）
+const SYNC_CALL_TIMEOUT_MS = 60000; // ブリッジ1回あたりの待ち上限。超えたら打ち切って分かりやすいエラーを出す。
 
 function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
 
@@ -690,20 +695,32 @@ async function syncSaveSettingsUI(quiet){
 }
 
 /* ブリッジ呼び出し。Apps Script は Content-Type: text/plain で送ると
-   プリフライト無しで呼べる。応答は常に JSON {ok:true/false,...}。 */
+   プリフライト無しで呼べる。応答は常に JSON {ok:true/false,...}。
+   60秒応答がなければ打ち切る（Apps Script のリダイレクト経由は遅く、
+   無期限に待つと「ボタンが効かない」ように見えるため）。 */
 async function syncCall(action, body){
   const payload = Object.assign({action:action, secret:state.sync.secret}, body||{});
   let res;
+  const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const timer = ctrl ? setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, SYNC_CALL_TIMEOUT_MS) : null;
   try {
     res = await fetch(state.sync.bridgeUrl, {
       method:'POST',
       headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: ctrl ? ctrl.signal : undefined
     });
   } catch (e){
+    if (e && e.name === 'AbortError'){
+      const err = new Error('timeout');
+      err.isTimeout = true;
+      throw err;
+    }
     const err = new Error('network_error');
     err.isNetwork = true;
     throw err;
+  } finally {
+    if (timer) clearTimeout(timer);
   }
   let data = null;
   try { data = await res.json(); } catch (e){ throw new Error('bad_response'); }
@@ -877,16 +894,39 @@ function updateSyncStatus(msg){
   if (el) el.innerHTML = syncStatusHTML();
 }
 
+/* 同期中の進捗表示（段階＋経過秒）。#sync-status だけを更新し、入力欄には触らない。 */
+let syncTickTimer = null;
+function syncElapsedText(){
+  const s = state.sync;
+  const sec = s.startedAt ? Math.floor((Date.now() - s.startedAt)/1000) : 0;
+  const phase = s.phase==='push' ? t('sync_phase_push')
+    : s.phase==='pull' ? t('sync_phase_pull') : t('sync_syncing');
+  return phase + (LANG==='ja' ? '（' + sec + '秒）' : ' (' + sec + 's)');
+}
+function syncTickStart(){
+  syncTickStop();
+  state.sync.startedAt = Date.now();
+  updateSyncStatus(syncElapsedText());
+  syncTickTimer = setInterval(function(){
+    if (!state.sync.syncing){ syncTickStop(); return; }
+    updateSyncStatus(syncElapsedText());
+  }, 1000);
+}
+function syncTickStop(){
+  if (syncTickTimer){ clearInterval(syncTickTimer); syncTickTimer = null; }
+}
+
 /* 同期1回分（push → pull）。auto時は失敗しても画面を再描画しない。 */
 async function syncNow(opts){
   opts = opts || {};
-  if (state.sync.syncing){ updateSyncStatus(t('sync_syncing')); return null; }
+  if (state.sync.syncing){ updateSyncStatus(state.sync.startedAt ? syncElapsedText() : t('sync_syncing')); return null; }
   if (!syncConfigured()){
     updateSyncStatus(t('sync_need_config'));
     return null;
   }
   state.sync.syncing = true;
-  updateSyncStatus(t('sync_syncing'));
+  state.sync.phase = 'push';
+  syncTickStart();
   let pushRes = {pushed:0, conflicts:[]};
   let pullRes = null;
   let pushErr = null, pullErr = null;
@@ -895,9 +935,13 @@ async function syncNow(opts){
     pushRes = await syncPush();
   } catch (err){ pushErr = err; }
   try {
+    state.sync.phase = 'pull';
+    updateSyncStatus(syncElapsedText());
     pullRes = await syncPull();
   } catch (err){ pullErr = err; }
   state.sync.syncing = false;
+  syncTickStop();
+  state.sync.phase = null;
   const conflicts = pushRes.conflicts || [];
   if (conflicts.length){
     state.sync.conflictCount = (state.sync.conflictCount||0) + conflicts.length;
@@ -911,6 +955,7 @@ async function syncNow(opts){
   }
   if (firstErr){
     const msg = firstErr.message==='offline' ? t('sync_offline')
+      : firstErr.message==='timeout' ? t('sync_timeout')
       : firstErr.message==='network_error' ? t('sync_push_failed')
       : (firstErr.data && firstErr.data.message) ? String(firstErr.data.message)
       : t('sync_push_failed');
@@ -959,6 +1004,7 @@ async function syncTestUI(){
     updateSyncStatus();
   } catch (err){
     const msg = err.message==='offline' ? t('sync_offline')
+      : err.message==='timeout' ? t('sync_timeout')
       : (err.data && err.data.message) ? String(err.data.message)
       : t('sync_push_failed');
     state.sync.lastError = msg;
@@ -990,7 +1036,7 @@ const state = {
   currentPlayerId: localStorage.getItem('ss-player') || null,
   players:[], matches:[], gears:[], maintenances:[], focuses:[], notes:[],
   outboxCount:0, isPro:false, persisted:null, demo:false,
-  sync:{bridgeUrl:'', spreadsheetUrl:'', spreadsheetId:'', secret:'', lastSyncAt:null, lastError:null, conflictCount:0, syncing:false, statusText:''},
+  sync:{bridgeUrl:'', spreadsheetUrl:'', spreadsheetId:'', secret:'', lastSyncAt:null, lastError:null, conflictCount:0, syncing:false, statusText:'', phase:null, startedAt:null},
   search:'', filter:'all',
   editingMatchId:null, editingGearId:null,
   draft:null, // 試合フォームの下書き（メモリ上のみ）
