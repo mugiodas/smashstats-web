@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C3E63">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SmashStats">
+<title>SmashStats</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+/* ---- theme variables ---- */
+:root{
+  --navy:#0C3E63; --navy-dark:#0F1E36; --gold:#FABE0F; --rose:#C2486B;
+  --bg:#F2F5F7; --surface:#FFFFFF; --surface-muted:#E9EEF1; --text:#16222B;
+  --muted:#5B6B76; --border:#D3DCE1; --accent:#0C3E63; --danger:#B3261E;
+  --win:#1B7A3D; --loss:#B3261E; --tabbar-h:64px;
+}
+[data-theme="mint_pale"]{
+  --navy:#2F6B5E; --navy-dark:#234F46; --gold:#E8B64C; --rose:#C2486B;
+  --bg:#EFF7F3; --surface:#FFFFFF; --surface-muted:#DCEDE6; --text:#1C2B27;
+  --muted:#5A7268; --border:#C4D8CE; --accent:#2F6B5E; --danger:#B3261E;
+  --win:#1B7A3D; --loss:#B3261E;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  background:var(--bg); color:var(--text); font-size:16px; line-height:1.5;
+  padding-top:env(safe-area-inset-top);
+}
+#app{max-width:480px; margin:0 auto; min-height:100vh; background:var(--bg);
+  padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 12px);}
+body.kb #tabbar{display:none;}
+body.kb #app{padding-bottom:12px;}
+header{
+  position:sticky; top:0; z-index:20;
+  background:var(--navy); color:#fff;
+  padding:10px 14px calc(10px + env(safe-area-inset-top)*0);
+  padding-top:calc(10px + env(safe-area-inset-top));
+  display:flex; align-items:center; gap:10px;
+}
+header h1{font-size:19px; margin:0; letter-spacing:.5px; white-space:nowrap;}
+header h1 .gold{color:var(--gold);}
+header .spacer{flex:1;}
+header select{
+  max-width:150px; font-size:15px; padding:8px 6px; border-radius:8px;
+  border:1px solid rgba(255,255,255,.4); background:rgba(255,255,255,.12); color:#fff;
+}
+header select option{color:#16222B;}
+.icon-btn{
+  min-width:44px; min-height:44px; border-radius:10px; border:1px solid rgba(255,255,255,.4);
+  background:rgba(255,255,255,.12); color:#fff; font-size:20px; cursor:pointer;
+}
+#install-banner{
+  display:none; margin:10px 12px 0; padding:12px; border-radius:12px;
+  background:#FFF7D6; border:1px solid var(--gold); color:#5A4300; font-size:14px;
+}
+#install-banner.show{display:block;}
+#install-banner button{margin-top:8px;}
+main{padding:12px;}
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:14px;
+  padding:14px; margin-bottom:12px;
+}
+.card h2{font-size:17px; margin:0 0 8px;}
+.card h3{font-size:15px; margin:14px 0 6px;}
+.muted{color:var(--muted); font-size:14px;}
+.small{font-size:13px;}
+.badge{
+  display:inline-block; padding:2px 9px; border-radius:999px; font-size:13px; font-weight:700;
+  white-space:nowrap; flex-shrink:0;
+}
+.badge.win{background:#DDF2E3; color:var(--win);}
+.badge.loss{background:#FBE3E1; color:var(--loss);}
+.badge.draw{background:#E9EEF1; color:var(--muted);}
+.badge.pro{background:var(--gold); color:#4A3600;}
+.badge.free{background:var(--surface-muted); color:var(--muted);}
+.badge.demo{background:#F3D9E2; color:var(--rose);}
+.badge.sync{background:#E3ECF5; color:var(--navy);}
+button, .btn{
+  font-size:16px; min-height:48px; padding:10px 16px; border-radius:12px;
+  border:1px solid var(--border); background:var(--surface); color:var(--text);
+  cursor:pointer; font-family:inherit;
+}
+button.primary, .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:700;}
+button.danger{background:#fff; border-color:var(--danger); color:var(--danger);}
+button.gold{background:var(--gold); border-color:var(--gold); color:#4A3600; font-weight:700;}
+button:disabled{opacity:.45; cursor:default;}
+button.block{width:100%;}
+label{display:block; font-size:14px; font-weight:700; margin:12px 0 4px;}
+input, select, textarea{
+  width:100%; font-size:16px; padding:11px 10px; border-radius:10px;
+  border:1px solid var(--border); background:var(--surface); color:var(--text);
+  font-family:inherit;
+}
+input[type="date"]{min-height:48px;}
+textarea{min-height:76px; resize:vertical;}
+.row{display:flex; gap:8px; align-items:center;}
+.row>*{flex:1;}
+.row .narrow{flex:0 0 auto;}
+.set-row{
+  border:1px solid var(--border); border-radius:12px; padding:10px; margin-bottom:10px;
+  background:var(--surface-muted);
+}
+.set-row .set-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+.set-row .set-head b{font-size:15px;}
+.match-card{cursor:pointer;}
+.match-card .top{display:flex; justify-content:space-between; gap:8px; align-items:flex-start;}
+.match-card .opp{font-size:17px; font-weight:700;}
+.match-card .score{font-size:17px; font-weight:700; white-space:nowrap;}
+.match-card .sub{font-size:14px; color:var(--muted); margin-top:4px;}
+.stat-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center;}
+.stat-grid .stat{background:var(--surface-muted); border-radius:12px; padding:10px 4px;}
+.stat-grid .num{font-size:22px; font-weight:800;}
+.stat-grid .lbl{font-size:12px; color:var(--muted);}
+.bar-row{display:flex; align-items:center; gap:8px; font-size:14px; margin:6px 0;}
+.bar-row .bar-label{flex:0 0 92px;}
+.bar-row .bar-track{flex:1; height:10px; background:var(--surface-muted); border-radius:6px; overflow:hidden;}
+.bar-row .bar-fill{height:100%; background:var(--accent);}
+.bar-row .bar-val{flex:0 0 52px; text-align:right;}
+#tabbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:30;
+  background:var(--surface); border-top:1px solid var(--border);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+#tabbar .tabs{max-width:480px; margin:0 auto; display:flex;}
+#tabbar button{
+  flex:1; border:none; background:none; border-radius:0; min-height:var(--tabbar-h);
+  padding:6px 0 8px; font-size:12px; color:var(--muted);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+}
+#tabbar button .ic{font-size:22px; line-height:1;}
+#tabbar button.active{color:var(--accent); font-weight:700;}
+#tabbar button.active .ic{color:var(--accent);}
+#overlay{
+  display:none; position:fixed; inset:0; z-index:50; background:rgba(10,25,35,.55);
+  align-items:flex-end; justify-content:center;
+}
+#overlay.show{display:flex;}
+#overlay .sheet{
+  width:100%; max-width:480px; max-height:86vh; overflow:auto;
+  background:var(--surface); border-radius:18px 18px 0 0; padding:16px 16px calc(20px + env(safe-area-inset-bottom));
+}
+#overlay .sheet h2{margin-top:0;}
+.point-btns{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0;}
+.point-btns button{min-height:72px; font-size:20px; font-weight:800;}
+.score-big{font-size:34px; font-weight:800; text-align:center; margin:8px 0;}
+.notice{
+  border-radius:12px; padding:12px; margin-bottom:12px; font-size:15px;
+  background:#FFF7D6; border:1px solid var(--gold);
+}
+.notice.info{background:#E3ECF5; border-color:#9DB8D2;}
+.notice.error{background:#FBE3E1; border-color:#E0A49F;}
+.empty{padding:22px 10px; text-align:center; color:var(--muted);}
+.divider{height:1px; background:var(--border); margin:14px 0;}
+.kv{display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px solid var(--surface-muted); font-size:15px;}
+.kv:last-child{border-bottom:none;}
+.kv b{text-align:right;}
+.tabs-inline{display:flex; gap:8px; margin-bottom:12px;}
+.tabs-inline button{flex:1; min-height:44px; font-size:15px;}
+.tabs-inline button.active{background:var(--accent); color:#fff; border-color:var(--accent); font-weight:700;}
+@media (max-width:360px){ header h1{font-size:17px;} }
+</style>
+</head>
+<body data-theme="standard">
+<div id="app">
+  <header>
+    <h1>Smash<span class="gold">Stats</span></h1>
+    <div class="spacer"></div>
+    <select id="player-select" aria-label="選手切替"></select>
+    <button class="icon-btn" id="btn-settings" aria-label="設定">⚙️</button>
+  </header>
+  <div id="install-banner"></div>
+  <main id="view"></main>
+  <nav id="tabbar" aria-label="タブ">
+    <div class="tabs">
+      <button data-tab="home"><span class="ic">🏠</span><span data-i18n="tab_home">ホーム</span></button>
+      <button data-tab="matches"><span class="ic">🎾</span><span data-i18n="tab_matches">試合</span></button>
+      <button data-tab="register"><span class="ic">✏️</span><span data-i18n="tab_register">登録</span></button>
+      <button data-tab="analytics"><span class="ic">📊</span><span data-i18n="tab_analytics">分析</span></button>
+      <button data-tab="gear"><span class="ic">🏸</span><span data-i18n="tab_gear">用具</span></button>
+    </div>
+  </nav>
+</div>
+<div id="overlay"><div class="sheet" id="overlay-sheet"></div></div>
+<script>
+'use strict';
+/* =====================================================================
+   SmashStats iPhone Web版 — Phase 1
+   PWA + IndexedDB（DB名 smashstats-web）+ ローカルファースト。
+   外部CDN依存なし。同期（Phase 2）・Stripe（Phase 4）は含まない。
+   設計書: ~/workspace/smashstats-iphone-web/DESIGN.md §4・§8・§15 Phase 1
+   ===================================================================== */
+
+/* ---------------- i18n辞書（JA/EN。後から言語追加できる構造） ---------------- */
+const I18N = {
+  ja: {
+    tab_home:'ホーム', tab_matches:'試合', tab_register:'登録', tab_analytics:'分析', tab_gear:'用具',
+    settings:'設定', back:'← 戻る', save:'保存する', cancel:'キャンセル', del:'削除', edit:'編集',
+    add_player:'選手を追加', player_name:'選手名', team:'所属チーム', sport:'競技',
+    no_player:'選手がまだいません。「選手を追加」から登録してください。',
+    focus_now:'現在のフォーカス', no_focus:'フォーカスはまだありません。',
+    recent_matches:'直近の試合', summary:'サマリ', total_matches:'総試合数', wins:'勝利', win_rate:'勝率',
+    matches:'試合', gears:'用具', search_ph:'相手名・大会名で検索',
+    no_matches:'試合がまだありません。', demo_badge:'デモデータ',
+    register_match:'試合を登録', edit_match:'試合を編集', match_date:'試合日', tournament:'大会名',
+    year:'年度', round:'ラウンド', match_type:'種目', singles:'シングルス', doubles:'ダブルス',
+    opponent:'対戦相手', partner:'ペア名（ダブルス時）', surface:'サーフェス', env:'屋内 / 屋外',
+    indoor:'屋内', outdoor:'屋外', unknown:'不明', team_match:'団体戦', team_score:'チームスコア',
+    sets:'セット', add_set:'セットを追加', my_score:'自分の得点', opp_score:'相手の得点',
+    tiebreak:'タイブレーク', special:'特記事項（RET / WO / DEF）', none:'なし',
+    lost_score:'流れを失ったスコア', gained_score:'流れを取り戻したスコア', momentum:'戦術メモ',
+    memo:'メモ', video:'動画URL', result:'結果', win:'勝ち', loss:'負け', draw:'引き分け',
+    monthly_win_rate:'月別勝率', surface_win_rate:'サーフェス別勝率',
+    gear_list:'用具一覧', add_gear:'用具を追加', racket:'ラケット名', string_name:'ガット名',
+    tension:'テンション', tension_unit:'単位', last_maintenance:'最終張り替え日',
+    days_since:'張り替えからの経過日数', matches_since:'張り替え後の試合数',
+    record_maintenance:'張り替えを記録', maintenance_history:'張り替え履歴',
+    language:'言語', theme:'テーマ', theme_standard:'スタンダード', theme_mint:'ミントペール',
+    plan:'プラン', free_plan:'無料プラン', pro_plan:'Pro（準備中）',
+    pro_soon:'Pro（買い切り）は Phase 4 で提供予定です。今は無料プランの範囲で使えます。',
+    data_location:'データの置き場所', data_location_note:'Phase 2 で自分のスプレッドシートへの接続を追加予定です。今はこの端末内にだけ保存されます。',
+    export_json:'JSONで全量書き出し', import_json:'JSONで取り込み（Android版と同じ形式）',
+    demo_load:'デモデータを入れる', demo_delete:'デモデータを消す',
+    demo_note:'デモデータはAndroid版バックアップのサンプル（架空の選手）です。',
+    storage:'端末内の保存', storage_persisted:'永続化: 許可されています', storage_not_persisted:'永続化: 未許可（ホーム画面追加で安定します）',
+    install_title:'ホーム画面に追加すると、7日間開かなくてもデータが消えにくくなります。',
+    install_how:'Safariの共有ボタン →「ホーム画面に追加」を選んでください。',
+    install_close:'閉じる',
+    free_limit_player:'無料プランでは選手は1名までです。2人目以降はPro（準備中）が必要です。',
+    free_limit_match:'無料プランでは当月の試合登録は5試合までです。6試合目以降はPro（準備中）が必要です。',
+    saved:'保存しました。', deleted:'削除しました。', imported:'取り込みました。',
+    confirm_delete:'削除しますか？', confirm_demo_delete:'デモデータをすべて消しますか？',
+    point_input:'ポイント入力', point_a:'自選手が得点', point_b:'相手が得点',
+    undo:'1つ戻る', clear_points:'クリア', apply_points:'このスコアで確定',
+    game_over:'ゲーム終了', server:'サーバー', need_player:'先に選手を登録してください。',
+    need_opponent:'対戦相手を入力してください。', need_date:'試合日を入力してください。',
+    export_done:'書き出しファイルを作成しました。', import_error:'取り込みに失敗しました。JSONファイルを確認してください。',
+    outbox_pending:'未同期の変更', sync_pending_note:'Phase 2 の同期でスプレッドシートへ送られます。',
+    notes:'ノート', add_note:'ノートを追加', note_content:'内容',
+    venue:'会場', night_match:'ナイトマッチ', weather:'天候', ball:'ボール / シャトル',
+    all:'すべて', filter_win:'勝ちのみ', filter_loss:'負けのみ',
+    active:'使用中', inactive:'休止中'
+  },
+  en: {
+    tab_home:'Home', tab_matches:'Matches', tab_register:'Add', tab_analytics:'Stats', tab_gear:'Gear',
+    settings:'Settings', back:'← Back', save:'Save', cancel:'Cancel', del:'Delete', edit:'Edit',
+    add_player:'Add player', player_name:'Player name', team:'Team', sport:'Sport',
+    no_player:'No player yet. Add one from “Add player”.',
+    focus_now:'Current focus', no_focus:'No focus yet.',
+    recent_matches:'Recent matches', summary:'Summary', total_matches:'Matches', wins:'Wins', win_rate:'Win rate',
+    matches:'Matches', gears:'Gear', search_ph:'Search by opponent or tournament',
+    no_matches:'No matches yet.', demo_badge:'Demo data',
+    register_match:'Add a match', edit_match:'Edit match', match_date:'Date', tournament:'Tournament',
+    year:'Year', round:'Round', match_type:'Type', singles:'Singles', doubles:'Doubles',
+    opponent:'Opponent', partner:'Partner (doubles)', surface:'Surface', env:'Indoor / Outdoor',
+    indoor:'Indoor', outdoor:'Outdoor', unknown:'Unknown', team_match:'Team match', team_score:'Team score',
+    sets:'Sets', add_set:'Add set', my_score:'My score', opp_score:'Opponent score',
+    tiebreak:'Tiebreak', special:'Special (RET / WO / DEF)', none:'None',
+    lost_score:'Score when momentum was lost', gained_score:'Score when momentum was regained', momentum:'Tactical note',
+    memo:'Memo', video:'Video URL', result:'Result', win:'Win', loss:'Loss', draw:'Draw',
+    monthly_win_rate:'Monthly win rate', surface_win_rate:'Surface win rate',
+    gear_list:'Gear list', add_gear:'Add gear', racket:'Racket', string_name:'String',
+    tension:'Tension', tension_unit:'Unit', last_maintenance:'Last restrung',
+    days_since:'Days since restring', matches_since:'Matches since restring',
+    record_maintenance:'Record restring', maintenance_history:'Restring history',
+    language:'Language', theme:'Theme', theme_standard:'Standard', theme_mint:'Mint Pale',
+    plan:'Plan', free_plan:'Free plan', pro_plan:'Pro (coming soon)',
+    pro_soon:'Pro (one-time purchase) will be available in Phase 4. Free plan limits apply for now.',
+    data_location:'Where data lives', data_location_note:'Connecting your own spreadsheet arrives in Phase 2. For now data is stored only on this device.',
+    export_json:'Export all as JSON', import_json:'Import JSON (same format as Android)',
+    demo_load:'Load demo data', demo_delete:'Delete demo data',
+    demo_note:'Demo data is the sample from the Android backup (fictional players).',
+    storage:'On-device storage', storage_persisted:'Persistence: granted', storage_not_persisted:'Persistence: not granted (add to Home Screen for stability)',
+    install_title:'Add to Home Screen so your data is not cleared after 7 days of not opening the app.',
+    install_how:'In Safari, tap Share → “Add to Home Screen”.',
+    install_close:'Close',
+    free_limit_player:'Free plan allows 1 player. A 2nd player needs Pro (coming soon).',
+    free_limit_match:'Free plan allows 5 matches per month. The 6th needs Pro (coming soon).',
+    saved:'Saved.', deleted:'Deleted.', imported:'Imported.',
+    confirm_delete:'Delete this?', confirm_demo_delete:'Delete all demo data?',
+    point_input:'Point input', point_a:'I scored', point_b:'Opponent scored',
+    undo:'Undo', clear_points:'Clear', apply_points:'Apply this score',
+    game_over:'Game over', server:'Server', need_player:'Please add a player first.',
+    need_opponent:'Please enter the opponent.', need_date:'Please enter the date.',
+    export_done:'Export file created.', import_error:'Import failed. Please check the JSON file.',
+    outbox_pending:'Pending changes', sync_pending_note:'These will be sent to your spreadsheet by Phase 2 sync.',
+    notes:'Notes', add_note:'Add note', note_content:'Content',
+    venue:'Venue', night_match:'Night match', weather:'Weather', ball:'Ball / shuttle',
+    all:'All', filter_win:'Wins only', filter_loss:'Losses only',
+    active:'Active', inactive:'Inactive'
+  }
+};
+const SPORTS = ['BADMINTON','TENNIS','SOFT_TENNIS','TABLE_TENNIS','PICKLEBALL'];
+const SPORT_LABEL = {
+  ja:{BADMINTON:'バドミントン',TENNIS:'テニス',SOFT_TENNIS:'ソフトテニス',TABLE_TENNIS:'卓球',PICKLEBALL:'ピックルボール'},
+  en:{BADMINTON:'Badminton',TENNIS:'Tennis',SOFT_TENNIS:'Soft Tennis',TABLE_TENNIS:'Table Tennis',PICKLEBALL:'Pickleball'}
+};
+const SURFACES = ['HARD','CLAY','OMNI','CARPET','WOOD','MAT','UNKNOWN'];
+const THEMES = { standard:'theme_standard', mint_pale:'theme_mint' };
+
+let LANG = localStorage.getItem('ss-lang') || 'ja';
+let THEME = localStorage.getItem('ss-theme') || 'standard';
+if (!I18N[LANG]) LANG = 'ja';
+function t(key){ const d = I18N[LANG] || I18N.ja; return d[key] || I18N.ja[key] || key; }
+function sportLabel(code){ return (SPORT_LABEL[LANG]||SPORT_LABEL.ja)[code] || code; }
+
+/* ---------------- ユーティリティ ---------------- */
+function $(sel, root){ return (root||document).querySelector(sel); }
+function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function uuid(){
+  if (crypto && crypto.randomUUID) return crypto.randomUUID();
+  return 'id-' + Date.now().toString(36) + '-' + Math.floor(Math.random()*1e9).toString(36);
+}
+function epochDayToDate(ed){ return new Date(ed*86400000); }
+function dateToEpochDay(d){ return Math.floor((d.getTime() - d.getTimezoneOffset()*60000)/86400000); }
+function dateInputToEpochDay(v){ // 'YYYY-MM-DD' -> epoch day（ローカル日付）
+  if(!v) return null;
+  const p = v.split('-').map(Number);
+  return dateToEpochDay(new Date(p[0], p[1]-1, p[2]));
+}
+function epochDayToInput(ed){
+  if(ed==null) return '';
+  const d = epochDayToDate(ed);
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+function fmtDate(ed){
+  if(ed==null) return '';
+  const d = epochDayToDate(ed);
+  return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();
+}
+function fmtDateTime(ms){
+  const d = new Date(ms);
+  return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function daysBetween(fromMs, toMs){ return Math.max(0, Math.floor((toMs-fromMs)/86400000)); }
+function parseScoresJson(s){
+  try { const v = JSON.parse(s||'[]'); return Array.isArray(v)?v:[]; } catch(e){ return []; }
+}
+function scoreText(sets){
+  return sets.map(function(s){
+    if (s.specialResult) return s.specialResult;
+    let a = (s.myScore==null?'–':s.myScore), b = (s.opponentScore==null?'–':s.opponentScore);
+    let txt = a+'-'+b;
+    if (s.tieBreakMy!=null && s.tieBreakOpponent!=null) txt += ' ('+s.tieBreakMy+'-'+s.tieBreakOpponent+')';
+    return txt;
+  }).join(', ');
+}
+
+/* =====================================================================
+   競技別スコア計算（純粋関数。UI・勝敗判定・分析の共通ロジック）
+   ScoreSheetModels.kt の calculateGameProgress 相当を移植。
+   ===================================================================== */
+function rallyTarget(sport){
+  if (sport==='BADMINTON') return 21;
+  if (sport==='TABLE_TENNIS' || sport==='PICKLEBALL') return 11;
+  return 21;
+}
+function isRallySport(sport){ return sport==='BADMINTON'||sport==='TABLE_TENNIS'||sport==='PICKLEBALL'; }
+
+/* 1ゲーム分のポイント列 ["A","B",...] から進行状態を計算する */
+function calcGameProgress(sport, initialServer, points){
+  let a=0, b=0, server=initialServer||'A';
+  let gamesA=0, gamesB=0, rallyA=0, rallyB=0;
+  let tieA=null, tieB=null, isTiebreak=false, gameOver=false;
+  const tennis = (sport==='TENNIS' || sport==='SOFT_TENNIS');
+  const target = rallyTarget(sport);
+  const cap = sport==='BADMINTON' ? 30 : null;
+
+  function rallyDone(x, y){
+    if (cap!=null && (x===cap || y===cap)) return true;
+    return (x>=target && (x-y)>=2) || (y>=target && (y-x)>=2);
+  }
+  for (const w of points){
+    if (gameOver) break;
+    if (tennis){
+      const tb = (sport==='TENNIS' && gamesA===6 && gamesB===6) ||
+                 (sport==='SOFT_TENNIS' && gamesA===3 && gamesB===3);
+      isTiebreak = tb;
+      if (w==='A') rallyA++; else rallyB++;
+      if (tb){
+        tieA=rallyA; tieB=rallyB;
+        if ((rallyA>=7 && rallyA-rallyB>=2) || (rallyB>=7 && rallyB-rallyA>=2)){
+          if (rallyA>rallyB) gamesA++; else gamesB++;
+          rallyA=0; rallyB=0; gameOver=true;
+        }
+      } else {
+        if ((rallyA>=4 && rallyA-rallyB>=2) || (rallyB>=4 && rallyB-rallyA>=2)){
+          if (rallyA>rallyB) gamesA++; else gamesB++;
+          rallyA=0; rallyB=0; server = (server==='A')?'B':'A';
+        }
+      }
+    } else {
+      if (w==='A') a++; else b++;
+      if (w!==server) server = w; // ラリー競技: レシーバーが取ればサーブ権が移る（簡易）
+      if (rallyDone(a,b)) gameOver=true;
+    }
+  }
+  const rallyLabel = tennis ? tennisPointLabel(rallyA, rallyB) : null;
+  return {
+    scoreA: tennis?gamesA:a, scoreB: tennis?gamesB:b,
+    rallyDisplayA: tennis?rallyLabel.a:String(a), rallyDisplayB: tennis?rallyLabel.b:String(b),
+    currentServer: server, isGameOver: gameOver,
+    tennisGamesScoreA: gamesA, tennisGamesScoreB: gamesB,
+    tennisCurrentRallyA: rallyA, tennisCurrentRallyB: rallyB,
+    isTennisTiebreak: isTiebreak, tieBreakScoreA: tieA, tieBreakScoreB: tieB,
+    isChangeEndsNeeded: false,
+    consecutivePointsA: streak(points,'A'), consecutivePointsB: streak(points,'B')
+  };
+}
+function streak(points, who){
+  let n=0;
+  for (let i=points.length-1;i>=0;i--){ if(points[i]===who) n++; else break; }
+  return n;
+}
+function tennisPointLabel(a, b){
+  const names=['0','15','30','40'];
+  if (a>=3 && b>=3){
+    if (a===b) return {a:'40', b:'40'};
+    if (a===b+1) return {a:'AD', b:'40'};
+    if (b===a+1) return {a:'40', b:'AD'};
+  }
+  return {a:names[Math.min(a,3)], b:names[Math.min(b,3)]};
+}
+
+/* セット列から勝敗を判定する（Android版 getIndividualResultType 相当） */
+function decideWinner(sets, sport){
+  if (!sets || sets.length===0) return {result:'DRAW', mySets:0, oppSets:0, finalResultCode:'NORMAL'};
+  for (const s of sets){
+    if (s.specialResult==='RET') return {result:'LOSS', mySets:0, oppSets:0, finalResultCode:'RET'};
+    if (s.specialResult==='WO') return {result:'WIN', mySets:0, oppSets:0, finalResultCode:'WO'};
+    if (s.specialResult==='DEF') return {result:'LOSS', mySets:0, oppSets:0, finalResultCode:'DEF'};
+  }
+  let mySets=0, oppSets=0;
+  for (const s of sets){
+    const my = (s.myScore==null?0:s.myScore), op=(s.opponentScore==null?0:s.opponentScore);
+    if (my===0 && op===0) continue;
+    if (my===op){
+      // 同点セットはタイブレークがある場合のみ判定し、なければ引き分け扱いで数えない
+      if (s.tieBreakMy!=null && s.tieBreakOpponent!=null){
+        if (s.tieBreakMy>s.tieBreakOpponent) mySets++; else if (s.tieBreakOpponent>s.tieBreakMy) oppSets++;
+      }
+      continue;
+    }
+    if (my>op) mySets++; else oppSets++;
+  }
+  const result = mySets>oppSets?'WIN':(oppSets>mySets?'LOSS':'DRAW');
+  return {result, mySets, oppSets, finalResultCode:'NORMAL'};
+}
+/* 試合保存時に派生値を再計算する（isWin / finalResultCode） */
+function deriveMatch(m){
+  const sets = parseScoresJson(m.scoresJson);
+  const d = decideWinner(sets, m.sportType);
+  m.isWin = (d.result==='WIN');
+  m.finalResultCode = d.finalResultCode;
+  return m;
+}
+
+/* =====================================================================
+   IndexedDB（DB名 smashstats-web）— 生の IndexedDB API のみで実装
+   ===================================================================== */
+const DB_NAME='smashstats-web', DB_VERSION=1;
+const STORES=[
+  {name:'players', key:'playerId'},
+  {name:'matches', key:'matchId'},
+  {name:'gears', key:'gearId'},
+  {name:'gear_maintenances', key:'maintenanceId'},
+  {name:'venues', key:'id', auto:true},
+  {name:'opponent_profiles', key:'opponentId'},
+  {name:'opponent_custom_items', key:'id'},
+  {name:'focuses', key:'focusId'},
+  {name:'notes', key:'noteId'},
+  {name:'_outbox', key:'outboxId', auto:true},
+  {name:'_meta', key:'key'}
+];
+let dbPromise=null;
+function openDB(){
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise(function(resolve, reject){
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = function(){
+      const db = req.result;
+      for (const s of STORES){
+        if (db.objectStoreNames.contains(s.name)) continue;
+        db.createObjectStore(s.name, s.auto?{keyPath:s.key, autoIncrement:true}:{keyPath:s.key});
+      }
+    };
+    req.onsuccess = function(){ resolve(req.result); };
+    req.onerror = function(){ reject(req.error); };
+  });
+  return dbPromise;
+}
+function idbTx(storeNames, mode, fn){
+  return openDB().then(function(db){
+    return new Promise(function(resolve, reject){
+      const tx = db.transaction(storeNames, mode);
+      const out = fn(tx);
+      tx.oncomplete = function(){ resolve(out && out.value!==undefined?out.value:out); };
+      tx.onerror = function(){ reject(tx.error); };
+      tx.onabort = function(){ reject(tx.error||new Error('tx aborted')); };
+    });
+  });
+}
+function idbPut(store, value){
+  return idbTx([store,'_outbox'], 'readwrite', function(tx){
+    const req = tx.objectStore(store).put(value);
+    const holder = {};
+    req.onsuccess = function(){ holder.value = req.result; };
+    if (store!=='_outbox' && store!=='_meta'){
+      const key = value[STORES.find(function(s){return s.name===store;}).key];
+      tx.objectStore('_outbox').add({
+        table:store, rowId:String(key), op:'upsert',
+        payload:JSON.stringify(value), createdAt:Date.now(), tryCount:0, lastError:null
+      });
+    }
+    return holder;
+  });
+}
+function idbDelete(store, key){
+  return idbTx([store,'_outbox'], 'readwrite', function(tx){
+    const req = tx.objectStore(store).delete(key);
+    const holder = {};
+    req.onsuccess = function(){ holder.value = true; };
+    tx.objectStore('_outbox').add({
+      table:store, rowId:String(key), op:'delete',
+      payload:'', createdAt:Date.now(), tryCount:0, lastError:null
+    });
+    return holder;
+  });
+}
+function idbGet(store, key){
+  return openDB().then(function(db){
+    return new Promise(function(resolve, reject){
+      const req = db.transaction(store,'readonly').objectStore(store).get(key);
+      req.onsuccess = function(){ resolve(req.result||null); };
+      req.onerror = function(){ reject(req.error); };
+    });
+  });
+}
+function idbAll(store){
+  return openDB().then(function(db){
+    return new Promise(function(resolve, reject){
+      const req = db.transaction(store,'readonly').objectStore(store).getAll();
+      req.onsuccess = function(){ resolve(req.result||[]); };
+      req.onerror = function(){ reject(req.error); };
+    });
+  });
+}
+function idbClear(store){
+  return idbTx([store], 'readwrite', function(tx){ tx.objectStore(store).clear(); return {}; });
+}
+function metaGet(key){ return idbGet('_meta', key).then(function(r){ return r?r.value:null; }); }
+function metaSet(key, value){ return idbPut('_meta', {key:key, value:value}); }
+
+/* ---------------- 状態 ---------------- */
+const state = {
+  tab:'home', view:'tab', // view: 'tab' | 'settings'
+  currentPlayerId: localStorage.getItem('ss-player') || null,
+  players:[], matches:[], gears:[], maintenances:[], focuses:[], notes:[],
+  outboxCount:0, isPro:false, persisted:null, demo:false,
+  search:'', filter:'all',
+  editingMatchId:null, editingGearId:null,
+  draft:null, // 試合フォームの下書き（メモリ上のみ）
+  pointSheet:null // {setIndex, points:[], server}
+};
+
+async function loadAll(){
+  const p = await idbAll('players');
+  state.players = p.filter(function(x){return !x.isDeleted;}).sort(function(a,b){return a.createdAt-b.createdAt;});
+  state.matches = (await idbAll('matches')).filter(function(x){return !x.isDeleted;});
+  state.gears = (await idbAll('gears')).filter(function(x){return !x.isDeleted;});
+  state.maintenances = await idbAll('gear_maintenances');
+  state.focuses = (await idbAll('focuses')).filter(function(x){return !x.isDeleted;});
+  state.notes = (await idbAll('notes')).filter(function(x){return !x.isDeleted;});
+  state.outboxCount = (await idbAll('_outbox')).length;
+  state.isPro = (await metaGet('isPro'))===true;
+  state.demo = (await metaGet('demo'))===true;
+  if (!state.currentPlayerId || !state.players.some(function(x){return x.playerId===state.currentPlayerId;})){
+    state.currentPlayerId = state.players.length?state.players[0].playerId:null;
+    if (state.currentPlayerId) localStorage.setItem('ss-player', state.currentPlayerId);
+  }
+}
+function currentPlayer(){
+  return state.players.find(function(p){return p.playerId===state.currentPlayerId;})||null;
+}
+function playerMatches(pid){
+  const id = pid||state.currentPlayerId;
+  return state.matches.filter(function(m){return m.playerId===id;})
+    .sort(function(a,b){return (b.matchDateEpochDay-a.matchDateEpochDay)||(b.createdAt-a.createdAt);});
+}
+function monthMatchCount(pid){
+  const now=new Date(), y=now.getFullYear(), mo=now.getMonth();
+  return state.matches.filter(function(m){
+    if(m.playerId!==pid) return false;
+    const d=new Date(m.createdAt);
+    return d.getFullYear()===y && d.getMonth()===mo;
+  }).length;
+}
+
+/* ---------------- 画面描画 ---------------- */
+function setTab(tab){
+  state.tab=tab; state.view='tab';
+  if(tab==='register' && !state.draft) newDraft();
+  render();
+}
+function render(){
+  document.body.dataset.theme = THEME;
+  document.documentElement.lang = (LANG==='ja'?'ja':'en');
+  renderPlayerSelect();
+  renderInstallBanner();
+  $all('#tabbar button').forEach(function(b){
+    b.classList.toggle('active', state.view==='tab' && b.dataset.tab===state.tab);
+  });
+  const view = $('#view');
+  if (state.view==='settings'){ view.innerHTML = settingsHTML(); return; }
+  if (state.tab==='home') view.innerHTML = homeHTML();
+  else if (state.tab==='matches') view.innerHTML = matchesHTML();
+  else if (state.tab==='register') view.innerHTML = registerHTML();
+  else if (state.tab==='analytics') view.innerHTML = analyticsHTML();
+  else if (state.tab==='gear') view.innerHTML = gearHTML();
+  if (state.tab==='matches') bindMatchesSearch();
+}
+function renderPlayerSelect(){
+  const sel = $('#player-select');
+  const cur = state.currentPlayerId;
+  sel.innerHTML = state.players.map(function(p){
+    return '<option value="'+esc(p.playerId)+'"'+(p.playerId===cur?' selected':'')+'>'+esc(p.playerName)+'</option>';
+  }).join('') + '<option value="__add__">＋ '+esc(t('add_player'))+'</option>';
+  if (!state.players.length) sel.innerHTML = '<option value="__add__">＋ '+esc(t('add_player'))+'</option>';
+}
+function renderInstallBanner(){
+  const el = $('#install-banner');
+  const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+  const dismissed = localStorage.getItem('ss-install-dismissed')==='1';
+  if (standalone || dismissed){ el.classList.remove('show'); el.innerHTML=''; return; }
+  el.innerHTML = '<div>'+esc(t('install_title'))+'<br><span class="small">'+esc(t('install_how'))+'</span></div>'
+    + '<button type="button" id="install-close">'+esc(t('install_close'))+'</button>';
+  el.classList.add('show');
+  const btn = $('#install-close');
+  if (btn) btn.addEventListener('click', function(){
+    localStorage.setItem('ss-install-dismissed','1'); renderInstallBanner();
+  });
+}
+function toast(msg){
+  const view = $('#view');
+  const d = document.createElement('div');
+  d.className='notice info'; d.textContent = msg;
+  view.prepend(d);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 3500);
+}
+function proNotice(msg){
+  const view = $('#view');
+  const d = document.createElement('div');
+  d.className='notice'; d.textContent = msg;
+  view.prepend(d);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 5000);
+}
+
+/* ---- ホーム ---- */
+function homeHTML(){
+  const p = currentPlayer();
+  const ms = playerMatches();
+  const wins = ms.filter(function(m){return m.isWin;}).length;
+  const focus = state.focuses
+    .filter(function(f){return f.playerId===state.currentPlayerId && !f.endDate;})
+    .sort(function(a,b){return b.startDate-a.startDate;})[0];
+  let h = '';
+  if (state.demo) h += '<div><span class="badge demo">'+esc(t('demo_badge'))+'</span></div>';
+  if (!p){
+    h += '<div class="card"><p>'+esc(t('no_player'))+'</p>'
+      + '<button type="button" class="primary block" onclick="showPlayerForm()">'+esc(t('add_player'))+'</button></div>';
+  } else {
+    h += '<div class="card"><h2>'+esc(p.playerName)+' <span class="muted small">'+esc(sportLabel(p.sportType))+' / '+esc(p.defaultTeamName||'')+'</span></h2>'
+      + '<div class="stat-grid"><div class="stat"><div class="num">'+ms.length+'</div><div class="lbl">'+esc(t('total_matches'))+'</div></div>'
+      + '<div class="stat"><div class="num">'+wins+'</div><div class="lbl">'+esc(t('wins'))+'</div></div>'
+      + '<div class="stat"><div class="num">'+(ms.length?Math.round(wins/ms.length*100):0)+'%</div><div class="lbl">'+esc(t('win_rate'))+'</div></div></div></div>';
+    h += '<div class="card"><h2>'+esc(t('focus_now'))+'</h2>'
+      + (focus?'<p>'+esc(focus.title)+'</p><p class="muted small">'+esc(fmtDate(focus.startDate))+' 〜</p>':'<p class="muted">'+esc(t('no_focus'))+'</p>')
+      + '<button type="button" onclick="showFocusForm()">＋ '+esc(t('focus_now'))+'</button></div>';
+    h += '<div class="card"><h2>'+esc(t('recent_matches'))+'</h2>';
+    if (!ms.length) h += '<p class="muted">'+esc(t('no_matches'))+'</p>';
+    else h += ms.slice(0,3).map(matchCardHTML).join('');
+    h += '<button type="button" class="block" onclick="setTab(\'matches\')">'+esc(t('tab_matches'))+'</button></div>';
+    if (state.outboxCount>0){
+      h += '<div class="card"><span class="badge sync">'+esc(t('outbox_pending'))+' '+state.outboxCount+'</span>'
+        + '<p class="muted small">'+esc(t('sync_pending_note'))+'</p></div>';
+    }
+  }
+  h += '<div id="player-form-slot"></div><div id="focus-form-slot"></div>';
+  return h;
+}
+function matchCardHTML(m){
+  const sets = parseScoresJson(m.scoresJson);
+  const badge = m.isWin?'<span class="badge win">'+esc(t('win'))+'</span>':'<span class="badge loss">'+esc(t('loss'))+'</span>';
+  return '<div class="card match-card" onclick="editMatch(\''+esc(m.matchId)+'\')">'
+    + '<div class="top"><div><div class="opp">'+esc(m.opponentDisplayName)+'</div>'
+    + '<div class="sub">'+esc(fmtDate(m.matchDateEpochDay))+' ・ '+esc(m.tournamentName||'')+' ・ '+esc(m.roundName||'')+'</div></div>'
+    + '<div style="text-align:right">'+badge+'<div class="score">'+esc(scoreText(sets))+'</div></div></div>'
+    + (m.matchNote?'<div class="sub">'+esc(m.matchNote)+'</div>':'')
+    + '</div>';
+}
+
+/* ---- 試合一覧（検索は一覧部分だけ更新。入力欄は再描画しない） ---- */
+function matchesHTML(){
+  const p = currentPlayer();
+  let h = '';
+  if (!p) return '<div class="card"><p>'+esc(t('no_player'))+'</p></div>';
+  h += '<div class="tabs-inline">'
+    + '<button type="button" data-filter="all" class="'+(state.filter==='all'?'active':'')+'">'+esc(t('all'))+'</button>'
+    + '<button type="button" data-filter="win" class="'+(state.filter==='win'?'active':'')+'">'+esc(t('filter_win'))+'</button>'
+    + '<button type="button" data-filter="loss" class="'+(state.filter==='loss'?'active':'')+'">'+esc(t('filter_loss'))+'</button></div>';
+  h += '<input id="match-search" type="search" placeholder="'+esc(t('search_ph'))+'" value="'+esc(state.search)+'" autocomplete="off">';
+  h += '<div id="match-list" style="margin-top:12px">'+matchListHTML()+'</div>';
+  h += '<button type="button" class="primary block" onclick="newDraft(); setTab(\'register\')">＋ '+esc(t('register_match'))+'</button>';
+  return h;
+}
+function filteredMatches(){
+  const q = state.search.trim();
+  return playerMatches().filter(function(m){
+    if (state.filter==='win' && !m.isWin) return false;
+    if (state.filter==='loss' && m.isWin) return false;
+    if (!q) return true;
+    return (m.opponentDisplayName||'').includes(q) || (m.tournamentName||'').includes(q);
+  });
+}
+function matchListHTML(){
+  const list = filteredMatches();
+  if (!list.length) return '<div class="empty">'+esc(t('no_matches'))+'</div>';
+  return list.map(matchCardHTML).join('');
+}
+function bindMatchesSearch(){
+  const input = $('#match-search');
+  if (input){
+    // IME対応: oninput では一覧部分だけを更新し、入力欄自体は触らない
+    input.addEventListener('input', function(){
+      state.search = input.value;
+      const list = $('#match-list');
+      if (list) list.innerHTML = matchListHTML();
+    });
+  }
+  $all('[data-filter]').forEach(function(b){
+    b.addEventListener('click', function(){ state.filter=b.dataset.filter; render(); });
+  });
+}
+
+/* ---- 試合登録フォーム ---- */
+function blankSet(){ return {myScore:null, opponentScore:null, tieBreakMy:null, tieBreakOpponent:null, specialResult:null, lostInitiativeScore:'', gainedInitiativeScore:'', momentumDetail:'', pointSequence:null}; }
+function newDraft(){
+  const p = currentPlayer();
+  const today = new Date();
+  state.editingMatchId = null;
+  state.draft = {
+    matchId: uuid(), playerId: p?p.playerId:null, sportType: p?p.sportType:'BADMINTON',
+    matchType:'SINGLES', partnerName:'', opponentDisplayName:'', opponentTeamNameSnapshot:'',
+    tournamentName:'', tournamentYear: today.getFullYear(),
+    matchDateEpochDay: dateToEpochDay(today),
+    roundName:'', tournamentDivision:'', tournamentFormat:'',
+    courtSurface:'UNKNOWN', environmentType:'INDOOR',
+    sets:[blankSet(), blankSet()],
+    isTeamMatch:false, teamMyScore:null, teamOpponentScore:null,
+    weatherType:'', ballOrShuttle:'', isNightMatch:false,
+    videoPathOrUrl:'', matchNote:'', photoPath:'', gearId:null, venueId:null
+  };
+}
+function editMatch(id){
+  const m = state.matches.find(function(x){return x.matchId===id;});
+  if(!m) return;
+  const sets = parseScoresJson(m.scoresJson);
+  state.editingMatchId = id;
+  state.draft = {
+    matchId:m.matchId, playerId:m.playerId, sportType:m.sportType, matchType:m.matchType||'SINGLES',
+    partnerName:m.partnerName||'', opponentDisplayName:m.opponentDisplayName||'', opponentTeamNameSnapshot:m.opponentTeamNameSnapshot||'',
+    tournamentName:m.tournamentName||'', tournamentYear:m.tournamentYear||new Date().getFullYear(),
+    matchDateEpochDay:m.matchDateEpochDay, roundName:m.roundName||'', tournamentDivision:m.tournamentDivision||'',
+    tournamentFormat:m.tournamentFormat||'', courtSurface:m.courtSurface||'UNKNOWN',
+    environmentType:m.environmentType||'INDOOR',
+    sets: sets.length?sets:[blankSet()], isTeamMatch:!!m.isTeamMatch,
+    teamMyScore:m.teamMyScore, teamOpponentScore:m.teamOpponentScore,
+    weatherType:m.weatherType||'', ballOrShuttle:m.ballOrShuttle||'', isNightMatch:!!m.isNightMatch,
+    videoPathOrUrl:m.videoPathOrUrl||'', matchNote:m.matchNote||'', photoPath:m.photoPath||'',
+    gearId:m.gearId||null, venueId:m.venueId||null
+  };
+  setTab('register');
+}
+function registerHTML(){
+  const d = state.draft;
+  const p = currentPlayer();
+  if (!p) return '<div class="card"><p>'+esc(t('need_player'))+'</p><button type="button" class="primary block" onclick="showPlayerForm()">'+esc(t('add_player'))+'</button><div id="player-form-slot"></div></div>';
+  if (!d) newDraft();
+  const dd = state.draft;
+  let h = '<div class="card"><h2>'+esc(state.editingMatchId?t('edit_match'):t('register_match'))+'</h2>';
+  h += '<div id="match-error"></div>';
+  h += '<label>'+esc(t('match_date'))+'</label><input id="f-date" type="date" value="'+esc(epochDayToInput(dd.matchDateEpochDay))+'">';
+  h += '<label>'+esc(t('tournament'))+'</label><input id="f-tournament" type="text" value="'+esc(dd.tournamentName)+'" placeholder="○○大会">';
+  h += '<div class="row"><div><label>'+esc(t('year'))+'</label><input id="f-year" type="number" value="'+esc(dd.tournamentYear)+'" min="2000" max="2100"></div>'
+    + '<div><label>'+esc(t('round'))+'</label><input id="f-round" type="text" value="'+esc(dd.roundName)+'" placeholder="1回戦"></div></div>';
+  h += '<div class="row"><div><label>'+esc(t('match_type'))+'</label><select id="f-type">'
+    + '<option value="SINGLES"'+(dd.matchType==='SINGLES'?' selected':'')+'>'+esc(t('singles'))+'</option>'
+    + '<option value="DOUBLES"'+(dd.matchType==='DOUBLES'?' selected':'')+'>'+esc(t('doubles'))+'</option></select></div>'
+    + '<div><label>'+esc(t('surface'))+'</label><select id="f-surface">'
+    + SURFACES.map(function(s){return '<option'+(dd.courtSurface===s?' selected':'')+'>'+s+'</option>';}).join('')+'</select></div></div>';
+  h += '<label>'+esc(t('opponent'))+'</label><input id="f-opponent" type="text" value="'+esc(dd.opponentDisplayName)+'">';
+  h += '<label>'+esc(t('partner'))+'</label><input id="f-partner" type="text" value="'+esc(dd.partner)+'">';
+  h += '<label>'+esc(t('env'))+'</label><select id="f-env">'
+    + '<option value="INDOOR"'+(dd.environmentType==='INDOOR'?' selected':'')+'>'+esc(t('indoor'))+'</option>'
+    + '<option value="OUTDOOR"'+(dd.environmentType==='OUTDOOR'?' selected':'')+'>'+esc(t('outdoor'))+'</option></select>';
+  h += '<h3>'+esc(t('sets'))+'</h3><div id="sets-slot">'+setsHTML()+'</div>'
+    + '<button type="button" onclick="addSet()">＋ '+esc(t('add_set'))+'</button>';
+  h += '<h3>'+esc(t('team_match'))+'</h3>'
+    + '<label><input id="f-team" type="checkbox" style="width:auto;min-height:24px"'+(dd.isTeamMatch?' checked':'')+'> '+esc(t('team_match'))+'</label>'
+    + '<div class="row"><div><label>'+esc(t('team_score'))+'（自）</label><input id="f-team-my" type="number" min="0" value="'+(dd.teamMyScore==null?'':dd.teamMyScore)+'"></div>'
+    + '<div><label>'+esc(t('team_score'))+'（相手）</label><input id="f-team-op" type="number" min="0" value="'+(dd.teamOpponentScore==null?'':dd.teamOpponentScore)+'"></div></div>';
+  h += '<label>'+esc(t('ball'))+'</label><input id="f-ball" type="text" value="'+esc(dd.ballOrShuttle)+'">';
+  h += '<label>'+esc(t('video'))+'</label><input id="f-video" type="url" value="'+esc(dd.videoPathOrUrl)+'" placeholder="https://">';
+  h += '<label>'+esc(t('memo'))+'</label><textarea id="f-note">'+esc(dd.matchNote)+'</textarea>';
+  h += '<div style="height:12px"></div>';
+  h += '<button type="button" class="primary block" onclick="saveMatch()">'+esc(t('save'))+'</button> ';
+  if (state.editingMatchId) h += '<div style="height:8px"></div><button type="button" class="danger block" onclick="deleteMatch()">'+esc(t('del'))+'</button>';
+  h += '</div>';
+  return h;
+}
+function setsHTML(){
+  const d = state.draft;
+  return d.sets.map(function(s, i){
+    const sp = '<option value="">'+esc(t('none'))+'</option>'
+      + ['RET','WO','DEF'].map(function(v){return '<option value="'+v+'"'+(s.specialResult===v?' selected':'')+'>'+v+'</option>';}).join('');
+    return '<div class="set-row" data-set="'+i+'">'
+      + '<div class="set-head"><b>'+(i+1)+'セット</b>'
+      + '<button type="button" onclick="openPointSheet('+i+')">🎯 '+esc(t('point_input'))+'</button></div>'
+      + '<div class="row"><div><label>'+esc(t('my_score'))+'</label>'
+      + '<input type="number" min="0" data-f="myScore" value="'+(s.myScore==null?'':s.myScore)+'"></div>'
+      + '<div><label>'+esc(t('opp_score'))+'</label>'
+      + '<input type="number" min="0" data-f="opponentScore" value="'+(s.opponentScore==null?'':s.opponentScore)+'"></div></div>'
+      + '<div class="row"><div><label>'+esc(t('tiebreak'))+'（自）</label>'
+      + '<input type="number" min="0" data-f="tieBreakMy" value="'+(s.tieBreakMy==null?'':s.tieBreakMy)+'"></div>'
+      + '<div><label>'+esc(t('tiebreak'))+'（相手）</label>'
+      + '<input type="number" min="0" data-f="tieBreakOpponent" value="'+(s.tieBreakOpponent==null?'':s.tieBreakOpponent)+'"></div></div>'
+      + '<label>'+esc(t('special'))+'</label><select data-f="specialResult">'+sp+'</select>'
+      + '<div class="row"><div><label>'+esc(t('lost_score'))+'</label>'
+      + '<input type="text" data-f="lostInitiativeScore" value="'+esc(s.lostInitiativeScore||'')+'" placeholder="7-11"></div>'
+      + '<div><label>'+esc(t('gained_score'))+'</label>'
+      + '<input type="text" data-f="gainedInitiativeScore" value="'+esc(s.gainedInitiativeScore||'')+'" placeholder="15-12"></div></div>'
+      + '<label>'+esc(t('momentum'))+'</label><input type="text" data-f="momentumDetail" value="'+esc(s.momentumDetail||'')+'">'
+      + (d.sets.length>1?'<div style="margin-top:8px"><button type="button" onclick="removeSet('+i+')">'+esc(t('del'))+'</button></div>':'')
+      + '</div>';
+  }).join('');
+}
+function readSetsFromForm(){
+  const rows = $all('.set-row');
+  state.draft.sets = rows.map(function(row){
+    const get = function(f){ const el = row.querySelector('[data-f="'+f+'"]'); return el?el.value:''; };
+    const num = function(f){ const v=get(f); return v===''||v==null?null:parseInt(v,10); };
+    const s = state.draft.sets[parseInt(row.dataset.set,10)] || blankSet();
+    return {
+      myScore:num('myScore'), opponentScore:num('opponentScore'),
+      tieBreakMy:num('tieBreakMy'), tieBreakOpponent:num('tieBreakOpponent'),
+      specialResult:get('specialResult')||null,
+      lostInitiativeScore:get('lostInitiativeScore')||null,
+      gainedInitiativeScore:get('gainedInitiativeScore')||null,
+      momentumDetail:get('momentumDetail')||null,
+      pointSequence: s.pointSequence||null
+    };
+  });
+}
+function addSet(){ readSetsFromForm(); state.draft.sets.push(blankSet()); const slot=$('#sets-slot'); if(slot) slot.innerHTML=setsHTML(); }
+function removeSet(i){ readSetsFromForm(); state.draft.sets.splice(i,1); const slot=$('#sets-slot'); if(slot) slot.innerHTML=setsHTML(); }
+async function saveMatch(){
+  const d = state.draft;
+  const err = $('#match-error');
+  const showErr = function(msg){ if(err){ err.innerHTML='<div class="notice error">'+esc(msg)+'</div>'; } };
+  const dateVal = $('#f-date').value;
+  if (!dateVal){ showErr(t('need_date')); return; }
+  const opp = $('#f-opponent').value.trim();
+  if (!opp){ showErr(t('need_opponent')); return; }
+  readSetsFromForm();
+  const isNew = !state.editingMatchId;
+  if (isNew && !state.isPro && monthMatchCount(d.playerId)>=5){
+    proNotice(t('free_limit_match')); return;
+  }
+  const now = Date.now();
+  const prev = isNew?null:state.matches.find(function(m){return m.matchId===d.matchId;});
+  const m = {
+    matchId:d.matchId, playerId:d.playerId, sportType:d.sportType, matchType:$('#f-type').value,
+    playerTeamNameSnapshot:(currentPlayer()||{}).defaultTeamName||null,
+    partnerName:$('#f-partner').value.trim()||null,
+    opponentDisplayName:opp,
+    opponentMembersJson:JSON.stringify([opp]),
+    opponentTeamNameSnapshot:d.opponentTeamNameSnapshot||null,
+    courtSurface:$('#f-surface').value, environmentType:$('#f-env').value,
+    gearId:d.gearId||null, tournamentName:$('#f-tournament').value.trim(),
+    tournamentYear:parseInt($('#f-year').value,10)||new Date().getFullYear(),
+    matchDateEpochDay:dateInputToEpochDay(dateVal),
+    finalResultCode:'NORMAL', roundName:$('#f-round').value.trim()||null,
+    tournamentDivision:d.tournamentDivision||null, tournamentFormat:d.tournamentFormat||null,
+    scoresJson:JSON.stringify(d.sets), isWin:false,
+    videoPathOrUrl:$('#f-video').value.trim()||null, matchNote:$('#f-note').value.trim()||null,
+    photoPath:d.photoPath||null, isTeamMatch:$('#f-team').checked,
+    teamMyScore:$('#f-team-my').value===''?null:parseInt($('#f-team-my').value,10),
+    teamOpponentScore:$('#f-team-op').value===''?null:parseInt($('#f-team-op').value,10),
+    weatherType:d.weatherType||null, ballOrShuttle:$('#f-ball').value.trim()||null,
+    isNightMatch:d.isNightMatch||false, venueId:d.venueId||null,
+    elapsedDaysFromMaintenance:prev?prev.elapsedDaysFromMaintenance:null,
+    cumulativeMatchesFromMaintenance:prev?prev.cumulativeMatchesFromMaintenance:null,
+    createdAt:prev?prev.createdAt:now, updatedAt:now, isDeleted:false, deletedAt:null
+  };
+  deriveMatch(m);
+  await idbPut('matches', m);
+  await loadAll();
+  state.editingMatchId=null; state.draft=null;
+  toast(t('saved'));
+  setTab('matches');
+}
+async function deleteMatch(){
+  if (!state.editingMatchId) return;
+  if (!confirm(t('confirm_delete'))) return;
+  const m = state.matches.find(function(x){return x.matchId===state.editingMatchId;});
+  if (m){ m.isDeleted=true; m.deletedAt=Date.now(); m.updatedAt=Date.now(); await idbPut('matches', m); }
+  await loadAll();
+  state.editingMatchId=null; state.draft=null;
+  toast(t('deleted'));
+  setTab('matches');
+}
+
+/* ---- ポイント入力シート（純粋関数 calcGameProgress をUIから呼ぶ） ---- */
+function openPointSheet(setIndex){
+  readSetsFromForm();
+  const s = state.draft.sets[setIndex];
+  state.pointSheet = {setIndex:setIndex, points:(s.pointSequence||[]).slice(), server:'A'};
+  renderPointSheet();
+  $('#overlay').classList.add('show');
+}
+function renderPointSheet(){
+  const ps = state.pointSheet;
+  const sport = state.draft.sportType;
+  const prog = calcGameProgress(sport, 'A', ps.points);
+  const sheet = $('#overlay-sheet');
+  sheet.innerHTML = '<h2>'+esc(t('point_input'))+' — '+(ps.setIndex+1)+'セット</h2>'
+    + '<div class="score-big">'+esc(prog.rallyDisplayA)+' : '+esc(prog.rallyDisplayB)
+    + (prog.isTennisTiebreak?' <span class="small">TB '+esc(String(prog.tieBreakScoreA||0))+'-'+esc(String(prog.tieBreakScoreB||0))+'</span>':'')
+    + '</div>'
+    + '<p class="muted" style="text-align:center">'+esc(t('server'))+': '+(prog.currentServer==='A'?esc(t('point_a')):esc(t('point_b')))
+    + (prog.isGameOver?' ・ '+esc(t('game_over')):'')+'</p>'
+    + '<div class="point-btns">'
+    + '<button type="button" class="primary" onclick="pointTap(\'A\')">A<br><span class="small">'+esc(t('point_a'))+'</span></button>'
+    + '<button type="button" onclick="pointTap(\'B\')">B<br><span class="small">'+esc(t('point_b'))+'</span></button></div>'
+    + '<div class="row"><button type="button" onclick="pointUndo()">'+esc(t('undo'))+'</button>'
+    + '<button type="button" onclick="pointClear()">'+esc(t('clear_points'))+'</button></div>'
+    + '<div style="height:10px"></div>'
+    + '<button type="button" class="primary block" onclick="pointApply()">'+esc(t('apply_points'))+'</button>'
+    + '<div style="height:8px"></div><button type="button" class="block" onclick="closeOverlay()">'+esc(t('cancel'))+'</button>';
+}
+function pointTap(w){ state.pointSheet.points.push(w); renderPointSheet(); }
+function pointUndo(){ state.pointSheet.points.pop(); renderPointSheet(); }
+function pointClear(){ state.pointSheet.points=[]; renderPointSheet(); }
+function pointApply(){
+  const ps = state.pointSheet;
+  const sport = state.draft.sportType;
+  const prog = calcGameProgress(sport, 'A', ps.points);
+  const s = state.draft.sets[ps.setIndex];
+  s.pointSequence = ps.points.slice();
+  if (sport==='TENNIS' || sport==='SOFT_TENNIS'){
+    s.myScore = prog.tennisGamesScoreA; s.opponentScore = prog.tennisGamesScoreB;
+    if (prog.isTennisTiebreak){ s.tieBreakMy=prog.tieBreakScoreA; s.tieBreakOpponent=prog.tieBreakScoreB; }
+  } else {
+    s.myScore = prog.scoreA; s.opponentScore = prog.scoreB;
+  }
+  closeOverlay();
+  const slot=$('#sets-slot'); if(slot) slot.innerHTML=setsHTML();
+}
+function closeOverlay(){ $('#overlay').classList.remove('show'); state.pointSheet=null; }
+
+/* ---- 分析（最小限） ---- */
+function analyticsHTML(){
+  const p = currentPlayer();
+  if (!p) return '<div class="card"><p>'+esc(t('no_player'))+'</p></div>';
+  const ms = playerMatches();
+  const wins = ms.filter(function(m){return m.isWin;}).length;
+  let h = '<div class="card"><h2>'+esc(p.playerName)+'</h2><div class="stat-grid">'
+    + '<div class="stat"><div class="num">'+ms.length+'</div><div class="lbl">'+esc(t('total_matches'))+'</div></div>'
+    + '<div class="stat"><div class="num">'+wins+'</div><div class="lbl">'+esc(t('wins'))+'</div></div>'
+    + '<div class="stat"><div class="num">'+(ms.length?Math.round(wins/ms.length*100):0)+'%</div><div class="lbl">'+esc(t('win_rate'))+'</div></div></div></div>';
+  // 月別勝率（直近6か月）
+  const byMonth = {};
+  ms.forEach(function(m){
+    const d = epochDayToDate(m.matchDateEpochDay);
+    const key = d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0');
+    byMonth[key]=byMonth[key]||{total:0,wins:0};
+    byMonth[key].total++; if(m.isWin) byMonth[key].wins++;
+  });
+  const months = Object.keys(byMonth).sort().slice(-6);
+  h += '<div class="card"><h2>'+esc(t('monthly_win_rate'))+'</h2>';
+  if (!months.length) h += '<p class="muted">'+esc(t('no_matches'))+'</p>';
+  months.forEach(function(k){
+    const v=byMonth[k], rate=v.total?Math.round(v.wins/v.total*100):0;
+    h += '<div class="bar-row"><span class="bar-label">'+esc(k)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+rate+'%"></div></div><span class="bar-val">'+rate+'% ('+v.wins+'/'+v.total+')</span></div>';
+  });
+  h += '</div>';
+  // サーフェス別勝率
+  const bySurf = {};
+  ms.forEach(function(m){
+    const s=m.courtSurface||'UNKNOWN';
+    bySurf[s]=bySurf[s]||{total:0,wins:0};
+    bySurf[s].total++; if(m.isWin) bySurf[s].wins++;
+  });
+  h += '<div class="card"><h2>'+esc(t('surface_win_rate'))+'</h2>';
+  const surfs = Object.keys(bySurf).sort();
+  if (!surfs.length) h += '<p class="muted">'+esc(t('no_matches'))+'</p>';
+  surfs.forEach(function(k){
+    const v=bySurf[k], rate=v.total?Math.round(v.wins/v.total*100):0;
+    h += '<div class="bar-row"><span class="bar-label">'+esc(k)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+rate+'%"></div></div><span class="bar-val">'+rate+'% ('+v.wins+'/'+v.total+')</span></div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+/* ---- 用具（最小限） ---- */
+function gearHTML(){
+  const p = currentPlayer();
+  if (!p) return '<div class="card"><p>'+esc(t('no_player'))+'</p></div>';
+  const gs = state.gears.filter(function(g){return g.playerId===p.playerId;})
+    .sort(function(a,b){return b.lastMaintenanceAt-a.lastMaintenanceAt;});
+  let h = '<div class="card"><h2>'+esc(t('gear_list'))+'</h2>';
+  if (!gs.length) h += '<p class="muted">—</p>';
+  gs.forEach(function(g){
+    const days = daysBetween(g.lastMaintenanceAt, Date.now());
+    const used = state.matches.filter(function(m){return m.gearId===g.gearId && m.createdAt>=g.lastMaintenanceAt;}).length;
+    h += '<div class="card" style="margin-bottom:8px"><div class="top" style="display:flex;justify-content:space-between;gap:8px">'
+      + '<div><b>'+esc(g.racketName)+'</b><div class="sub muted">'+esc(g.stringName||'')+' ・ '+esc(String(g.tensionValue==null?'':g.tensionValue))+' '+esc(g.tensionUnit||'')+'</div>'
+      + '<div class="sub muted">'+esc(t('last_maintenance'))+': '+esc(fmtDateTime(g.lastMaintenanceAt))+'</div>'
+      + '<div class="sub">'+esc(t('days_since'))+': <b>'+days+'</b> ・ '+esc(t('matches_since'))+': <b>'+used+'</b></div></div>'
+      + '<div><span class="badge '+(g.isActive?'win':'draw')+'">'+esc(g.isActive?t('active'):t('inactive'))+'</span></div></div>'
+      + '<div class="row" style="margin-top:8px"><button type="button" onclick="showGearForm(\''+esc(g.gearId)+'\')">'+esc(t('edit'))+'</button>'
+      + '<button type="button" onclick="recordMaintenance(\''+esc(g.gearId)+'\')">'+esc(t('record_maintenance'))+'</button></div></div>';
+  });
+  h += '<button type="button" class="primary block" onclick="showGearForm(null)">＋ '+esc(t('add_gear'))+'</button></div>';
+  h += '<div id="gear-form-slot"></div>';
+  return h;
+}
+function showGearForm(gearId){
+  const p = currentPlayer();
+  const g = gearId?state.gears.find(function(x){return x.gearId===gearId;}):null;
+  const slot = $('#gear-form-slot');
+  if(!slot) return;
+  slot.innerHTML = '<div class="card"><h3>'+esc(g?t('edit'):t('add_gear'))+'</h3>'
+    + '<label>'+esc(t('racket'))+'</label><input id="g-racket" type="text" value="'+esc(g?g.racketName:'')+'">'
+    + '<label>'+esc(t('string_name'))+'</label><input id="g-string" type="text" value="'+esc(g?g.stringName||'':'')+'">'
+    + '<div class="row"><div><label>'+esc(t('tension'))+'</label><input id="g-tension" type="number" min="0" value="'+esc(g&&g.tensionValue!=null?g.tensionValue:'')+'"></div>'
+    + '<div><label>'+esc(t('tension_unit'))+'</label><select id="g-unit"><option value="lbs"'+(g&&g.tensionUnit==='lbs'?' selected':'')+'>lbs</option><option value="kg"'+(g&&g.tensionUnit==='kg'?' selected':'')+'>kg</option></select></div></div>'
+    + '<label>'+esc(t('last_maintenance'))+'</label><input id="g-last" type="date" value="'+esc(g?epochDayToInput(dateToEpochDay(new Date(g.lastMaintenanceAt))):epochDayToInput(dateToEpochDay(new Date())))+'">'
+    + '<div style="height:10px"></div><div class="row">'
+    + '<button type="button" class="primary" onclick="saveGear(\''+(g?esc(g.gearId):'')+'\')">'+esc(t('save'))+'</button>'
+    + '<button type="button" onclick="render()">'+esc(t('cancel'))+'</button>'
+    + (g?'<button type="button" class="danger" onclick="deleteGear(\''+esc(g.gearId)+'\')">'+esc(t('del'))+'</button>':'')
+    + '</div></div>';
+  $('#g-racket').focus();
+}
+async function saveGear(gearId){
+  const p = currentPlayer();
+  const name = $('#g-racket').value.trim();
+  if(!name) return;
+  const now = Date.now();
+  const prev = gearId?state.gears.find(function(g){return g.gearId===gearId;}):null;
+  const lastMs = dateInputToEpochDay($('#g-last').value)!=null
+    ? epochDayToDate(dateInputToEpochDay($('#g-last').value)).getTime() : now;
+  const g = {
+    gearId: prev?prev.gearId:uuid(), playerId:p.playerId, sportType:p.sportType,
+    racketName:name, stringName:$('#g-string').value.trim()||null,
+    tensionValue:$('#g-tension').value===''?null:parseInt($('#g-tension').value,10),
+    tensionUnit:$('#g-unit').value, lastMaintenanceAt:lastMs,
+    customItemsJson:prev?prev.customItemsJson:'[]', isActive:prev?prev.isActive:true,
+    createdAt:prev?prev.createdAt:now, updatedAt:now, isDeleted:false
+  };
+  await idbPut('gears', g);
+  await loadAll(); toast(t('saved')); render();
+}
+async function deleteGear(gearId){
+  if(!confirm(t('confirm_delete'))) return;
+  const g = state.gears.find(function(x){return x.gearId===gearId;});
+  if(g){ g.isDeleted=true; g.updatedAt=Date.now(); await idbPut('gears', g); }
+  await loadAll(); toast(t('deleted')); render();
+}
+async function recordMaintenance(gearId){
+  const g = state.gears.find(function(x){return x.gearId===gearId;});
+  if(!g) return;
+  const now = Date.now();
+  await idbPut('gear_maintenances', {
+    maintenanceId:uuid(), gearId:gearId, maintenanceDate:now,
+    note:'', stringName:g.stringName, tensionValue:g.tensionValue,
+    tensionUnit:g.tensionUnit, createdAt:now
+  });
+  g.lastMaintenanceAt = now; g.updatedAt = now;
+  await idbPut('gears', g);
+  await loadAll(); toast(t('saved')); render();
+}
+
+/* ---- 選手フォーム・フォーカスフォーム ---- */
+function showPlayerForm(){
+  const slot = $('#player-form-slot') || $('#view');
+  const p = currentPlayer();
+  slot.innerHTML = '<div class="card"><h3>'+esc(t('add_player'))+'</h3>'
+    + '<label>'+esc(t('player_name'))+'</label><input id="p-name" type="text" value="">'
+    + '<label>'+esc(t('team'))+'</label><input id="p-team" type="text" value="">'
+    + '<label>'+esc(t('sport'))+'</label><select id="p-sport">'
+    + SPORTS.map(function(s){return '<option value="'+s+'">'+esc(sportLabel(s))+'</option>';}).join('')+'</select>'
+    + '<div style="height:10px"></div><div class="row">'
+    + '<button type="button" class="primary" onclick="savePlayer()">'+esc(t('save'))+'</button>'
+    + '<button type="button" onclick="render()">'+esc(t('cancel'))+'</button></div></div>';
+  const inp = $('#p-name'); if(inp) inp.focus();
+}
+async function savePlayer(){
+  const name = $('#p-name').value.trim();
+  if(!name) return;
+  if (!state.isPro && state.players.length>=1){ proNotice(t('free_limit_player')); return; }
+  const now = Date.now();
+  const p = {
+    playerId:uuid(), playerName:name, defaultTeamName:$('#p-team').value.trim()||null,
+    sportType:$('#p-sport').value, avatarUri:null, createdAt:now, updatedAt:now, isDeleted:false
+  };
+  await idbPut('players', p);
+  state.currentPlayerId = p.playerId;
+  localStorage.setItem('ss-player', p.playerId);
+  await loadAll(); toast(t('saved')); render();
+}
+function showFocusForm(){
+  const slot = $('#focus-form-slot');
+  if(!slot) return;
+  slot.innerHTML = '<div class="card"><h3>'+esc(t('focus_now'))+'</h3>'
+    + '<label>'+esc(t('focus_now'))+'</label><input id="f-focus" type="text" value="">'
+    + '<div style="height:10px"></div><div class="row">'
+    + '<button type="button" class="primary" onclick="saveFocus()">'+esc(t('save'))+'</button>'
+    + '<button type="button" onclick="render()">'+esc(t('cancel'))+'</button></div></div>';
+  const inp = $('#f-focus'); if(inp) inp.focus();
+}
+async function saveFocus(){
+  const p = currentPlayer(); if(!p) return;
+  const title = $('#f-focus').value.trim();
+  if(!title) return;
+  const now = Date.now();
+  // 既存の有効フォーカスを終了させる
+  for (const f of state.focuses){
+    if (f.playerId===p.playerId && !f.endDate){ f.endDate=dateToEpochDay(new Date()); f.updatedAt=now; await idbPut('focuses', f); }
+  }
+  await idbPut('focuses', {
+    focusId:uuid(), playerId:p.playerId, title:title,
+    startDate:dateToEpochDay(new Date()), endDate:null, createdAt:now, updatedAt:now, isDeleted:false
+  });
+  await loadAll(); toast(t('saved')); render();
+}
+
+/* ---- 設定 ---- */
+function settingsHTML(){
+  const planBadge = state.isPro?'<span class="badge pro">'+esc(t('pro_plan'))+'</span>':'<span class="badge free">'+esc(t('free_plan'))+'</span>';
+  let h = '<div class="card"><button type="button" onclick="state.view=\'tab\'; render()">'+esc(t('back'))+'</button>'
+    + '<h2 style="margin-top:10px">'+esc(t('settings'))+'</h2></div>';
+  h += '<div class="card"><h2>'+esc(t('plan'))+' '+planBadge+'</h2>'
+    + '<p class="muted">'+esc(t('pro_soon'))+'</p>'
+    + '<div class="kv"><span>'+esc(t('matches'))+' ('+esc(LANG==='ja'?'今月':'this month')+')</span><b>'+(currentPlayer()?monthMatchCount(state.currentPlayerId):0)+' / 5</b></div>'
+    + '<div class="kv"><span>'+esc(t('add_player'))+'</span><b>'+state.players.length+' / 1</b></div></div>';
+  h += '<div class="card"><h2>'+esc(t('language'))+'</h2><div class="row">'
+    + '<button type="button" class="'+(LANG==='ja'?'primary':'')+'" onclick="setLang(\'ja\')">日本語</button>'
+    + '<button type="button" class="'+(LANG==='en'?'primary':'')+'" onclick="setLang(\'en\')">English</button></div>'
+    + '<h2 style="margin-top:16px">'+esc(t('theme'))+'</h2><div class="row">'
+    + '<button type="button" class="'+(THEME==='standard'?'primary':'')+'" onclick="setTheme(\'standard\')">'+esc(t('theme_standard'))+'</button>'
+    + '<button type="button" class="'+(THEME==='mint_pale'?'primary':'')+'" onclick="setTheme(\'mint_pale\')">'+esc(t('theme_mint'))+'</button></div></div>';
+  h += '<div class="card"><h2>'+esc(t('data_location'))+'</h2><p class="muted">'+esc(t('data_location_note'))+'</p>'
+    + '<div class="kv"><span>'+esc(t('storage'))+'</span><b>'+esc(state.persisted===true?t('storage_persisted'):state.persisted===false?t('storage_not_persisted'):'—')+'</b></div>'
+    + '<div class="kv"><span>'+esc(t('outbox_pending'))+'</span><b>'+state.outboxCount+'</b></div></div>';
+  h += '<div class="card"><h2>JSON</h2>'
+    + '<button type="button" class="block" onclick="exportJSON()">'+esc(t('export_json'))+'</button>'
+    + '<div style="height:8px"></div>'
+    + '<button type="button" class="block" onclick="document.getElementById(\'import-file\').click()">'+esc(t('import_json'))+'</button>'
+    + '<input id="import-file" type="file" accept="application/json,.json" style="display:none"></div>';
+  h += '<div class="card"><h2>'+esc(t('demo_badge'))+'</h2><p class="muted small">'+esc(t('demo_note'))+'</p>'
+    + (state.demo
+      ? '<button type="button" class="danger block" onclick="deleteDemo()">'+esc(t('demo_delete'))+'</button>'
+      : '<button type="button" class="block" onclick="loadDemo()">'+esc(t('demo_load'))+'</button>')
+    + '</div>';
+  h += '<div class="card"><p class="muted small">SmashStats Web — Phase 1<br>DB: smashstats-web（IndexedDB）・ schema v16相当<br>Phase 2: スプレッドシート同期 / Phase 4: Pro（買い切り）</p></div>';
+  return h;
+}
+function setLang(l){ LANG=l; localStorage.setItem('ss-lang', l); render(); }
+function setTheme(th){ THEME=th; localStorage.setItem('ss-theme', th); render(); }
+
+/* ---- JSON書き出し・取り込み（Android版と同じキー名） ---- */
+async function exportJSON(){
+  const data = {
+    players: await idbAll('players'),
+    gears: await idbAll('gears'),
+    matches: await idbAll('matches'),
+    maintenances: await idbAll('gear_maintenances'),
+    venues: await idbAll('venues'),
+    opponentProfiles: await idbAll('opponent_profiles'),
+    opponentCustomItems: await idbAll('opponent_custom_items'),
+    focuses: await idbAll('focuses'),
+    notes: await idbAll('notes')
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  const d = new Date();
+  a.href = URL.createObjectURL(blob);
+  a.download = 'smashstats_backup_' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  toast(t('export_done'));
+}
+async function importJSONFile(file){
+  try{
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const map = {players:'players', gears:'gears', matches:'matches', maintenances:'gear_maintenances',
+      venues:'venues', opponentProfiles:'opponent_profiles', opponentCustomItems:'opponent_custom_items',
+      focuses:'focuses', notes:'notes'};
+    for (const k of Object.keys(map)){
+      const arr = data[k];
+      if (!Array.isArray(arr)) continue;
+      for (const row of arr){
+        if (k==='matches') deriveMatch(row);
+        await idbPut(map[k], row);
+      }
+    }
+    await loadAll(); toast(t('imported')); render();
+  }catch(e){ proNotice(t('import_error')); }
+}
+
+/* ---- デモデータ（Android版バックアップのサンプルをそのまま使う） ---- */
+const DEMO = {
+  players:[{playerId:'player_badminton_001', playerName:'高橋 翔太', defaultTeamName:'緑が丘ジュニアバドミントンクラブ', sportType:'BADMINTON', avatarUri:null, createdAt:1787629637883, updatedAt:1792813637883, isDeleted:false}],
+  gears:[{gearId:'gear_badminton_001', playerId:'player_badminton_001', sportType:'BADMINTON', racketName:'YONEX ASTROX 99 PRO', stringName:'BG66 ULTIMAX', tensionValue:26, tensionUnit:'lbs', lastMaintenanceAt:1791604037883, customItemsJson:'[]', isActive:true, createdAt:1787629637883, updatedAt:1791604037883, isDeleted:false}],
+  matches:[
+    {matchId:'match_badminton_001', playerId:'player_badminton_001', sportType:'BADMINTON', matchType:'SINGLES', playerTeamNameSnapshot:'緑が丘ジュニアバドミントンクラブ', partnerName:null, opponentDisplayName:'三浦 颯太', opponentMembersJson:'["三浦 颯太"]', opponentTeamNameSnapshot:'八幡バドミントン少年団', courtSurface:'WOOD', environmentType:'INDOOR', gearId:'gear_badminton_001', tournamentName:'秋季市民ジュニアバドミントン選手権', tournamentYear:2026, matchDateEpochDay:20745, finalResultCode:'NORMAL', roundName:'準決勝', tournamentDivision:'決勝（上位）トーナメント', tournamentFormat:'予選リーグ→決勝・下位トーナメント', scoresJson:'[{"myScore":21,"opponentScore":17,"lostInitiativeScore":"11-13","gainedInitiativeScore":"16-15","momentumDetail":"第1セット中盤に相手のヘアピンで崩されたが、奥へのクリアで主導権奪回"},{"myScore":18,"opponentScore":21,"lostInitiativeScore":"14-18","gainedInitiativeScore":"7-5","momentumDetail":"スマッシュが浮き連続失点"},{"myScore":21,"opponentScore":19,"lostInitiativeScore":"15-18","gainedInitiativeScore":"19-18","momentumDetail":"15-18劣勢から渾身のストレートスマッシュ3連続で逆転"}]', isWin:true, videoPathOrUrl:'https://youtu.be/sample_match_badminton_001', matchNote:'ファイナル終盤の集中力が見事。相手の疲労を見逃さずラリーのテンポを上げたのが勝因。', photoPath:null, isTeamMatch:false, teamMyScore:null, teamOpponentScore:null, weatherType:null, ballOrShuttle:'YONEX AEROSENSA 700', isNightMatch:false, venueId:1, elapsedDaysFromMaintenance:9, cumulativeMatchesFromMaintenance:2, createdAt:1792381637883, updatedAt:1792813637883, isDeleted:false, deletedAt:null},
+    {matchId:'match_badminton_002', playerId:'player_badminton_001', sportType:'BADMINTON', matchType:'SINGLES', playerTeamNameSnapshot:'緑が丘ジュニアバドミントンクラブ', partnerName:null, opponentDisplayName:'佐々木 陸', opponentMembersJson:'["佐々木 陸"]', opponentTeamNameSnapshot:'港南ジュニアクラブ', courtSurface:'WOOD', environmentType:'INDOOR', gearId:'gear_badminton_001', tournamentName:'秋季市民ジュニアバドミントン選手権', tournamentYear:2026, matchDateEpochDay:20745, finalResultCode:'NORMAL', roundName:'決勝', tournamentDivision:'決勝（上位）トーナメント', tournamentFormat:'予選リーグ→決勝・下位トーナメント', scoresJson:'[{"myScore":19,"opponentScore":21,"lostInitiativeScore":"17-19","gainedInitiativeScore":"11-8","momentumDetail":"相手左利きのクロスカットに苦戦"},{"myScore":21,"opponentScore":15,"lostInitiativeScore":"5-7","gainedInitiativeScore":"11-9","momentumDetail":"相手のバック奥を徹底的に攻めて奪取"},{"myScore":17,"opponentScore":21,"lostInitiativeScore":"13-17","gainedInitiativeScore":"8-6","momentumDetail":"最終盤、相手の執念のレシーブに根負けしアウトミス"}]', isWin:false, videoPathOrUrl:'https://youtu.be/sample_match_badminton_002', matchNote:'惜しくも準優勝。左利き対策が次回までの最大の課題。', photoPath:null, isTeamMatch:false, teamMyScore:null, teamOpponentScore:null, weatherType:null, ballOrShuttle:'YONEX AEROSENSA 700', isNightMatch:false, venueId:1, elapsedDaysFromMaintenance:9, cumulativeMatchesFromMaintenance:3, createdAt:1792381637883, updatedAt:1792813637883, isDeleted:false, deletedAt:null}
+  ],
+  focuses:[{focusId:'focus_badminton_001', playerId:'player_badminton_001', title:'レシーブ時に足を止めず、バック奥へ高く返球して態勢を立て直す', startDate:20736, endDate:null, createdAt:1791604037883, updatedAt:1792813637883, isDeleted:false}],
+  notes:[{noteId:'note_badminton_001', playerId:'player_badminton_001', content:'今日の練習ではフットワークの1歩目を意識。フォア前のシャトルに対して沈み込まずに早くシャトルの下に入れた。', photoPath:null, noteDate:20748, createdAt:1792640837883, updatedAt:1792813637883, isDeleted:false}]
+};
+async function loadDemo(){
+  for (const p of DEMO.players) await idbPut('players', p);
+  for (const g of DEMO.gears) await idbPut('gears', g);
+  for (const m of DEMO.matches){ deriveMatch(m); await idbPut('matches', m); }
+  for (const f of DEMO.focuses) await idbPut('focuses', f);
+  for (const n of DEMO.notes) await idbPut('notes', n);
+  await metaSet('demo', true);
+  state.currentPlayerId = 'player_badminton_001';
+  localStorage.setItem('ss-player', state.currentPlayerId);
+  await loadAll(); toast(t('imported')); setTab('home');
+}
+async function deleteDemo(){
+  if (!confirm(t('confirm_demo_delete'))) return;
+  for (const p of DEMO.players){ const r=await idbGet('players', p.playerId); if(r){ r.isDeleted=true; await idbPut('players', r); } }
+  for (const g of DEMO.gears){ const r=await idbGet('gears', g.gearId); if(r){ r.isDeleted=true; await idbPut('gears', r); } }
+  for (const m of DEMO.matches){ const r=await idbGet('matches', m.matchId); if(r){ r.isDeleted=true; await idbPut('matches', r); } }
+  for (const f of DEMO.focuses){ const r=await idbGet('focuses', f.focusId); if(r){ r.isDeleted=true; await idbPut('focuses', r); } }
+  for (const n of DEMO.notes){ const r=await idbGet('notes', n.noteId); if(r){ r.isDeleted=true; await idbPut('notes', r); } }
+  await metaSet('demo', false);
+  await loadAll();
+  if (state.currentPlayerId==='player_badminton_001'){ state.currentPlayerId=null; localStorage.removeItem('ss-player'); await loadAll(); }
+  toast(t('deleted')); render();
+}
+
+/* ---------------- 起動 ---------------- */
+function bindGlobal(){
+  $all('#tabbar button').forEach(function(b){
+    b.addEventListener('click', function(){ setTab(b.dataset.tab); });
+  });
+  $('#btn-settings').addEventListener('click', function(){ state.view='settings'; render(); });
+  const sel = $('#player-select');
+  sel.addEventListener('change', function(){
+    if (sel.value==='__add__'){ showPlayerForm(); renderPlayerSelect(); return; }
+    state.currentPlayerId = sel.value;
+    localStorage.setItem('ss-player', sel.value);
+    render();
+  });
+  document.addEventListener('click', function(e){
+    if (e.target && e.target.id==='import-file') return;
+    const f = $('#import-file');
+    if (f) f.onchange = function(){ if(f.files && f.files[0]) importJSONFile(f.files[0]); f.value=''; };
+  });
+  // キーボード表示時は下部タブを隠す（入力欄にフォーカスしている間だけ）
+  document.addEventListener('focusin', function(e){
+    const tag = (e.target.tagName||'').toLowerCase();
+    if (tag==='input' || tag==='textarea' || tag==='select') document.body.classList.add('kb');
+  });
+  document.addEventListener('focusout', function(){
+    setTimeout(function(){ document.body.classList.remove('kb'); }, 150);
+  });
+  document.addEventListener('click', function(e){
+    if (e.target && e.target.id==='overlay' ) closeOverlay();
+  });
+}
+async function init(){
+  bindGlobal();
+  try{
+    if (navigator.storage && navigator.storage.persist){
+      state.persisted = await navigator.storage.persist();
+    }
+  }catch(e){ state.persisted = null; }
+  await loadAll();
+  await metaSet('schemaVersion', 16);
+  if (!await metaGet('deviceId')) await metaSet('deviceId', uuid());
+  render();
+  if ('serviceWorker' in navigator && (location.protocol==='http:' || location.protocol==='https:')){
+    navigator.serviceWorker.register('sw.js').catch(function(){ /* オフライン時は無視 */ });
+  }
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
