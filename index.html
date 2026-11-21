@@ -160,11 +160,24 @@ textarea{min-height:76px; resize:vertical;}
 .divider{height:1px; background:var(--border); margin:14px 0;}
 .kv{display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px solid var(--surface-muted); font-size:15px;}
 .kv:last-child{border-bottom:none;}
-.kv b{text-align:right;}
+.kv span{text-wrap:balance;}
+.kv b{text-align:right; text-wrap:balance;}
 .tabs-inline{display:flex; gap:8px; margin-bottom:12px;}
 .tabs-inline button{flex:1; min-height:44px; font-size:15px;}
 .tabs-inline button.active{background:var(--accent); color:#fff; border-color:var(--accent); font-weight:700;}
 @media (max-width:360px){ header h1{font-size:17px;} }
+/* Phase 3: score sheet */
+.sheet-table{width:100%;border-collapse:collapse;font-size:15px}
+.sheet-table th,.sheet-table td{border:1px solid var(--border);padding:8px;text-align:center}
+.sheet-table td:first-child{font-weight:700}
+.small{font-size:12px}
+@media print{
+  body{background:#fff}
+  header, #tabbar, #install-banner, .no-print{display:none !important}
+  #overlay{position:static;background:#fff;display:block !important}
+  #overlay .sheet{max-height:none;border-radius:0;box-shadow:none;padding:0}
+  .sheet-table th,.sheet-table td{border-color:#999}
+}
 </style>
 </head>
 <body data-theme="standard">
@@ -210,11 +223,11 @@ const I18N = {
     no_matches:'試合がまだありません。', demo_badge:'デモデータ',
     register_match:'試合を登録', edit_match:'試合を編集', match_date:'試合日', tournament:'大会名',
     year:'年度', round:'ラウンド', match_type:'種目', singles:'シングルス', doubles:'ダブルス',
-    opponent:'対戦相手', partner:'ペア名（ダブルス時）', surface:'サーフェス', env:'屋内 / 屋外',
+    opponent:'対戦相手', partner:'ペア名（ダブルス時）', surface:'サーフェス', surface_unknown:'未選択', env:'屋内 / 屋外',
     indoor:'屋内', outdoor:'屋外', unknown:'不明', team_match:'団体戦', team_score:'チームスコア',
     sets:'セット', add_set:'セットを追加', my_score:'自分の得点', opp_score:'相手の得点',
     tiebreak:'タイブレーク', special:'特記事項（RET / WO / DEF）', none:'なし',
-    lost_score:'流れを失ったスコア', gained_score:'流れを取り戻したスコア', momentum:'戦術メモ',
+    lost_score:'失ったスコア', gained_score:'取り戻したスコア', momentum:'戦術メモ',
     memo:'メモ', video:'動画URL', result:'結果', win:'勝ち', loss:'負け', draw:'引き分け',
     monthly_win_rate:'月別勝率', surface_win_rate:'サーフェス別勝率',
     gear_list:'用具一覧', add_gear:'用具を追加', racket:'ラケット名', string_name:'ガット名',
@@ -222,8 +235,8 @@ const I18N = {
     days_since:'張り替えからの経過日数', matches_since:'張り替え後の試合数',
     record_maintenance:'張り替えを記録', maintenance_history:'張り替え履歴',
     language:'言語', theme:'テーマ', theme_standard:'スタンダード', theme_mint:'ミントペール',
-    plan:'プラン', free_plan:'無料プラン', pro_plan:'Pro（準備中）',
-    pro_soon:'Pro（買い切り）は Phase 4 で提供予定です。今は無料プランの範囲で使えます。',
+    plan:'プラン', free_plan:'無料プラン', pro_plan:'Pro',
+    pro_soon:'Pro（買い切り）は選手・試合の登録が無制限になります。過去のデータはそのまま使えます。',
     data_location:'データの置き場所', data_location_note:'試合データはこの端末と、自分のスプレッドシートの両方に保存します。同期は手動または起動時に行います。',
     sync_bridge_url:'ブリッジURL（Apps Script）', sync_sheet_url:'スプレッドシートのURL', sync_secret:'合言葉',
     sync_secret_ph:'自分で決めた合言葉（8文字以上）を入力', sync_secret_set:'設定済み（変更時のみ再入力）',
@@ -246,12 +259,49 @@ const I18N = {
     export_json:'JSONで全量書き出し', import_json:'JSONで取り込み（Android版と同じ形式）',
     demo_load:'デモデータを入れる', demo_delete:'デモデータを消す',
     demo_note:'デモデータはAndroid版バックアップのサンプル（架空の選手）です。',
-    storage:'端末内の保存', storage_persisted:'永続化: 許可されています', storage_not_persisted:'永続化: 未許可（ホーム画面追加で安定します）',
+    storage:'端末内の保存', storage_persisted:'永続化: 許可されています', storage_not_persisted:'未許可（ホーム画面追加で安定）',
     install_title:'ホーム画面に追加すると、7日間開かなくてもデータが消えにくくなります。',
     install_how:'Safariの共有ボタン →「ホーム画面に追加」を選んでください。',
     install_close:'閉じる',
-    free_limit_player:'無料プランでは選手は1名までです。2人目以降はPro（準備中）が必要です。',
-    free_limit_match:'無料プランでは当月の試合登録は5試合までです。6試合目以降はPro（準備中）が必要です。',
+    free_limit_player:'無料プランでは選手は1名までです。2人目以降はProが必要です。',
+    free_limit_match:'無料プランでは当月の試合登録は5試合までです。6試合目以降はProが必要です。',
+    lic_title:'Pro・ライセンス',
+    lic_price_soon:'価格は近日公開です',
+    lic_buy:'Proにする（買い切り）',
+    lic_buy_note:'Stripeの決済ページが開きます。決済が終わるとライセンスキーが発行され、このアプリに戻ります。',
+    lic_key_label:'ライセンスキー',
+    lic_key_ph:'SS-XXXX-XXXX-XXXX',
+    lic_activate:'ライセンスを有効化',
+    lic_activated:'Proを有効化しました。',
+    lic_invalid:'ライセンスキーが正しくありません。',
+    lic_revoked:'このライセンスは無効化されています。',
+    lic_device_limit:'このライセンスはすでに2台の端末で使われています。使わなくなった端末でProを解除してから、こちらで有効化してください。',
+    lic_not_configured:'ライセンスサーバーの設定がまだです。',
+    lic_server_url:'ライセンスサーバーURL',
+    lic_server_hint:'ライセンスサーバー（Cloudflare Worker）のURLを入力します。空のままでも無料プランで使えます。',
+    lic_restore:'キーをなくした方',
+    lic_restore_email:'購入時のメールアドレス',
+    lic_restore_btn:'キーのヒントを確認',
+    lic_restore_found:'このメールアドレスのライセンスが見つかりました。キーの末尾: ',
+    lic_restore_notfound:'このメールアドレスのライセンスは見つかりませんでした。',
+    lic_restore_note:'購入時のメールにライセンスキーが届いています。キーの全文はセキュリティのためここでは表示しません。',
+    lic_devices:'利用中の端末',
+    lic_last_verified:'最終確認',
+    lic_deactivate:'この端末のProを解除',
+    lic_deactivated:'この端末のProを解除しました。ライセンスキー自体は有効なままです。',
+    lic_key_saved_note:'ライセンスキーは控えておいてください。端末内に保存されるのはキーのハッシュだけで、キーそのものは保存されません。',
+    lic_claim_done:'決済を確認し、ライセンスを発行しました。キーを控えておいてください。',
+    lic_claim_failed:'決済の確認ができませんでした。',
+    lic_claimed_before:'この決済のライセンスはすでに発行済みです。控えたキーを入力してください。',
+    lic_network:'ライセンスサーバーに接続できませんでした。オンラインになってから再度お試しください。',
+    lic_promo:'プロモコード（任意）',
+    lic_promo_invalid:'プロモコードが正しくないか、使えません。',
+    lic_crypto:'この環境ではライセンス確認ができません（httpsで開いてください）。',
+    lic_unlimited:'無制限',
+    lic_key_shown_once:'発行されたライセンスキー（この画面でのみ表示します）',
+    lic_copy:'コピーする',
+    lic_copied:'コピーしました。',
+    lic_reverify_failed:'ライセンスの確認ができませんでした。Proを無料プランに戻しました。',
     saved:'保存しました。', deleted:'削除しました。', imported:'取り込みました。',
     confirm_delete:'削除しますか？', confirm_demo_delete:'デモデータをすべて消しますか？',
     point_input:'ポイント入力', point_a:'自選手が得点', point_b:'相手が得点',
@@ -263,7 +313,99 @@ const I18N = {
     notes:'ノート', add_note:'ノートを追加', note_content:'内容',
     venue:'会場', night_match:'ナイトマッチ', weather:'天候', ball:'ボール / シャトル',
     all:'すべて', filter_win:'勝ちのみ', filter_loss:'負けのみ',
-    active:'使用中', inactive:'休止中'
+    active:'使用中', inactive:'休止中',
+    losses:'敗北',
+    an_month:'今月', an_3m:'3か月', an_year:'今年', an_all:'全期間',
+    an_no_data:'データがありません',
+    an_a:'A 成長', an_b:'B 勝敗', an_c:'C 用具・環境', an_d:'D 戦術', an_e:'E 対戦相手',
+    an_rivals:'ライバル推移', an_scorecard:'スコアカード分析',
+    an_recent5:'直近5試合', an_recent10:'直近10試合', an_avg_pd:'平均得失点差/ゲーム',
+    an_streak_max:'最大連勝', an_streak_max_l:'最大連敗', an_current_streak:'現在の連勝・連敗',
+    an_weekday:'平日', an_weekend:'休日', an_team:'団体戦', an_indiv:'個人戦',
+    an_first_set:'第1セット先取後の勝率', an_after_lose_first:'第1セットを落とした後の勝率',
+    an_close:'接戦ゲーム（2点差以内）の勝率', an_tight:'タイトな試合の勝率',
+    an_sets:'セット取得率', an_points:'得点率', an_avg_scored:'平均得点/ゲーム', an_avg_conceded:'平均失点/ゲーム',
+    an_straight:'ストレート勝ち', an_full_win:'フルセット勝ち', an_full_loss:'フルセット負け', an_straight_loss:'ストレート負け',
+    an_fg:'第1セット取得率', an_final:'ファイナルセット率',
+    an_gear_rate:'用具別勝率', an_string_rate:'ガット別勝率', an_maint_rate:'張り替えからの経過日数別勝率',
+    an_cum_rate:'張り替え後の使用試合数別勝率', an_tension_rate:'テンション別勝率', an_surf_rate:'サーフェス別勝率',
+    an_final_set_loss:'ファイナルセット相手得点率', an_wear:'用具の注意', an_surface_rec:'サーフェス別おすすめ',
+    an_round_first:'初戦の勝率', an_round_later:'2回戦以降の勝率', an_round_medal:'上位戦の勝率',
+    an_first_day:'その日の1試合目', an_subseq_day:'その日の2試合目以降',
+    an_lead_slip:'第1セット先取後の逆転負け率', an_comeback:'第1セットを落とした後の逆転率',
+    an_tb:'タイブレーク・デュースの勝率', an_deciding:'ファイナルセットの勝率',
+    an_indoor:'屋内', an_outdoor:'屋外', an_day:'昼', an_night:'夜',
+    an_club:'クラブ別勝率', an_singles:'シングルス', an_doubles:'ダブルス', an_partner:'ペア相性',
+    an_gp_conv:'ゲームポイント決定率', an_gp_save:'ゲームポイント阻止率',
+    an_bounce:'バウンスバック率', an_momentum_keep:'流れの維持率',
+    an_phase:'序盤（1〜5点目）の得点率', an_phase_mid:'中盤（6〜15点目）の得点率', an_phase_end:'終盤（16点目〜）の得点率',
+    an_lead_keep:'リード時の逃げ切り率', an_comeback_game:'ビハインドからの逆転率', an_dominance:'主導権（リード中の得点割合）',
+    an_max_consec:'平均最大連続得点', an_max_consec_l:'平均最大連続失点',
+    an_insights:'コーチングのヒント', an_scorecard_empty:'スコアカード登録済みの試合がありません。試合のポイント入力からスコアカード（ポイント経過）を保存すると詳細分析が解放されます。',
+    venue_list:'会場一覧', add_venue:'会場を追加', venue_name:'会場名', venue_address:'住所', venue_phone:'電話番号',
+    venue_surface:'サーフェス', venue_note:'備考', venue_indoor_outdoor:'屋内 / 屋外',
+    opp_list:'対戦相手一覧', add_opponent:'対戦相手を追加', opp_name:'名前', opp_team:'所属', opp_hand:'利き手',
+    opp_hand_r:'右', opp_hand_l:'左', opp_strong:'得意なショット', opp_weak:'苦手なショット',
+    opp_strong_course:'得意なコース', opp_weak_course:'苦手なコース', opp_memo:'戦術メモ',
+    scoresheet:'スコアシート', scoresheet_print:'印刷する', scoresheet_sets:'セット', scoresheet_total:'合計',
+    csv_import:'CSV取り込み', csv_import_btn:'CSVファイルを選んで取り込み',
+    csv_imported:'CSVを取り込みました。', csv_dup:'重複のためスキップ', csv_limit:'無料枠のためスキップ',
+    csv_error:'CSVの読み取りに失敗しました。10列の形式を確認してください。',
+    ig_title:'Instagram画像', ig_download:'画像をダウンロード', ig_summary:'戦績サマリ', ig_monthly:'月別勝率',
+    ig_note:'選手名のみ表示します。対戦相手の名前は出しません。',
+    ai_title:'AIプロンプト', ai_copy:'コピーする', ai_copied:'コピーしました。',
+    ai_issues:'課題分析', ai_tactics:'次戦戦術', ai_image:'画像指示',
+    gear_win_rate:'勝率',
+    an_wear_warn:'ギア [{name}]：使用頻度が高め（{n}試合・総ゲーム数 {sets}）またはメンテナンス後{limit}日以上経過。張替え・状態チェック推奨です。',
+    an_wear_ok:'選択期間内のギアは推奨メンテナンス周期内で良好な状態です。',
+    an_surf_rec:'{surface}コート最適ギア: [{name}] (勝率 {rate} / {n}試合)',
+    an_surf_rec_empty:'用具・サーフェスデータが揃うとコート別の相性アドバイスが表示されます。',
+    an_insight_first:'⚡ 初戦の立ち上がりが課題（初戦 {a}% vs 2回戦以降 {b}%）：試合前のアップや1ポイント目から足を動かすルーティンを強化しましょう。',
+    an_insight_medal:'🎯 上位戦（準決勝・決勝）への壁（勝率 {a}%）：序盤は安定して勝てています。上位選手に対して序盤から主導権を握るパターンを増やしましょう。',
+    an_insight_stamina:'🔋 連戦後半のスタミナ注意（1試合目 {a}% → 2試合目以降 {b}%）：同日連戦で勝率が落ちています。試合間の水分・補食とクールダウンを意識しましょう。',
+    an_insight_engine:'🔥 エンジンがかかるのが後半型（2試合目以降 {a}%）：試合を重ねるごとに調子を上げられています。',
+    an_insight_lead:'⚠️ リード後の逃げ切り注意（第1G先取後に逆転負け {a}%）：先手を取った後に守勢になりがちです。リード時こそ積極的に攻める姿勢が有効です。',
+    an_insight_comeback:'💪 粘り強い逆転力（第1G失点からの逆転率 {a}%）：劣勢でも集中を切らさず試合を立て直せています。',
+    an_insight_empty:'📊 試合や環境条件（ラウンド・天候・スコア）を継続記録すると、課題と強みがここに自動整理されます。',
+    an_e_threshold:'同一の対戦相手クラブ（所属）と2戦以上の対戦で相性が表示されます',
+    an_rival_once:'対戦履歴1回（推移分析は2回以上から）',
+    an_rival_up:'力関係向上中（スコア差向上） 📈',
+    an_rival_down:'苦戦傾向（スコア差拡大） 📉',
+    an_rival_stable:'拮抗・互角の推移 🤝',
+    an_rival_threshold:'同一対戦相手と2回以上の対戦データを登録すると、力関係の推移や得意・苦手分析（ライバル相性分析）が自動解放されます',
+    an_sc_bounce_hi:'🔥 切り替え力（バウンスバック率 {a}%）：失点直後に連続失点を防ぎ、すばやく得点を奪い返すメンタルタフネスが強みです！',
+    an_sc_bounce_lo:'💡 失点直後のバウンスバック率（{a}%）：失点後に相手のペースに飲まれやすい傾向があります。失点後は間を取り、サーブ/レシーブの基本に集中しましょう。',
+    an_sc_gp_hi:'🎯 ゲームポイント決定力（{a}%）：勝負所で確実に決めきる勝負強さを持っています。',
+    an_sc_gp_lo:'⚠️ ゲームポイントの取りこぼし（獲得率 {a}%）：ゲームポイントを迎えた際に慎重になりすぎる傾向があります。得意な攻めのパターンを貫きましょう。',
+    an_sc_slow:'🚀 スロースターターの傾向（序盤得点率 {a}%）：1〜5ポイント目の立ち上がりが低めです。試合前のウォーミングアップで1本目の集中力を高めましょう。',
+    an_sc_fast:'⚡ 立ち上がりの速さ（序盤得点率 {a}%）：試合の出だしで主導権を握るのが得意です！',
+    an_sc_lead_hi:'🛡️ リード時の逃げ切り力（{a}%）：2点以上リードした展開を確実に勝ちにつなげるゲームコントロールができています。',
+    an_sc_lead_lo:'⚠️ リード時の逆転負け注意（逃げ切り率 {a}%）：リード時に気を緩めず、加点を狙うゲーム展開を意識しましょう。',
+    an_sc_comeback:'🏆 粘り強さと逆転力（ビハインドからの逆転率 {a}%）：2点以上差をつけられても諦めず、後半巻き返す粘り強さがあります！',
+    an_sc_empty:'📊 スコアカードデータを継続的に記録することで、より精度の高い勝因・課題の分析が可能になります。',
+    opp_no_data:'対戦相手がまだいません。',
+    ai_p_issues_title:'【課題分析プロンプト】',
+    ai_p_issues_body:'あなたはジュニアスポーツのコーチです。以下の戦績データから、選手の課題を3つに絞って具体的に指摘し、それぞれの改善ドリルを提案してください。',
+    ai_p_tactics_title:'【次戦戦術プロンプト】',
+    ai_p_tactics_body:'あなたはジュニアスポーツのコーチです。以下の戦績データから、次の試合に向けた戦術プランを立ててください。相手の傾向、自分の強み、注意点を具体的に示してください。',
+    ai_p_image_title:'【画像指示文プロンプト】',
+    ai_p_image_body:'以下の戦績データをもとに、SNSで共有する応援画像のデザイン指示文を作ってください。選手名のみを使い、対戦相手の名前は出さないこと。',
+    ai_p_player:'選手: {name} / {sport} / 期間: {period}',
+    ai_p_no_data:'試合データ: まだありません',
+    ai_p_total:'総試合数: {total} / 勝利: {wins} / 敗北: {losses} / 勝率: {rate}',
+    ai_p_recent5:'直近5試合: {w}勝{l}敗（勝率{rate}）',
+    ai_p_streak:'最大連勝: {a} / 最大連敗: {b} / 現在: {c}',
+    ai_p_monthly:'月別勝率: ',
+    ai_p_sets:'セット取得率: {a} / 得点率: {b}',
+    ai_p_fst:'第1セット先取後の勝率: {a}（{w}/{t}）',
+    ai_p_als:'第1セットを落とした後の勝率: {a}（{w}/{t}）',
+    ai_p_surf:'サーフェス別勝率: ',
+    ai_p_gear:'用具別勝率: ',
+    ai_p_insights:'戦術の気づき:',
+    ai_p_clubs:'苦手なクラブ: ',
+    ai_p_partners:'ペア相性: ',
+    ai_p_momentum:'流れの変化があったセット: {n}セット',
+    ai_p_recent:'直近の試合:'
   },
   en: {
     tab_home:'Home', tab_matches:'Matches', tab_register:'Add', tab_analytics:'Stats', tab_gear:'Gear',
@@ -276,11 +418,11 @@ const I18N = {
     no_matches:'No matches yet.', demo_badge:'Demo data',
     register_match:'Add a match', edit_match:'Edit match', match_date:'Date', tournament:'Tournament',
     year:'Year', round:'Round', match_type:'Type', singles:'Singles', doubles:'Doubles',
-    opponent:'Opponent', partner:'Partner (doubles)', surface:'Surface', env:'Indoor / Outdoor',
+    opponent:'Opponent', partner:'Partner (doubles)', surface:'Surface', surface_unknown:'Not set', env:'Indoor / Outdoor',
     indoor:'Indoor', outdoor:'Outdoor', unknown:'Unknown', team_match:'Team match', team_score:'Team score',
     sets:'Sets', add_set:'Add set', my_score:'My score', opp_score:'Opponent score',
     tiebreak:'Tiebreak', special:'Special (RET / WO / DEF)', none:'None',
-    lost_score:'Score when momentum was lost', gained_score:'Score when momentum was regained', momentum:'Tactical note',
+    lost_score:'Score when lost', gained_score:'Score when regained', momentum:'Tactical note',
     memo:'Memo', video:'Video URL', result:'Result', win:'Win', loss:'Loss', draw:'Draw',
     monthly_win_rate:'Monthly win rate', surface_win_rate:'Surface win rate',
     gear_list:'Gear list', add_gear:'Add gear', racket:'Racket', string_name:'String',
@@ -288,8 +430,8 @@ const I18N = {
     days_since:'Days since restring', matches_since:'Matches since restring',
     record_maintenance:'Record restring', maintenance_history:'Restring history',
     language:'Language', theme:'Theme', theme_standard:'Standard', theme_mint:'Mint Pale',
-    plan:'Plan', free_plan:'Free plan', pro_plan:'Pro (coming soon)',
-    pro_soon:'Pro (one-time purchase) will be available in Phase 4. Free plan limits apply for now.',
+    plan:'Plan', free_plan:'Free plan', pro_plan:'Pro',
+    pro_soon:'Pro (one-time purchase) removes the player and match limits. Your existing data stays as is.',
     data_location:'Where data lives', data_location_note:'Match data is kept on this device and in your own spreadsheet. Sync runs manually or at startup.',
     sync_bridge_url:'Bridge URL (Apps Script)', sync_sheet_url:'Spreadsheet URL', sync_secret:'Passphrase',
     sync_secret_ph:'Choose a passphrase (8+ characters)', sync_secret_set:'Set (re-enter only to change)',
@@ -316,8 +458,45 @@ const I18N = {
     install_title:'Add to Home Screen so your data is not cleared after 7 days of not opening the app.',
     install_how:'In Safari, tap Share → “Add to Home Screen”.',
     install_close:'Close',
-    free_limit_player:'Free plan allows 1 player. A 2nd player needs Pro (coming soon).',
-    free_limit_match:'Free plan allows 5 matches per month. The 6th needs Pro (coming soon).',
+    free_limit_player:'Free plan allows 1 player. A 2nd player needs Pro.',
+    free_limit_match:'Free plan allows 5 matches per month. The 6th needs Pro.',
+    lic_title:'Pro & license',
+    lic_price_soon:'Price coming soon',
+    lic_buy:'Get Pro (one-time purchase)',
+    lic_buy_note:'Stripe checkout will open. After payment, a license key is issued and you return to this app.',
+    lic_key_label:'License key',
+    lic_key_ph:'SS-XXXX-XXXX-XXXX',
+    lic_activate:'Activate license',
+    lic_activated:'Pro activated.',
+    lic_invalid:'This license key is not valid.',
+    lic_revoked:'This license has been revoked.',
+    lic_device_limit:'This license is already used on 2 devices. Deactivate Pro on a device you no longer use, then activate here.',
+    lic_not_configured:'The license server is not configured yet.',
+    lic_server_url:'License server URL',
+    lic_server_hint:'Enter the license server (Cloudflare Worker) URL. You can keep using the free plan with this empty.',
+    lic_restore:'Lost your key?',
+    lic_restore_email:'Email used at purchase',
+    lic_restore_btn:'Check key hint',
+    lic_restore_found:'A license for this email was found. Key ending: ',
+    lic_restore_notfound:'No license was found for this email.',
+    lic_restore_note:'Your license key was sent to your purchase email. The full key is never shown here for security.',
+    lic_devices:'Devices in use',
+    lic_last_verified:'Last verified',
+    lic_deactivate:'Deactivate Pro on this device',
+    lic_deactivated:'Pro deactivated on this device. The license key itself stays valid.',
+    lic_key_saved_note:'Keep your license key somewhere safe. Only its hash is stored on this device, never the key itself.',
+    lic_claim_done:'Payment confirmed and your license issued. Keep the key somewhere safe.',
+    lic_claim_failed:'Could not confirm the payment.',
+    lic_claimed_before:'This payment already issued a license. Enter the key you saved.',
+    lic_network:'Could not reach the license server. Try again when online.',
+    lic_promo:'Promo code (optional)',
+    lic_promo_invalid:'This promo code is invalid or cannot be used.',
+    lic_crypto:'License verification is unavailable in this environment (open via https).',
+    lic_unlimited:'Unlimited',
+    lic_key_shown_once:'Your license key (shown only on this screen)',
+    lic_copy:'Copy',
+    lic_copied:'Copied.',
+    lic_reverify_failed:'License verification failed. Pro was reverted to the free plan.',
     saved:'Saved.', deleted:'Deleted.', imported:'Imported.',
     confirm_delete:'Delete this?', confirm_demo_delete:'Delete all demo data?',
     point_input:'Point input', point_a:'I scored', point_b:'Opponent scored',
@@ -329,7 +508,99 @@ const I18N = {
     notes:'Notes', add_note:'Add note', note_content:'Content',
     venue:'Venue', night_match:'Night match', weather:'Weather', ball:'Ball / shuttle',
     all:'All', filter_win:'Wins only', filter_loss:'Losses only',
-    active:'Active', inactive:'Inactive'
+    active:'Active', inactive:'Inactive',
+    losses:'Losses',
+    an_month:'This month', an_3m:'3 months', an_year:'This year', an_all:'All time',
+    an_no_data:'No data yet',
+    an_a:'A Growth', an_b:'B Win / Loss', an_c:'C Gear & Conditions', an_d:'D Tactics', an_e:'E Opponents',
+    an_rivals:'Rival trends', an_scorecard:'Score-card analysis',
+    an_recent5:'Last 5 matches', an_recent10:'Last 10 matches', an_avg_pd:'Avg point diff / game',
+    an_streak_max:'Longest win streak', an_streak_max_l:'Longest losing streak', an_current_streak:'Current streak',
+    an_weekday:'Weekday', an_weekend:'Weekend', an_team:'Team matches', an_indiv:'Individual matches',
+    an_first_set:'Win rate after taking the 1st set', an_after_lose_first:'Win rate after losing the 1st set',
+    an_close:'Close-game win rate (within 2 pts)', an_tight:'Tight-match win rate',
+    an_sets:'Set win rate', an_points:'Point win rate', an_avg_scored:'Avg points scored / game', an_avg_conceded:'Avg points conceded / game',
+    an_straight:'Straight wins', an_full_win:'Full-length wins', an_full_loss:'Full-length losses', an_straight_loss:'Straight losses',
+    an_fg:'1st set win rate', an_final:'Deciding-set rate',
+    an_gear_rate:'Win rate by gear', an_string_rate:'Win rate by string', an_maint_rate:'Win rate by days since restring',
+    an_cum_rate:'Win rate by matches since restring', an_tension_rate:'Win rate by tension', an_surf_rate:'Win rate by surface',
+    an_final_set_loss:'Opponent points share in final set', an_wear:'Gear alerts', an_surface_rec:'Best gear by surface',
+    an_round_first:'First-round win rate', an_round_later:'Later-round win rate', an_round_medal:'Medal-round win rate',
+    an_first_day:'1st match of the day', an_subseq_day:'2nd+ match of the day',
+    an_lead_slip:'Lost after taking the 1st set', an_comeback:'Comeback rate after losing the 1st set',
+    an_tb:'Tiebreak / deuce win rate', an_deciding:'Deciding-set win rate',
+    an_indoor:'Indoor', an_outdoor:'Outdoor', an_day:'Day', an_night:'Night',
+    an_club:'Win rate by club', an_singles:'Singles', an_doubles:'Doubles', an_partner:'Partner synergy',
+    an_gp_conv:'Game-point conversion', an_gp_save:'Game-point saves',
+    an_bounce:'Bounce-back rate', an_momentum_keep:'Momentum retention',
+    an_phase:'Early-phase point rate (pts 1–5)', an_phase_mid:'Mid-phase point rate (pts 6–15)', an_phase_end:'Late-phase point rate (pt 16+)',
+    an_lead_keep:'Lead preservation rate', an_comeback_game:'Comeback rate from behind', an_dominance:'Dominance (share of points while leading)',
+    an_max_consec:'Avg max consecutive points won', an_max_consec_l:'Avg max consecutive points lost',
+    an_insights:'Coaching insights', an_scorecard_empty:'No matches with a score card yet. Save a point-by-point score card from the point input to unlock this analysis.',
+    venue_list:'Venues', add_venue:'Add venue', venue_name:'Venue name', venue_address:'Address', venue_phone:'Phone',
+    venue_surface:'Surface', venue_note:'Notes', venue_indoor_outdoor:'Indoor / Outdoor',
+    opp_list:'Opponents', add_opponent:'Add opponent', opp_name:'Name', opp_team:'Team', opp_hand:'Dominant hand',
+    opp_hand_r:'Right', opp_hand_l:'Left', opp_strong:'Strong shots', opp_weak:'Weak shots',
+    opp_strong_course:'Strong courses', opp_weak_course:'Weak courses', opp_memo:'Tactical memo',
+    scoresheet:'Score sheet', scoresheet_print:'Print', scoresheet_sets:'Set', scoresheet_total:'Total',
+    csv_import:'CSV import', csv_import_btn:'Choose a CSV file to import',
+    csv_imported:'CSV imported.', csv_dup:'skipped as duplicates', csv_limit:'skipped (free-plan limit)',
+    csv_error:'Could not read the CSV. Please check the 10-column format.',
+    ig_title:'Instagram image', ig_download:'Download image', ig_summary:'Results summary', ig_monthly:'Monthly win rate',
+    ig_note:'Only the player name is shown. Opponent names are not shown.',
+    ai_title:'AI prompt', ai_copy:'Copy', ai_copied:'Copied.',
+    ai_issues:'Issue analysis', ai_tactics:'Next-match tactics', ai_image:'Image',
+    gear_win_rate:'Win rate',
+    an_wear_warn:'Gear [{name}]: heavy use ({n} matches, {sets} games total) or {limit}+ days since maintenance. Consider restringing / checking its condition.',
+    an_wear_ok:'Gear in the selected period is within its recommended maintenance cycle and in good shape.',
+    an_surf_rec:'Best gear for {surface} courts: [{name}] (win rate {rate} / {n} matches)',
+    an_surf_rec_empty:'Once gear and surface data are available, court-specific gear advice will appear here.',
+    an_insight_first:'⚡ Slow starts in first-round matches (first round {a}% vs later rounds {b}%): strengthen your warm-up and move your feet from the first point.',
+    an_insight_medal:'🎯 A wall in medal rounds (win rate {a}%): you are steady early on. Build more patterns to take the initiative early against stronger opponents.',
+    an_insight_stamina:'🔋 Stamina in later matches of the day (1st match {a}% → 2nd+ {b}%): your win rate drops in same-day matches. Mind hydration, snacks and cool-down between matches.',
+    an_insight_engine:'🔥 Late starter (2nd+ matches {a}%): you get better as you play more matches in a day.',
+    an_insight_lead:'⚠️ Closing out leads (lost after taking the 1st set {a}%): you tend to get defensive after taking the lead. Stay aggressive while ahead.',
+    an_insight_comeback:'💪 Strong comeback ability (comeback rate after losing the 1st set {a}%): you stay focused and turn matches around even when behind.',
+    an_insight_empty:'📊 Keep recording matches and conditions (round, weather, score) and your strengths and issues will be summarised here automatically.',
+    an_e_threshold:'Play a club (team) at least twice to see your record against them',
+    an_rival_once:'Played once (trend analysis needs 2+ matches)',
+    an_rival_up:'Improving against this rival (point gap closing) 📈',
+    an_rival_down:'Struggling more against this rival (point gap widening) 📉',
+    an_rival_stable:'Evenly matched 🤝',
+    an_rival_threshold:'Register 2+ matches against the same opponent to unlock rival trends and strengths/weaknesses analysis',
+    an_sc_bounce_hi:'🔥 Strong reset ability (bounce-back rate {a}%): you stop losing streaks quickly and take points back right after conceding — real mental toughness!',
+    an_sc_bounce_lo:'💡 Bounce-back rate after conceding ({a}%): you tend to get dragged into the opponent’s rhythm after losing a point. Take a breath and refocus on serve/receive basics.',
+    an_sc_gp_hi:'🎯 Game-point conversion ({a}%): you finish the big points when it matters.',
+    an_sc_gp_lo:'⚠️ Game points slipping away (conversion {a}%): you get too cautious on game points. Stick to your best attacking patterns.',
+    an_sc_slow:'🚀 Slow starter (early-phase point rate {a}%): your first 5 points are below par. Use the warm-up to sharpen focus for the first point.',
+    an_sc_fast:'⚡ Fast starter (early-phase point rate {a}%): you take control from the first points!',
+    an_sc_lead_hi:'🛡️ Closing out leads ({a}%): you reliably convert 2+ point leads into wins with strong game control.',
+    an_sc_lead_lo:'⚠️ Losing leads (lead preservation {a}%): don’t relax when ahead — keep looking to add points.',
+    an_sc_comeback:'🏆 Resilience and comebacks (comeback rate from behind {a}%): you never give up even 2+ points down and fight back late!',
+    an_sc_empty:'📊 Keep recording score-card data for sharper analysis of what wins and loses matches.',
+    opp_no_data:'No opponents yet.',
+    ai_p_issues_title:'[Issue analysis prompt]',
+    ai_p_issues_body:'You are a junior-sports coach. From the match data below, identify exactly three issues for this player, explain each concretely, and suggest a practice drill for each.',
+    ai_p_tactics_title:'[Next-match tactics prompt]',
+    ai_p_tactics_body:'You are a junior-sports coach. From the match data below, build a tactical plan for the next match: the opponent’s tendencies, the player’s strengths, and what to watch out for. Be specific.',
+    ai_p_image_title:'[Image brief prompt]',
+    ai_p_image_body:'Using the match data below, write a design brief for a fan image to share on social media. Use only the player’s name — never the opponent’s name.',
+    ai_p_player:'Player: {name} / {sport} / Period: {period}',
+    ai_p_no_data:'Match data: none yet',
+    ai_p_total:'Total matches: {total} / Wins: {wins} / Losses: {losses} / Win rate: {rate}',
+    ai_p_recent5:'Last 5 matches: {w} W - {l} L (win rate {rate})',
+    ai_p_streak:'Longest win streak: {a} / Longest losing streak: {b} / Current: {c}',
+    ai_p_monthly:'Monthly win rate: ',
+    ai_p_sets:'Set win rate: {a} / Point win rate: {b}',
+    ai_p_fst:'Win rate after taking the 1st set: {a} ({w}/{t})',
+    ai_p_als:'Win rate after losing the 1st set: {a} ({w}/{t})',
+    ai_p_surf:'Win rate by surface: ',
+    ai_p_gear:'Win rate by gear: ',
+    ai_p_insights:'Tactical notes:',
+    ai_p_clubs:'Toughest clubs: ',
+    ai_p_partners:'Partner synergy: ',
+    ai_p_momentum:'Sets with a momentum shift: {n}',
+    ai_p_recent:'Recent matches:'
   }
 };
 const SPORTS = ['BADMINTON','TENNIS','SOFT_TENNIS','TABLE_TENNIS','PICKLEBALL'];
@@ -344,6 +615,8 @@ let LANG = localStorage.getItem('ss-lang') || 'ja';
 let THEME = localStorage.getItem('ss-theme') || 'standard';
 if (!I18N[LANG]) LANG = 'ja';
 function t(key){ const d = I18N[LANG] || I18N.ja; return d[key] || I18N.ja[key] || key; }
+function jaEn(j,e){ return LANG==='ja'?j:e; }
+function tf(key, vars){ let s=t(key); for (const k in vars) s=s.split('{'+k+'}').join(vars[k]); return s; }
 function sportLabel(code){ return (SPORT_LABEL[LANG]||SPORT_LABEL.ja)[code] || code; }
 
 /* ---------------- ユーティリティ ---------------- */
@@ -637,6 +910,18 @@ const SYNC_PUSH_CHUNK = 300; // 1回の push に入れる行数
 const SYNC_PULL_LIMIT = 2000; // 1回の pull で受け取る行数（テーブルごと）
 const SYNC_CALL_TIMEOUT_MS = 60000; // ブリッジ1回あたりの待ち上限。超えたら打ち切って分かりやすいエラーを出す。
 
+/* ---------------- ライセンス設定（Phase 4: Stripe買い切り） ----------------
+   価格は未決定のため LICENSE_PRICE_JPY は null のまま。
+   Android版の価格が決まったらここ（表示用）と license-worker 側の
+   STRIPE_PRICE_JPY / STRIPE_PRICE_ID（請求額）に同じ金額を入れる。
+   LICENSE_WORKER_URL はライセンスサーバー（Cloudflare Worker）のURL。
+   空のままでは購入・検証は「未設定」表示になる。設定画面からも入力できる。 */
+const LICENSE_WORKER_URL = '';
+const LICENSE_PRICE_JPY = null; // ★価格未定。例: 1980
+const LICENSE_MAX_DEVICES = 2;
+const LICENSE_REVERIFY_DAYS = 7; // Pro の再確認は7日以上たっていたら行う
+const LICENSE_CALL_TIMEOUT_MS = 30000; // ライセンスサーバー1回あたりの待ち上限
+
 function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
 
 function extractSpreadsheetId(input){
@@ -747,7 +1032,7 @@ async function syncCallWithRetry(action, body){
       const code = (err && err.data && err.data.error) || (err && err.message) || '';
       const isRate = code==='RATE_LIMIT' || code==='LOCKED' || err.status===429;
       if (!isRate || attempt===3) throw err;
-      updateSyncStatus('制限中のため ' + Math.round(delay/1000) + '秒後に再試行します…');
+      updateSyncStatus(jaEn('制限中のため ','Rate limited. Retrying in ') + Math.round(delay/1000) + jaEn('秒後に再試行します…','s…'));
       await sleep(delay);
       delay *= 2;
     }
@@ -975,7 +1260,7 @@ async function syncNow(opts){
   await metaSet('syncLastError', null);
   state.sync.statusText = t('sync_done')
     + (conflicts.length ? ' ' + t('sync_conflict_note') : '')
-    + '（送信 ' + pushRes.pushed + '件 / 新規 ' + (pullRes?pullRes.inserted:0) + '件 / 更新 ' + (pullRes?pullRes.updated:0) + '件）';
+    + jaEn('（送信 ',' (sent ') + pushRes.pushed + jaEn('件 / 新規 ',' / new ') + (pullRes?pullRes.inserted:0) + jaEn('件 / 更新 ',' / updated ') + (pullRes?pullRes.updated:0) + jaEn('件）',')');
   updateSyncStatus();
   if (!opts.silent && !opts.auto) toast(t('sync_done'));
   await afterSyncRefresh(opts);
@@ -1004,7 +1289,7 @@ async function syncTestUI(){
     state.sync.lastError = null;
     await metaSet('syncLastError', null);
     const made = (data.created||[]).join(', ') || '—';
-    state.sync.statusText = t('sync_test_ok') + ' schemaVersion=' + data.schemaVersion + ' / 新規作成: ' + made;
+    state.sync.statusText = t('sync_test_ok') + ' schemaVersion=' + data.schemaVersion + jaEn(' / 新規作成: ',' / created: ') + made;
     updateSyncStatus();
   } catch (err){
     const msg = err.message==='offline' ? t('sync_offline')
@@ -1028,11 +1313,262 @@ async function syncRestoreUI(){
   if (!confirm(t('sync_restore_confirm'))) return;
   const res = await syncNow({restore:true});
   if (res && res.ok){
-    state.sync.statusText = t('sync_restored') + '（新規 ' + (res.pull?res.pull.inserted:0) + '件 / 更新 ' + (res.pull?res.pull.updated:0) + '件）';
+    state.sync.statusText = t('sync_restored') + jaEn('（新規 ',' (new ') + (res.pull?res.pull.inserted:0) + jaEn('件 / 更新 ',' / updated ') + (res.pull?res.pull.updated:0) + jaEn('件）',')');
     updateSyncStatus();
   }
 }
 
+
+/* =====================================================================
+   ライセンス（Phase 4: Stripe買い切り＋Cloudflare Worker）
+   キーそのものは端末内に保存しない。保存するのは SHA-256 ハッシュだけ
+   （設計書 DESIGN.md §7・§13）。サーバー側は license-worker/src/index.js。
+   無効化されても過去のデータは読める・書き出せる。新規登録だけ無料枠に戻る。
+   ネットワークの失敗では Pro を解除しない（サーバーからの確定応答だけが解除する）。
+   ===================================================================== */
+function licenseWorkerUrl(){ return (state.license.workerUrl || LICENSE_WORKER_URL || '').trim(); }
+function licenseConfigured(){ return !!licenseWorkerUrl(); }
+async function sha256Hex(str){
+  if (!crypto || !crypto.subtle) throw new Error('crypto_unavailable');
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ('0'+b.toString(16)).slice(-2); }).join('');
+}
+function canonicalLicenseKey(key){ return String(key||'').toUpperCase().replace(/[^A-Z0-9]/g,''); }
+async function licenseCall(path, body){
+  const url = licenseWorkerUrl().replace(/\/+$/,'') + path;
+  let res;
+  const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const timer = ctrl ? setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, LICENSE_CALL_TIMEOUT_MS) : null;
+  try {
+    res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body||{}), signal: ctrl ? ctrl.signal : undefined});
+  } catch(e){
+    if (e && e.name==='AbortError'){ const er=new Error('timeout'); er.isTimeout=true; throw er; }
+    const er=new Error('network_error'); er.isNetwork=true; throw er;
+  } finally { if (timer) clearTimeout(timer); }
+  let data=null;
+  try { data = await res.json(); } catch(e){ throw new Error('bad_response'); }
+  return data;
+}
+function licenseErrText(data){
+  const code = (data && data.error) || '';
+  if (code==='INVALID_KEY') return t('lic_invalid');
+  if (code==='REVOKED') return t('lic_revoked');
+  if (code==='DEVICE_LIMIT') return t('lic_device_limit');
+  if (code==='PROMO_INVALID') return t('lic_promo_invalid');
+  if (code==='ALREADY_CLAIMED') return t('lic_claimed_before');
+  if (code==='NOT_PAID' || code==='REFUNDED') return t('lic_claim_failed');
+  if (code==='PRICE_NOT_CONFIGURED') return t('lic_price_soon');
+  return t('lic_network');
+}
+async function setProLocal(on, info){
+  state.isPro = !!on;
+  await metaSet('isPro', !!on);
+  if (on){
+    const now = Date.now();
+    state.license.lastVerifiedAt = now;
+    await metaSet('licenseLastVerifiedAt', now);
+    if (info){
+      if (info.email){ state.license.email = info.email; await metaSet('licenseEmail', info.email); }
+      if (info.devices != null){ state.license.devices = info.devices; await metaSet('licenseDevices', info.devices); }
+    }
+  }
+}
+/* ライセンスサーバーURLを設定画面から保存する。 */
+async function licenseSaveServerUI(){
+  const el = document.getElementById('lic-worker-url');
+  const url = el ? el.value.trim() : '';
+  if (url && url.indexOf('https://')!==0 && url.indexOf('http://127.0.0.1')!==0 && url.indexOf('http://localhost')!==0){
+    proNotice(t('lic_not_configured')); return;
+  }
+  state.license.workerUrl = url;
+  await metaSet('licenseWorkerUrl', url);
+  toast(t('saved'));
+  render();
+}
+/* 購入: Stripe Checkout セッションを作って遷移する。 */
+async function licenseBuyUI(){
+  if (LICENSE_PRICE_JPY == null){ proNotice(t('lic_price_soon')); return; }
+  if (!licenseConfigured()){ proNotice(t('lic_not_configured')); return; }
+  const promoEl = document.getElementById('lic-promo');
+  const promo = promoEl ? promoEl.value.trim() : '';
+  const base = location.origin + location.pathname;
+  const btn = document.getElementById('lic-buy-btn');
+  if (btn) btn.disabled = true;
+  try {
+    const data = await licenseCall('/api/create-checkout', {
+      deviceId: await metaGet('deviceId'),
+      promoCode: promo || undefined,
+      successUrl: base + '?license_session={CHECKOUT_SESSION_ID}',
+      cancelUrl: base
+    });
+    if (!data || !data.ok || !data.url){ proNotice(licenseErrText(data)); if (btn) btn.disabled=false; return; }
+    location.href = data.url;
+  } catch(e){ proNotice(t('lic_network')); if (btn) btn.disabled=false; }
+}
+/* ライセンスキーを入力して有効化する（ハッシュだけを送る・保存する）。 */
+async function licenseVerifyUI(){
+  if (!licenseConfigured()){ proNotice(t('lic_not_configured')); return; }
+  const el = document.getElementById('lic-key');
+  const raw = el ? el.value.trim() : '';
+  if (!raw){ proNotice(t('lic_invalid')); return; }
+  let hash;
+  try { hash = await sha256Hex(canonicalLicenseKey(raw)); }
+  catch(e){ proNotice(t('lic_crypto')); return; }
+  try {
+    const data = await licenseCall('/api/verify', {keyHash: hash, deviceId: await metaGet('deviceId')});
+    if (data && data.ok){
+      await metaSet('licenseKeyHash', hash);
+      state.license.keyHash = hash;
+      state.license.justIssued = '';
+      await setProLocal(true, data);
+      toast(t('lic_activated'));
+      render();
+    } else proNotice(licenseErrText(data));
+  } catch(e){ proNotice(t('lic_network')); }
+}
+/* キーをなくした方: 購入メールアドレスからヒント（末尾4文字）を確認する。 */
+async function licenseRestoreUI(){
+  if (!licenseConfigured()){ proNotice(t('lic_not_configured')); return; }
+  const el = document.getElementById('lic-restore-email');
+  const email = el ? el.value.trim() : '';
+  if (!email || email.indexOf('@') < 0){ proNotice(t('lic_restore_notfound')); return; }
+  try {
+    const data = await licenseCall('/api/restore', {email: email});
+    if (data && data.ok && data.found){
+      state.license.restoreHint = data.hint || '';
+      toast(t('lic_restore_found') + (data.hint||''));
+    } else {
+      state.license.restoreHint = '';
+      proNotice(t('lic_restore_notfound'));
+    }
+    render();
+  } catch(e){ proNotice(t('lic_network')); }
+}
+/* この端末の Pro を解除する（サーバー側の端末登録も空ける。失敗しても端末側は解除）。 */
+async function licenseDeactivateUI(){
+  if (licenseConfigured() && state.license.keyHash){
+    try { await licenseCall('/api/unbind', {keyHash: state.license.keyHash, deviceId: await metaGet('deviceId')}); }
+    catch(e){ /* サーバー側の解除に失敗しても端末側は解除する */ }
+  }
+  await setProLocal(false);
+  state.license.keyHash = '';
+  state.license.email = '';
+  state.license.lastVerifiedAt = null;
+  state.license.devices = 0;
+  state.license.justIssued = '';
+  await metaSet('licenseKeyHash', '');
+  await metaSet('licenseEmail', '');
+  await metaSet('licenseLastVerifiedAt', null);
+  await metaSet('licenseDevices', 0);
+  toast(t('lic_deactivated'));
+  render();
+}
+/* 発行直後のキーを1回だけコピーする。 */
+function licenseCopyKey(){
+  const key = state.license.justIssued;
+  if (!key) return;
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(key).then(function(){ toast(t('lic_copied')); }, function(){ licenseCopyFallback(key); });
+  } else licenseCopyFallback(key);
+}
+function licenseCopyFallback(key){
+  const ta = document.createElement('textarea');
+  ta.value = key; document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); toast(t('lic_copied')); } catch(e){ proNotice(key); }
+  ta.remove();
+}
+/* Stripe 決済からの戻り（?license_session=...）でライセンスを発行する。 */
+async function licenseClaimFromUrl(){
+  let sid = null;
+  try { sid = new URLSearchParams(location.search).get('license_session'); } catch(e){}
+  if (!sid) return;
+  if (!licenseConfigured()){ proNotice(t('lic_not_configured')); return; }
+  let done = false;
+  try {
+    const data = await licenseCall('/api/claim', {sessionId: sid, deviceId: await metaGet('deviceId')});
+    done = true;
+    if (data && data.ok && data.licenseKey){
+      const hash = await sha256Hex(canonicalLicenseKey(data.licenseKey));
+      await metaSet('licenseKeyHash', hash);
+      state.license.keyHash = hash;
+      state.license.justIssued = data.licenseKey;
+      await setProLocal(true, data);
+      toast(t('lic_claim_done'));
+      if (state.view === 'settings') render();
+    } else proNotice(licenseErrText(data));
+  } catch(e){ proNotice(t('lic_network')); }
+  // 確定した結果が出たときだけURLをきれいにする（通信失敗時は再試行できるよう残す）。
+  if (done){ try { history.replaceState(null, '', location.pathname + location.hash); } catch(e){} }
+}
+/* Pro の定期的な再確認。7日以上たっていてオンラインのときだけ。
+   サーバーからの確定応答（無効化・台数超過）でのみ Pro を解除する。 */
+async function licenseReverifySilent(){
+  if (!state.isPro || !licenseConfigured() || navigator.onLine === false) return;
+  if (!state.license.keyHash) return;
+  const last = state.license.lastVerifiedAt || 0;
+  if (Date.now() - last < LICENSE_REVERIFY_DAYS * 86400000) return;
+  try {
+    const data = await licenseCall('/api/verify', {keyHash: state.license.keyHash, deviceId: await metaGet('deviceId')});
+    if (data && data.ok){ await setProLocal(true, data); }
+    else if (data && (data.error==='REVOKED' || data.error==='INVALID_KEY' || data.error==='DEVICE_LIMIT')){
+      await setProLocal(false);
+      proNotice(t('lic_reverify_failed'));
+      render();
+    }
+  } catch(e){ /* オフライン等: 確認できない期間は Pro のまま */ }
+}
+/* 設定画面の「Pro・ライセンス」カード。 */
+function licenseHTML(){
+  const isPro = state.isPro;
+  const planBadge = isPro?'<span class="badge pro">'+esc(t('pro_plan'))+'</span>':'<span class="badge free">'+esc(t('free_plan'))+'</span>';
+  let h = '<div class="card"><h2>'+esc(t('lic_title'))+' '+planBadge+'</h2>';
+  h += '<p class="muted">'+esc(t('pro_soon'))+'</p>';
+  const mm = currentPlayer()?monthMatchCount(state.currentPlayerId):0;
+  h += '<div class="kv"><span>'+esc(t('matches'))+' ('+esc(LANG==='ja'?'今月':'this month')+')</span><b>'+mm+' / '+(isPro?esc(t('lic_unlimited')):'5')+'</b></div>'
+    + '<div class="kv"><span>'+esc(t('add_player'))+'</span><b>'+state.players.length+' / '+(isPro?esc(t('lic_unlimited')):'1')+'</b></div>';
+  if (isPro){
+    h += '<div class="kv"><span>'+esc(t('lic_devices'))+'</span><b>'+(state.license.devices||1)+' / '+LICENSE_MAX_DEVICES+'</b></div>';
+    if (state.license.lastVerifiedAt){
+      h += '<div class="kv"><span>'+esc(t('lic_last_verified'))+'</span><b>'+esc(new Date(state.license.lastVerifiedAt).toLocaleDateString())+'</b></div>';
+    }
+    if (state.license.justIssued){
+      h += '<p class="small" style="margin-top:10px"><b>'+esc(t('lic_key_shown_once'))+'</b></p>'
+        + '<div class="set-row" style="word-break:break-all"><b>'+esc(state.license.justIssued)+'</b></div>'
+        + '<button type="button" onclick="licenseCopyKey()">'+esc(t('lic_copy'))+'</button>'
+        + '<p class="muted small">'+esc(t('lic_key_saved_note'))+'</p>';
+    }
+    h += '<div style="height:8px"></div><button type="button" onclick="licenseDeactivateUI()">'+esc(t('lic_deactivate'))+'</button>';
+  } else {
+    const priceTxt = (LICENSE_PRICE_JPY == null) ? t('lic_price_soon') : '¥' + LICENSE_PRICE_JPY.toLocaleString('ja-JP');
+    h += '<p><b>'+esc(priceTxt)+'</b></p>'
+      + '<p class="muted small">'+esc(t('lic_buy_note'))+'</p>'
+      + '<label>'+esc(t('lic_promo'))+'</label>'
+      + '<input id="lic-promo" type="text" autocomplete="off" placeholder="MUGI20" value="">'
+      + '<div style="height:8px"></div>'
+      + '<button type="button" id="lic-buy-btn" class="primary block" onclick="licenseBuyUI()">'+esc(t('lic_buy'))+'</button>'
+      + '<div style="height:10px"></div>'
+      + '<label>'+esc(t('lic_key_label'))+'</label>'
+      + '<input id="lic-key" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" placeholder="'+esc(t('lic_key_ph'))+'" value="">'
+      + '<div style="height:8px"></div>'
+      + '<button type="button" class="block" onclick="licenseVerifyUI()">'+esc(t('lic_activate'))+'</button>'
+      + '<div style="height:10px"></div>'
+      + '<label>'+esc(t('lic_restore'))+' — '+esc(t('lic_restore_email'))+'</label>'
+      + '<input id="lic-restore-email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" value="">'
+      + '<div style="height:8px"></div>'
+      + '<button type="button" class="block" onclick="licenseRestoreUI()">'+esc(t('lic_restore_btn'))+'</button>';
+    if (state.license.restoreHint){
+      h += '<p class="small" style="margin-top:8px">'+esc(t('lic_restore_found'))+'<b>'+esc(state.license.restoreHint)+'</b></p>'
+        + '<p class="muted small">'+esc(t('lic_restore_note'))+'</p>';
+    }
+  }
+  h += '<div style="height:10px"></div>'
+    + '<label>'+esc(t('lic_server_url'))+'</label>'
+    + '<input id="lic-worker-url" type="url" inputmode="url" autocomplete="off" placeholder="https://smashstats-license.…workers.dev" value="'+esc(state.license.workerUrl)+'">'
+    + '<p class="muted small">'+esc(t('lic_server_hint'))+'</p>'
+    + '<button type="button" onclick="licenseSaveServerUI()">'+esc(t('save'))+'</button></div>';
+  return h;
+}
 
 /* ---------------- 状態 ---------------- */
 const state = {
@@ -1040,9 +1576,12 @@ const state = {
   currentPlayerId: localStorage.getItem('ss-player') || null,
   players:[], matches:[], gears:[], maintenances:[], focuses:[], notes:[],
   outboxCount:0, isPro:false, persisted:null, demo:false,
+  license:{workerUrl:'', keyHash:'', email:'', lastVerifiedAt:null, devices:0, justIssued:'', restoreHint:''},
   sync:{bridgeUrl:'', spreadsheetUrl:'', spreadsheetId:'', secret:'', lastSyncAt:null, lastError:null, conflictCount:0, syncing:false, statusText:'', phase:null, startedAt:null},
   search:'', filter:'all',
   editingMatchId:null, editingGearId:null,
+  venues:[], opponentProfiles:[],
+  analyticsPeriod:'all', igMode:'summary', aiKind:'issues', aiText:'',
   draft:null, // 試合フォームの下書き（メモリ上のみ）
   pointSheet:null // {setIndex, points:[], server}
 };
@@ -1055,9 +1594,17 @@ async function loadAll(){
   state.maintenances = await idbAll('gear_maintenances');
   state.focuses = (await idbAll('focuses')).filter(function(x){return !x.isDeleted;});
   state.notes = (await idbAll('notes')).filter(function(x){return !x.isDeleted;});
+  state.venues = (await idbAll('venues')).filter(function(x){return !x.isDeleted;});
+  state.opponentProfiles = (await idbAll('opponent_profiles')).filter(function(x){return !x.isDeleted;});
   state.outboxCount = (await idbAll('_outbox')).length;
   state.isPro = (await metaGet('isPro'))===true;
   state.demo = (await metaGet('demo'))===true;
+  // ライセンス（キーそのものは保存しない。ハッシュだけ）
+  state.license.workerUrl = (await metaGet('licenseWorkerUrl'))||'';
+  state.license.keyHash = (await metaGet('licenseKeyHash'))||'';
+  state.license.email = (await metaGet('licenseEmail'))||'';
+  state.license.lastVerifiedAt = await metaGet('licenseLastVerifiedAt');
+  state.license.devices = (await metaGet('licenseDevices'))||0;
   // 同期設定（合言葉を含む。_meta は書き出し・同期の対象外）
   state.sync.bridgeUrl = (await metaGet('syncBridgeUrl'))||'';
   state.sync.spreadsheetUrl = (await metaGet('syncSpreadsheetUrl'))||'';
@@ -1099,6 +1646,7 @@ function render(){
   document.documentElement.lang = (LANG==='ja'?'ja':'en');
   renderPlayerSelect();
   renderInstallBanner();
+  $all('[data-i18n]').forEach(function(el){ el.textContent = t(el.dataset.i18n); });
   $all('#tabbar button').forEach(function(b){
     b.classList.toggle('active', state.view==='tab' && b.dataset.tab===state.tab);
   });
@@ -1107,7 +1655,7 @@ function render(){
   if (state.tab==='home') view.innerHTML = homeHTML();
   else if (state.tab==='matches') view.innerHTML = matchesHTML();
   else if (state.tab==='register') view.innerHTML = registerHTML();
-  else if (state.tab==='analytics') view.innerHTML = analyticsHTML();
+  else if (state.tab==='analytics'){ view.innerHTML = analyticsHTML(); setTimeout(igDraw, 0); }
   else if (state.tab==='gear') view.innerHTML = gearHTML();
   if (state.tab==='matches') bindMatchesSearch();
 }
@@ -1282,15 +1830,21 @@ function registerHTML(){
   let h = '<div class="card"><h2>'+esc(state.editingMatchId?t('edit_match'):t('register_match'))+'</h2>';
   h += '<div id="match-error"></div>';
   h += '<label>'+esc(t('match_date'))+'</label><input id="f-date" type="date" value="'+esc(epochDayToInput(dd.matchDateEpochDay))+'">';
-  h += '<label>'+esc(t('tournament'))+'</label><input id="f-tournament" type="text" value="'+esc(dd.tournamentName)+'" placeholder="○○大会">';
+  h += '<label>'+esc(t('tournament'))+'</label><input id="f-tournament" type="text" value="'+esc(dd.tournamentName)+'" placeholder="'+jaEn('○○大会','e.g. City Tournament')+'">';
   h += '<div class="row"><div><label>'+esc(t('year'))+'</label><input id="f-year" type="number" value="'+esc(dd.tournamentYear)+'" min="2000" max="2100"></div>'
-    + '<div><label>'+esc(t('round'))+'</label><input id="f-round" type="text" value="'+esc(dd.roundName)+'" placeholder="1回戦"></div></div>';
+    + '<div><label>'+esc(t('round'))+'</label><input id="f-round" type="text" value="'+esc(dd.roundName)+'" placeholder="'+jaEn('1回戦','Round 1')+'"></div></div>';
   h += '<div class="row"><div><label>'+esc(t('match_type'))+'</label><select id="f-type">'
     + '<option value="SINGLES"'+(dd.matchType==='SINGLES'?' selected':'')+'>'+esc(t('singles'))+'</option>'
     + '<option value="DOUBLES"'+(dd.matchType==='DOUBLES'?' selected':'')+'>'+esc(t('doubles'))+'</option></select></div>'
     + '<div><label>'+esc(t('surface'))+'</label><select id="f-surface">'
-    + SURFACES.map(function(s){return '<option'+(dd.courtSurface===s?' selected':'')+'>'+s+'</option>';}).join('')+'</select></div></div>';
-  h += '<label>'+esc(t('opponent'))+'</label><input id="f-opponent" type="text" value="'+esc(dd.opponentDisplayName)+'">';
+    + SURFACES.map(function(s){return '<option value="'+s+'"'+(dd.courtSurface===s?' selected':'')+'>'+(s==='UNKNOWN'?esc(t('surface_unknown')):s)+'</option>';}).join('')+'</select></div></div>';
+  const oppNames = {};
+  (state.opponentProfiles||[]).forEach(function(o){ oppNames[o.name]=1; });
+  state.matches.forEach(function(m){ if (m.opponentDisplayName) oppNames[m.opponentDisplayName]=1; });
+  h += '<label>'+esc(t('opponent'))+'</label><input id="f-opponent" type="text" list="opp-list" value="'+esc(dd.opponentDisplayName)+'">'
+    + '<datalist id="opp-list">'+Object.keys(oppNames).map(function(n){ return '<option value="'+esc(n)+'">'; }).join('')+'</datalist>';
+  h += '<label>'+esc(t('venue'))+'</label><select id="f-venue"><option value="">'+esc(t('none'))+'</option>'
+    + (state.venues||[]).map(function(v){ return '<option value="'+v.id+'"'+(dd.venueId===v.id?' selected':'')+'>'+esc(v.name)+'</option>'; }).join('')+'</select>';
   h += '<label>'+esc(t('partner'))+'</label><input id="f-partner" type="text" value="'+esc(dd.partner)+'">';
   h += '<label>'+esc(t('env'))+'</label><select id="f-env">'
     + '<option value="INDOOR"'+(dd.environmentType==='INDOOR'?' selected':'')+'>'+esc(t('indoor'))+'</option>'
@@ -1299,13 +1853,14 @@ function registerHTML(){
     + '<button type="button" onclick="addSet()">＋ '+esc(t('add_set'))+'</button>';
   h += '<h3>'+esc(t('team_match'))+'</h3>'
     + '<label><input id="f-team" type="checkbox" style="width:auto;min-height:24px"'+(dd.isTeamMatch?' checked':'')+'> '+esc(t('team_match'))+'</label>'
-    + '<div class="row"><div><label>'+esc(t('team_score'))+'（自）</label><input id="f-team-my" type="number" min="0" value="'+(dd.teamMyScore==null?'':dd.teamMyScore)+'"></div>'
-    + '<div><label>'+esc(t('team_score'))+'（相手）</label><input id="f-team-op" type="number" min="0" value="'+(dd.teamOpponentScore==null?'':dd.teamOpponentScore)+'"></div></div>';
+    + '<div class="row"><div><label>'+esc(t('team_score'))+jaEn('（自）',' (You)')+'</label><input id="f-team-my" type="number" min="0" value="'+(dd.teamMyScore==null?'':dd.teamMyScore)+'"></div>'
+    + '<div><label>'+esc(t('team_score'))+jaEn('（相手）',' (Opponent)')+'</label><input id="f-team-op" type="number" min="0" value="'+(dd.teamOpponentScore==null?'':dd.teamOpponentScore)+'"></div></div>';
   h += '<label>'+esc(t('ball'))+'</label><input id="f-ball" type="text" value="'+esc(dd.ballOrShuttle)+'">';
   h += '<label>'+esc(t('video'))+'</label><input id="f-video" type="url" value="'+esc(dd.videoPathOrUrl)+'" placeholder="https://">';
   h += '<label>'+esc(t('memo'))+'</label><textarea id="f-note">'+esc(dd.matchNote)+'</textarea>';
   h += '<div style="height:12px"></div>';
   h += '<button type="button" class="primary block" onclick="saveMatch()">'+esc(t('save'))+'</button> ';
+  h += '<div style="height:8px"></div><button type="button" class="block" onclick="showScoreSheet()">'+esc(t('scoresheet'))+'</button>';
   if (state.editingMatchId) h += '<div style="height:8px"></div><button type="button" class="danger block" onclick="deleteMatch()">'+esc(t('del'))+'</button>';
   h += '</div>';
   return h;
@@ -1316,15 +1871,15 @@ function setsHTML(){
     const sp = '<option value="">'+esc(t('none'))+'</option>'
       + ['RET','WO','DEF'].map(function(v){return '<option value="'+v+'"'+(s.specialResult===v?' selected':'')+'>'+v+'</option>';}).join('');
     return '<div class="set-row" data-set="'+i+'">'
-      + '<div class="set-head"><b>'+(i+1)+'セット</b>'
+      + '<div class="set-head"><b>'+jaEn((i+1)+'セット','Set '+(i+1))+'</b>'
       + '<button type="button" onclick="openPointSheet('+i+')">🎯 '+esc(t('point_input'))+'</button></div>'
       + '<div class="row"><div><label>'+esc(t('my_score'))+'</label>'
       + '<input type="number" min="0" data-f="myScore" value="'+(s.myScore==null?'':s.myScore)+'"></div>'
       + '<div><label>'+esc(t('opp_score'))+'</label>'
       + '<input type="number" min="0" data-f="opponentScore" value="'+(s.opponentScore==null?'':s.opponentScore)+'"></div></div>'
-      + '<div class="row"><div><label>'+esc(t('tiebreak'))+'（自）</label>'
+      + '<div class="row"><div><label>'+esc(t('tiebreak'))+jaEn('（自）',' (You)')+'</label>'
       + '<input type="number" min="0" data-f="tieBreakMy" value="'+(s.tieBreakMy==null?'':s.tieBreakMy)+'"></div>'
-      + '<div><label>'+esc(t('tiebreak'))+'（相手）</label>'
+      + '<div><label>'+esc(t('tiebreak'))+jaEn('（相手）',' (Opponent)')+'</label>'
       + '<input type="number" min="0" data-f="tieBreakOpponent" value="'+(s.tieBreakOpponent==null?'':s.tieBreakOpponent)+'"></div></div>'
       + '<label>'+esc(t('special'))+'</label><select data-f="specialResult">'+sp+'</select>'
       + '<div class="row"><div><label>'+esc(t('lost_score'))+'</label>'
@@ -1370,13 +1925,16 @@ async function saveMatch(){
   }
   const now = Date.now();
   const prev = isNew?null:state.matches.find(function(m){return m.matchId===d.matchId;});
+  const venueEl = $('#f-venue');
+  const venueId = venueEl && venueEl.value!=='' ? parseInt(venueEl.value,10) : null;
+  const oppProfile = (state.opponentProfiles||[]).find(function(o){ return o.name===opp; });
   const m = {
     matchId:d.matchId, playerId:d.playerId, sportType:d.sportType, matchType:$('#f-type').value,
     playerTeamNameSnapshot:(currentPlayer()||{}).defaultTeamName||null,
     partnerName:$('#f-partner').value.trim()||null,
     opponentDisplayName:opp,
     opponentMembersJson:JSON.stringify([opp]),
-    opponentTeamNameSnapshot:d.opponentTeamNameSnapshot||null,
+    opponentTeamNameSnapshot: oppProfile?oppProfile.teamName:(d.opponentTeamNameSnapshot||null),
     courtSurface:$('#f-surface').value, environmentType:$('#f-env').value,
     gearId:d.gearId||null, tournamentName:$('#f-tournament').value.trim(),
     tournamentYear:parseInt($('#f-year').value,10)||new Date().getFullYear(),
@@ -1389,7 +1947,7 @@ async function saveMatch(){
     teamMyScore:$('#f-team-my').value===''?null:parseInt($('#f-team-my').value,10),
     teamOpponentScore:$('#f-team-op').value===''?null:parseInt($('#f-team-op').value,10),
     weatherType:d.weatherType||null, ballOrShuttle:$('#f-ball').value.trim()||null,
-    isNightMatch:d.isNightMatch||false, venueId:d.venueId||null,
+    isNightMatch:d.isNightMatch||false, venueId:venueId,
     elapsedDaysFromMaintenance:prev?prev.elapsedDaysFromMaintenance:null,
     cumulativeMatchesFromMaintenance:prev?prev.cumulativeMatchesFromMaintenance:null,
     createdAt:prev?prev.createdAt:now, updatedAt:now, isDeleted:false, deletedAt:null
@@ -1412,6 +1970,60 @@ async function deleteMatch(){
   setTab('matches');
 }
 
+/* ---- スコアシート（表示のみ＋印刷） ---- */
+function showScoreSheet(){
+  readSetsFromForm();
+  const d = state.draft;
+  const m = {
+    matchId:d.matchId, playerId:d.playerId, sportType:d.sportType,
+    matchType:$('#f-type')?$('#f-type').value:d.matchType,
+    opponentDisplayName:($('#f-opponent')?$('#f-opponent').value:d.opponentDisplayName)||'',
+    opponentTeamNameSnapshot:d.opponentTeamNameSnapshot||null,
+    tournamentName:($('#f-tournament')?$('#f-tournament').value:d.tournamentName)||'',
+    tournamentYear:parseInt(($('#f-year')?$('#f-year').value:d.tournamentYear)||new Date().getFullYear(),10),
+    matchDateEpochDay:($('#f-date')&&$('#f-date').value)?dateInputToEpochDay($('#f-date').value):d.matchDateEpochDay,
+    roundName:($('#f-round')?$('#f-round').value:d.roundName)||'',
+    scoresJson:JSON.stringify(d.sets), isWin:false, matchNote:($('#f-note')?$('#f-note').value:d.matchNote)||'',
+    isTeamMatch:($('#f-team')?$('#f-team').checked:!!d.isTeamMatch),
+    teamMyScore:d.teamMyScore, teamOpponentScore:d.teamOpponentScore
+  };
+  deriveMatch(m);
+  const sheet = $('#overlay-sheet');
+  sheet.innerHTML = scoreSheetHTML(m);
+  $('#overlay').classList.add('show');
+}
+function scoreSheetHTML(m){
+  const p = currentPlayer();
+  const sets = parseScoresJson(m.scoresJson);
+  let mySets=0, opSets=0, myPts=0, opPts=0;
+  sets.forEach(function(s){ const a=s.myScore||0, b=s.opponentScore||0; myPts+=a; opPts+=b; if(a>b)mySets++; else if(b>a)opSets++; });
+  let h = '<h2>'+esc(t('scoresheet'))+'</h2>'
+    + '<p><b>'+esc(p?p.playerName:'')+'</b> vs <b>'+esc(m.opponentDisplayName)+'</b></p>'
+    + '<p class="muted">'+[fmtDate(m.matchDateEpochDay), m.tournamentName||'', m.roundName||''].filter(function(x){return x;}).map(esc).join(' ・ ')+'</p>'
+    + '<table class="sheet-table"><tr><th>'+esc(t('scoresheet_sets'))+'</th><th>'+esc(t('my_score'))+'</th><th>'+esc(t('opp_score'))+'</th><th>'+esc(t('result'))+'</th></tr>';
+  sets.forEach(function(s,i){
+    const a=s.myScore, b=s.opponentScore;
+    const r = s.specialResult?esc(s.specialResult):((a||0)>(b||0)?esc(t('win')):((b||0)>(a||0)?esc(t('loss')):'—'));
+    h += '<tr><td>'+(i+1)+'</td><td>'+(a==null?'–':a)+'</td><td>'+(b==null?'–':b)+'</td><td>'+r+'</td></tr>';
+    if (s.tieBreakMy!=null||s.tieBreakOpponent!=null) h += '<tr><td colspan="4" class="small muted">TB '+(s.tieBreakMy==null?'–':s.tieBreakMy)+'-'+(s.tieBreakOpponent==null?'–':s.tieBreakOpponent)+'</td></tr>';
+    if (s.lostInitiativeScore||s.gainedInitiativeScore||s.momentumDetail){
+      h += '<tr><td colspan="4" class="small" style="text-align:left">'
+        + (s.lostInitiativeScore?esc(t('lost_score'))+': '+esc(s.lostInitiativeScore)+' ':'')
+        + (s.gainedInitiativeScore?esc(t('gained_score'))+': '+esc(s.gainedInitiativeScore)+' ':'')
+        + (s.momentumDetail?'<br>'+esc(s.momentumDetail):'')+'</td></tr>';
+    }
+    if (s.pointSequence && s.pointSequence.length){
+      h += '<tr><td colspan="4" class="small muted" style="text-align:left">'+jaEn('ポイント: ','Points: ')+esc(s.pointSequence.join(' '))+'</td></tr>';
+    }
+  });
+  h += '<tr><td><b>'+esc(t('scoresheet_total'))+'</b></td><td><b>'+myPts+'</b></td><td><b>'+opPts+'</b></td><td><b>'+mySets+'-'+opSets+'</b></td></tr></table>';
+  if (m.isTeamMatch) h += '<p class="muted">'+esc(t('team_score'))+': '+esc(String(m.teamMyScore==null?'–':m.teamMyScore))+' - '+esc(String(m.teamOpponentScore==null?'–':m.teamOpponentScore))+'</p>';
+  if (m.matchNote) h += '<p>'+esc(m.matchNote)+'</p>';
+  h += '<div style="height:12px"></div><div class="row no-print"><button type="button" class="primary" onclick="window.print()">'+esc(t('scoresheet_print'))+'</button>'
+    + '<button type="button" onclick="closeOverlay()">'+esc(t('cancel'))+'</button></div>';
+  return h;
+}
+
 /* ---- ポイント入力シート（純粋関数 calcGameProgress をUIから呼ぶ） ---- */
 function openPointSheet(setIndex){
   readSetsFromForm();
@@ -1425,7 +2037,7 @@ function renderPointSheet(){
   const sport = state.draft.sportType;
   const prog = calcGameProgress(sport, 'A', ps.points);
   const sheet = $('#overlay-sheet');
-  sheet.innerHTML = '<h2>'+esc(t('point_input'))+' — '+(ps.setIndex+1)+'セット</h2>'
+  sheet.innerHTML = '<h2>'+esc(t('point_input'))+' — '+jaEn((ps.setIndex+1)+'セット','Set '+(ps.setIndex+1))+'</h2>'
     + '<div class="score-big">'+esc(prog.rallyDisplayA)+' : '+esc(prog.rallyDisplayB)
     + (prog.isTennisTiebreak?' <span class="small">TB '+esc(String(prog.tieBreakScoreA||0))+'-'+esc(String(prog.tieBreakScoreB||0))+'</span>':'')
     + '</div>'
@@ -1460,48 +2072,834 @@ function pointApply(){
 }
 function closeOverlay(){ $('#overlay').classList.remove('show'); state.pointSheet=null; }
 
-/* ---- 分析（最小限） ---- */
+/* =====================================================================
+   分析エンジン（AnalyticsEngine.kt の移植。純粋関数）
+   IndexedDBの試合一覧からクライアント内で計算する。サーバー集計なし。
+   勝敗判定は Android の getIndividualResultType に準拠。
+   ===================================================================== */
+function anScores(m){ return parseScoresJson(m.scoresJson); }
+function anResult(m){ /* Android getIndividualResultType 相当 */
+  if (m.finalResultCode==='RET') return 'LOSS';
+  const ss = anScores(m);
+  if (!ss.length || ss.every(function(s){ return (s.myScore||0)===0 && (s.opponentScore||0)===0; })){
+    return m.isWin?'WIN':'LOSS';
+  }
+  let my=0, op=0;
+  ss.forEach(function(s){
+    const a=s.myScore||0, b=s.opponentScore||0;
+    if (a>b) my++; else if (b>a) op++;
+  });
+  return my>op?'WIN':(op>my?'LOSS':'DRAW');
+}
+function anIsSpecial(m){
+  if (m.finalResultCode==='RET'||m.finalResultCode==='WO'||m.finalResultCode==='DEF') return true;
+  return anScores(m).some(function(s){ return s.specialResult==='RET'||s.specialResult==='WO'||s.specialResult==='DEF'; });
+}
+function anRate(list){
+  if (!list.length) return 0;
+  const w = list.filter(function(m){ return anResult(m)==='WIN'; }).length;
+  return w/list.length*100;
+}
+function anWins(list){ return list.filter(function(m){ return anResult(m)==='WIN'; }).length; }
+function anLosses(list){ return list.filter(function(m){ return anResult(m)==='LOSS'; }).length; }
+function anRoundOrder(name){
+  const map = {'リーグ戦':1,'1回戦':10,'2回戦':11,'3回戦':12,'4回戦':13,'5回戦':14,'準々決勝':15,'準決勝':16,'3位決定戦':17,'決勝':18,'練習会':20};
+  return (name && map[name]) || 99;
+}
+function anResolveYear(m){
+  if (m.tournamentYear && m.tournamentYear>1990) return m.tournamentYear;
+  if (m.matchDateEpochDay>0) return new Date(m.matchDateEpochDay*86400000).getUTCFullYear();
+  if (m.createdAt>0) return new Date(m.createdAt).getFullYear();
+  return 0;
+}
+function anMonthKey(m){
+  const d = new Date(m.matchDateEpochDay*86400000);
+  return d.getUTCFullYear()+'/'+String(d.getUTCMonth()+1).padStart(2,'0');
+}
+function anWeekday(m){ return new Date(m.matchDateEpochDay*86400000).getUTCDay(); } /* 0=日..6=土 */
+function pct1(x){ return (Math.round(x*10)/10).toFixed(1)+'%'; }
+function pct0(x){ return Math.round(x)+'%'; }
+function kvRow(label, value){ return '<div class="kv"><span>'+esc(label)+'</span><b>'+value+'</b></div>'; }
+function barRow(label, rate, sub){
+  return '<div class="bar-row"><span class="bar-label">'+esc(label)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.max(0,Math.min(100,rate))+'%"></div></div><span class="bar-val">'+esc(sub)+'</span></div>';
+}
+function noDataHTML(){ return '<p class="muted">'+esc(t('an_no_data'))+'</p>'; }
+
+function anLayerA(ms){
+  const total = ms.length;
+  if (!total) return {unlocked:false, total:0, wins:0, winRate:0, r5:{wins:0,total:0,rate:0}, monthly:[]};
+  const wins = anWins(ms), losses = anLosses(ms);
+  const draws = Math.max(0, total-wins-losses);
+  const sortedDesc = ms.slice().sort(function(a,b){
+    return (b.matchDateEpochDay-a.matchDateEpochDay) || (anRoundOrder(b.roundName)-anRoundOrder(a.roundName)) || (b.createdAt-a.createdAt);
+  });
+  const r5 = sortedDesc.slice(0,5), r10 = sortedDesc.slice(0,10);
+  let gc=0, pd=0;
+  ms.forEach(function(m){
+    if (anIsSpecial(m)) return;
+    anScores(m).forEach(function(s){
+      const a=s.myScore||0, b=s.opponentScore||0;
+      if (a>0||b>0){ gc++; pd+=(a-b); }
+    });
+  });
+  const team = ms.filter(function(m){return m.isTeamMatch;});
+  const indiv = ms.filter(function(m){return !m.isTeamMatch;});
+  const byMonth = {};
+  ms.forEach(function(m){ const k=anMonthKey(m); (byMonth[k]=byMonth[k]||[]).push(m); });
+  const monthly = Object.keys(byMonth).sort().map(function(k){
+    return {label:k, total:byMonth[k].length, wins:anWins(byMonth[k]), rate:anRate(byMonth[k])};
+  });
+  const byYear = {};
+  ms.forEach(function(m){ const y=anResolveYear(m); if(y>0){ (byYear[y]=byYear[y]||[]).push(m); } });
+  const annual = Object.keys(byYear).map(Number).sort(function(a,b){return b-a;}).map(function(y){
+    return {year:y, wins:anWins(byYear[y]), losses:anLosses(byYear[y]), draws:Math.max(0, byYear[y].length-anWins(byYear[y])-anLosses(byYear[y]))};
+  });
+  const asc = sortedDesc.slice().reverse();
+  let mxW=0, mxL=0, cW=0, cL=0;
+  asc.forEach(function(m){
+    const r=anResult(m);
+    if (r==='WIN'){ cW++; mxW=Math.max(mxW,cW); cL=0; }
+    else if (r==='LOSS'){ cL++; mxL=Math.max(mxL,cL); cW=0; }
+    else { cW=0; cL=0; }
+  });
+  let curStreak = {type:null, n:0};
+  if (asc.length){
+    const last = anResult(asc[asc.length-1]);
+    let n=0;
+    for (let i=asc.length-1;i>=0;i--){ if (anResult(asc[i])===last) n++; else break; }
+    curStreak = {type:last, n:n};
+  }
+  let wdW=0, wdT=0, weW=0, weT=0;
+  ms.forEach(function(m){
+    const dow = anWeekday(m);
+    if (dow===0 || dow===6){ weT++; if (anResult(m)==='WIN') weW++; }
+    else { wdT++; if (anResult(m)==='WIN') wdW++; }
+  });
+  return {unlocked:true, total:total, wins:wins, losses:losses, draws:draws, winRate:anRate(ms),
+    r5:{wins:anWins(r5), total:r5.length, rate:anRate(r5)},
+    r10:{wins:anWins(r10), total:r10.length, rate:anRate(r10)},
+    avgPd: gc?pd/gc:0, team:{n:team.length, rate:anRate(team)}, indiv:{n:indiv.length, rate:anRate(indiv)},
+    monthly:monthly, annual:annual, maxWin:mxW, maxLoss:mxL, curStreak:curStreak,
+    weekday:{wins:wdW, total:wdT, rate:wdT?wdW/wdT*100:0}, weekend:{wins:weW, total:weT, rate:weT?weW/weT*100:0}};
+}
+
+function anLayerB(ms){
+  const f = ms.filter(function(m){ return !anIsSpecial(m); });
+  if (!f.length) return {unlocked:false, n:0};
+  let fstW=0, fstT=0, alsW=0, alsT=0, cgW=0, cgT=0, tgW=0, tgT=0;
+  let sw=0, fw=0, fl=0, sl=0, setsW=0, setsL=0, ptsW=0, ptsL=0, games=0;
+  let fgW=0, fgT=0, finalC=0;
+  f.forEach(function(m){
+    const won = anResult(m)==='WIN', lost = anResult(m)==='LOSS';
+    const ss = anScores(m);
+    let myS=0, opS=0, tight=false;
+    ss.forEach(function(s){
+      const a=s.myScore||0, b=s.opponentScore||0;
+      if (a>0||b>0){
+        games++; ptsW+=a; ptsL+=b;
+        if (a>b){ setsW++; myS++; } else if (b>a){ setsL++; opS++; }
+        const d=Math.abs(a-b);
+        if (d>=1 && d<=2){ cgT++; if (a>b) cgW++; }
+        if (d===2) tight=true;
+      }
+    });
+    if (ss.length && ((ss[0].myScore||0)>0 || (ss[0].opponentScore||0)>0)){
+      fgT++;
+      const a=ss[0].myScore||0, b=ss[0].opponentScore||0;
+      if (a>b){ fgW++; fstT++; if (won) fstW++; }
+      else if (b>a){ alsT++; if (won) alsW++; }
+      if (won && opS===0 && myS>0) sw++;
+      else if (won && opS>0) fw++;
+      else if (lost && myS>0) fl++;
+      else if (lost && myS===0 && opS>0) sl++;
+      const fin = (myS===2&&opS===1)||(myS===1&&opS===2)||(myS===3&&opS===2)||(myS===2&&opS===3)||(myS===4&&opS===3)||(myS===3&&opS===4);
+      if (fin) finalC++;
+    }
+    if (tight){ tgT++; if (won) tgW++; }
+  });
+  const totSets = setsW+setsL, totPts = ptsW+ptsL;
+  return {unlocked:true, n:f.length,
+    fst:{wins:fstW, total:fstT, rate:fstT?fstW/fstT*100:0},
+    als:{wins:alsW, total:alsT, rate:alsT?alsW/alsT*100:0},
+    close:{wins:cgW, total:cgT, rate:cgT?cgW/cgT*100:0},
+    tight:{wins:tgW, total:tgT, rate:tgT?tgW/tgT*100:0},
+    straight:sw, fullWin:fw, fullLoss:fl, straightLoss:sl,
+    sets:{won:setsW, lost:setsL, rate:totSets?setsW/totSets*100:0},
+    points:{won:ptsW, lost:ptsL, rate:totPts?ptsW/totPts*100:0},
+    avgScored: games?ptsW/games:0, avgConceded: games?ptsL/games:0,
+    fg:{wins:fgW, total:fgT, rate:fgT?fgW/fgT*100:0},
+    straightRate: fgT?sw/fgT*100:0, finalCount:finalC, finalRate: fgT?finalC/fgT*100:0};
+}
+
+function anLayerC(ms, gears){
+  const f = ms.filter(function(m){ return !anIsSpecial(m); });
+  if (!f.length) return {unlocked:false, n:0};
+  const gmap = {};
+  gears.forEach(function(g){ gmap[g.gearId]=g; });
+  const byGear = {};
+  f.forEach(function(m){ if (m.gearId){ (byGear[m.gearId]=byGear[m.gearId]||[]).push(m); } });
+  const gearRates = Object.keys(byGear).map(function(gid){
+    const g = gmap[gid];
+    return {gearId:gid, label: g?g.racketName:('ID: '+gid.slice(0,5)), stringName: (g && g.stringName)?g.stringName:null,
+      count:byGear[gid].length, wins:anWins(byGear[gid]), losses:anLosses(byGear[gid]), rate:anRate(byGear[gid])};
+  }).sort(function(a,b){ return (b.count-a.count)||(b.rate-a.rate); });
+  const byStr = {};
+  f.forEach(function(m){
+    const g = gmap[m.gearId||''];
+    const sn = g && g.stringName ? g.stringName.trim() : '';
+    if (sn) (byStr[sn]=byStr[sn]||[]).push(m);
+  });
+  const stringRates = Object.keys(byStr).map(function(sn){
+    return {stringName:sn, count:byStr[sn].length, wins:anWins(byStr[sn]), losses:anLosses(byStr[sn]), rate:anRate(byStr[sn])};
+  }).sort(function(a,b){ return (b.count-a.count)||(b.rate-a.rate); });
+  const maintEdges = [[0,7],[8,14],[15,21],[22,30],[31,Infinity]];
+  const maintLabels = LANG==='ja'?['0-7日','8-14日','15-21日','22-30日','31日+']:['0-7 days','8-14 days','15-21 days','22-30 days','31+ days'];
+  const maintRates = maintEdges.map(function(e,i){
+    const b = f.filter(function(m){ const d=m.elapsedDaysFromMaintenance; return d!=null && d>=0 && d>=e[0] && d<=e[1]; });
+    return {label:maintLabels[i], count:b.length, rate:anRate(b)};
+  });
+  const cumEdges = [[1,5],[6,15],[16,25],[26,Infinity]];
+  const cumLabels = LANG==='ja'?['1-5試合目','6-15試合目','16-25試合目','26試合目+']:['Matches 1-5','Matches 6-15','Matches 16-25','Match 26+'];
+  const cumRates = cumEdges.map(function(e,i){
+    const b = f.filter(function(m){ const c=m.cumulativeMatchesFromMaintenance; return c!=null && c>0 && c>=e[0] && c<=e[1]; });
+    return {label:cumLabels[i], count:b.length, rate:anRate(b)};
+  });
+  const bySurf = {};
+  f.forEach(function(m){ const s=m.courtSurface||'UNKNOWN'; (bySurf[s]=bySurf[s]||[]).push(m); });
+  const surfRates = Object.keys(bySurf).map(function(s){
+    return {surface:s, count:bySurf[s].length, rate:anRate(bySurf[s])};
+  }).sort(function(a,b){ return b.count-a.count; });
+  const byTen = {};
+  f.forEach(function(m){
+    const g = gmap[m.gearId||''];
+    if (g && g.tensionValue!=null){ const k=g.tensionValue+'|'+(g.tensionUnit||''); (byTen[k]=byTen[k]||[]).push(m); }
+  });
+  const tenRates = Object.keys(byTen).map(function(k){
+    const parts = k.split('|');
+    return {tension:parseInt(parts[0],10), unit:parts[1], count:byTen[k].length, wins:anWins(byTen[k]), losses:anLosses(byTen[k]), rate:anRate(byTen[k])};
+  }).sort(function(a,b){ return b.count-a.count; });
+  let oppF=0, totF=0, finC=0;
+  f.forEach(function(m){
+    const ss = anScores(m);
+    const isFinal = ss.length>=3 || (ss.length===2 && ss.some(function(s){ return s.myScore===1 && s.opponentScore===1; }));
+    if (isFinal){
+      const last = ss[ss.length-1];
+      const a=last.myScore||0, b=last.opponentScore||0;
+      if (a>0||b>0){ oppF+=b; totF+=a+b; finC++; }
+    }
+  });
+  function lifespan(g){
+    try{
+      const arr = JSON.parse(g.customItemsJson||'[]');
+      if (Array.isArray(arr)){
+        const it = arr.find(function(x){ return x && x.name==='__string_lifespan_days__'; });
+        if (it && typeof it.days==='number') return it.days;
+      }
+    }catch(e){}
+    return g.sportType==='PICKLEBALL'?180:45;
+  }
+  const wear = [];
+  const byGearUse = {};
+  f.forEach(function(m){ if (m.gearId){ (byGearUse[m.gearId]=byGearUse[m.gearId]||[]).push(m); } });
+  Object.keys(byGearUse).forEach(function(gid){
+    const g = gmap[gid];
+    const list = byGearUse[gid];
+    const totalSets = list.reduce(function(n,m){ return n+anScores(m).length; }, 0);
+    const limit = g?lifespan(g):45;
+    const overdue = list.some(function(m){ return (m.elapsedDaysFromMaintenance||0)>=limit; });
+    if (totalSets>=15 || overdue){
+      const name = g ? g.racketName + (g.stringName?' ('+g.stringName+')':'') : ('ID: '+gid.slice(0,5));
+      wear.push(tf('an_wear_warn',{name:name,n:list.length,sets:totalSets,limit:limit}));
+    }
+  });
+  const hasWarning = wear.length>0;
+  if (!hasWarning) wear.push(t('an_wear_ok'));
+  const surfGroups = {};
+  f.forEach(function(m){ const s=m.courtSurface||'UNKNOWN'; (surfGroups[s]=surfGroups[s]||[]).push(m); });
+  const recs = [];
+  Object.keys(surfGroups).forEach(function(s){
+    if (s==='UNKNOWN') return;
+    const byG = {};
+    surfGroups[s].forEach(function(m){ if (m.gearId){ (byG[m.gearId]=byG[m.gearId]||[]).push(m); } });
+    const keys = Object.keys(byG);
+    if (!keys.length) return;
+    let best = keys[0];
+    keys.forEach(function(k){ if (anRate(byG[k]) > anRate(byG[best])) best=k; });
+    const g = gmap[best];
+    const name = g ? g.racketName + (g.stringName?' ('+g.stringName+')':'') : ('ID: '+best.slice(0,5));
+    recs.push(tf('an_surf_rec',{surface:s,name:name,rate:pct1(anRate(byG[best])),n:byG[best].length}));
+  });
+  return {unlocked:true, n:f.length, gearRates:gearRates, stringRates:stringRates,
+    maintRates:maintRates, cumRates:cumRates, surfRates:surfRates, tenRates:tenRates,
+    finalLossRate: totF?oppF/totF*100:0, finalLossCount:finC,
+    wear:wear, hasWarning:hasWarning,
+    surfRec: recs.length?recs.join('\n'):t('an_surf_rec_empty')};
+}
+
+function anLayerD(ms){
+  if (!ms.length) return {unlocked:false, n:0};
+  const valid = ms.filter(function(m){ return !anIsSpecial(m); });
+  const totalWins = ms.filter(function(m){ return anResult(m)==='WIN'; }).length;
+  let sw=0, cw=0, fgw=0, ls=0, fgl=0;
+  valid.forEach(function(m){
+    const ss = anScores(m);
+    if (!ss.length) return;
+    const a=ss[0].myScore||0, b=ss[0].opponentScore||0, r=anResult(m);
+    if (a>b){ fgw++; if (r==='LOSS') ls++; }
+    else if (b>a){ fgl++; if (r==='WIN') cw++; }
+    if (r==='WIN' && !ss.some(function(s){ return (s.myScore||0)<(s.opponentScore||0); })) sw++;
+  });
+  let frW=0, frT=0, lrW=0, lrT=0, mdW=0, mdT=0;
+  ms.forEach(function(m){
+    const r=(m.roundName||'').trim();
+    if (r==='練習会' || r.indexOf('練習')>=0) return;
+    const w = anResult(m)==='WIN';
+    if (r==='1回戦'||r==='初戦'||r==='予選'||r==='リーグ戦'){ frT++; if(w) frW++; }
+    else if (r==='準決勝'||r==='3位決定戦'||r==='決勝'){ mdT++; if(w) mdW++; }
+    else if (r){ lrT++; if(w) lrW++; }
+  });
+  const byDay = {};
+  ms.forEach(function(m){ if (m.matchDateEpochDay>0){ (byDay[m.matchDateEpochDay]=byDay[m.matchDateEpochDay]||[]).push(m); } });
+  let foW=0, foT=0, sqW=0, sqT=0;
+  Object.keys(byDay).forEach(function(k){
+    const ordered = byDay[k].slice().sort(function(a,b){ return (anRoundOrder(a.roundName)-anRoundOrder(b.roundName))||(a.createdAt-b.createdAt); });
+    ordered.forEach(function(m, idx){
+      const w = anResult(m)==='WIN';
+      if (idx===0){ foT++; if(w) foW++; } else { sqT++; if(w) sqW++; }
+    });
+  });
+  let tbW=0, tbT=0, dsW=0, dsT=0;
+  valid.forEach(function(m){
+    const ss = anScores(m);
+    ss.forEach(function(s){
+      const a=s.myScore||0, b=s.opponentScore||0;
+      const tb = (s.tieBreakMy!=null || s.tieBreakOpponent!=null) ||
+        (a===7&&b===6)||(a===6&&b===7)||((a>=11||b>=11)&&Math.abs(a-b)===2)||(a===4&&b===3)||(a===3&&b===4);
+      if (tb && (a>0||b>0)){ tbT++; if (a>b) tbW++; }
+    });
+    if (ss.length>=3){
+      let myS=0, opS=0;
+      ss.forEach(function(s){ const a=s.myScore||0, b=s.opponentScore||0; if(a>b)myS++; else if(b>a)opS++; });
+      if (Math.abs(myS-opS)<=1 && (myS+opS)>=3){ dsT++; if (anResult(m)==='WIN') dsW++; }
+    }
+  });
+  const indoor = ms.filter(function(m){return m.environmentType==='INDOOR';});
+  const outdoor = ms.filter(function(m){return m.environmentType==='OUTDOOR';});
+  const wLabels = {SUNNY:jaEn('晴れ','Sunny'), CLOUDY:jaEn('曇り','Cloudy'), RAINY:jaEn('雨天','Rainy')};
+  const byW = {};
+  ms.forEach(function(m){ if (m.weatherType){ (byW[m.weatherType]=byW[m.weatherType]||[]).push(m); } });
+  const weatherRates = Object.keys(byW).map(function(k){
+    return {label:wLabels[k]||k, wins:anWins(byW[k]), count:byW[k].length, rate:anRate(byW[k])};
+  }).sort(function(a,b){ return b.count-a.count; });
+  const day = ms.filter(function(m){return m.isNightMatch===false;});
+  const night = ms.filter(function(m){return m.isNightMatch===true;});
+  const insights = [];
+  const frRate = frT?frW/frT*100:0, lrRate = lrT?lrW/lrT*100:0, mdRate = mdT?mdW/mdT*100:0;
+  const foRate = foT?foW/foT*100:0, sqRate = sqT?sqW/sqT*100:0;
+  const lsRate = fgw?ls/fgw*100:0, cbRate = fgl?cw/fgl*100:0;
+  if (frT>=3 && lrT>=2){
+    if (frRate < lrRate-12) insights.push(tf('an_insight_first',{a:Math.round(frRate),b:Math.round(lrRate)}));
+    else if (frRate>=70 && mdT>=2 && mdRate<50) insights.push(tf('an_insight_medal',{a:Math.round(mdRate)}));
+  }
+  if (sqT>=3 && foT>=3){
+    if (sqRate < foRate-12) insights.push(tf('an_insight_stamina',{a:Math.round(foRate),b:Math.round(sqRate)}));
+    else if (sqRate >= foRate+10) insights.push(tf('an_insight_engine',{a:Math.round(sqRate)}));
+  }
+  if (fgw>=3 && lsRate>=25) insights.push(tf('an_insight_lead',{a:Math.round(lsRate)}));
+  if (fgl>=3 && cbRate>=35) insights.push(tf('an_insight_comeback',{a:Math.round(cbRate)}));
+  if (!insights.length) insights.push(t('an_insight_empty'));
+  return {unlocked:true, n:ms.length,
+    straight:{n:sw, rate: totalWins?sw/totalWins*100:0},
+    comeback:{n:cw, rate: totalWins?cw/totalWins*100:0, trueRate:cbRate},
+    leadSlip:{n:ls, total:fgw, rate:lsRate}, firstLost:{n:fgl},
+    first:{wins:frW, total:frT, rate:frRate}, later:{wins:lrW, total:lrT, rate:lrRate}, medal:{wins:mdW, total:mdT, rate:mdRate},
+    firstDay:{wins:foW, total:foT, rate:foRate}, subseqDay:{wins:sqW, total:sqT, rate:sqRate},
+    tb:{wins:tbW, total:tbT, rate:tbT?tbW/tbT*100:0}, dec:{wins:dsW, total:dsT, rate:dsT?dsW/dsT*100:0},
+    indoor:{n:indoor.length, rate:anRate(indoor)}, outdoor:{n:outdoor.length, rate:anRate(outdoor)},
+    weatherRates:weatherRates,
+    day:{n:day.length, rate:anRate(day)}, night:{n:night.length, rate:anRate(night)},
+    insights:insights};
+}
+
+function anLayerE(ms){
+  const byClub = {};
+  ms.forEach(function(m){
+    const c=(m.opponentTeamNameSnapshot||'').trim();
+    if (c) (byClub[c]=byClub[c]||[]).push(m);
+  });
+  const clubs = Object.keys(byClub).filter(function(c){ return byClub[c].length>=2; }).map(function(c){
+    const l=byClub[c];
+    return {club:c, wins:anWins(l), losses:anLosses(l), count:l.length, rate:anRate(l)};
+  }).sort(function(a,b){ return (a.rate-b.rate)||(b.losses-a.losses); });
+  const sg = ms.filter(function(m){ return (m.matchType||'').toUpperCase()==='SINGLES'; });
+  const dg = ms.filter(function(m){ return (m.matchType||'').toUpperCase()==='DOUBLES'; });
+  const byPartner = {};
+  dg.forEach(function(m){ const p=(m.partnerName||'').trim(); if (p) (byPartner[p]=byPartner[p]||[]).push(m); });
+  const partners = Object.keys(byPartner).map(function(p){
+    const l=byPartner[p];
+    return {partner:p, wins:anWins(l), losses:anLosses(l), count:l.length, rate:anRate(l)};
+  }).sort(function(a,b){ return (b.count-a.count)||(b.rate-a.rate); });
+  return {unlocked: ms.length>0, clubs:clubs,
+    singles:{n:sg.length, wins:anWins(sg), rate:anRate(sg)},
+    doubles:{n:dg.length, wins:anWins(dg), rate:anRate(dg)},
+    partners:partners,
+    threshold: clubs.length?'':t('an_e_threshold')};
+}
+
+function anRivals(ms){
+  const byOpp = {};
+  ms.forEach(function(m){ const k=m.opponentDisplayName||''; (byOpp[k]=byOpp[k]||[]).push(m); });
+  const trends = Object.keys(byOpp).map(function(name){
+    const list = byOpp[name].slice().sort(function(a,b){ return a.matchDateEpochDay-b.matchDateEpochDay; });
+    const diffs = list.map(function(m){
+      let a=0, b=0;
+      anScores(m).forEach(function(s){ a+=s.myScore||0; b+=s.opponentScore||0; });
+      return a-b;
+    });
+    const gameScores = list.map(function(m){
+      let a=0, b=0;
+      anScores(m).forEach(function(s){ const x=s.myScore||0, y=s.opponentScore||0; if(x>y)a++; else if(y>x)b++; });
+      return a+'-'+b;
+    });
+    const dates = list.map(function(m){
+      const d=new Date(m.matchDateEpochDay*86400000);
+      return (d.getUTCFullYear()%100)+'.'+(d.getUTCMonth()+1);
+    });
+    let fgW=0, fgT=0, stW=0, finC=0;
+    list.forEach(function(m){
+      const ss=anScores(m);
+      if (ss.length && ((ss[0].myScore||0)>0 || (ss[0].opponentScore||0)>0)){
+        fgT++;
+        const a=ss[0].myScore||0, b=ss[0].opponentScore||0;
+        if (a>b) fgW++;
+        let myS=0, opS=0;
+        ss.forEach(function(s){ const x=s.myScore||0, y=s.opponentScore||0; if(x>y)myS++; else if(y>x)opS++; });
+        if (m.isWin && opS===0 && myS>0) stW++;
+        if ((myS===2&&opS===1)||(myS===1&&opS===2)||(myS===3&&opS===2)||(myS===2&&opS===3)||(myS===4&&opS===3)||(myS===3&&opS===4)) finC++;
+      }
+    });
+    let msg=t('an_rival_once'), code='NONE';
+    if (diffs.length>=2){
+      const d = diffs[diffs.length-1]-diffs[diffs.length-2];
+      if (d>1){ msg=t('an_rival_up'); code='UP'; }
+      else if (d<-1){ msg=t('an_rival_down'); code='DOWN'; }
+      else { msg=t('an_rival_stable'); code='STABLE'; }
+    }
+    return {name:name, count:list.length, wins:anWins(list), losses:anLosses(list), rate:anRate(list),
+      diffs:diffs, gameScores:gameScores, dates:dates, msg:msg, code:code,
+      fg:{wins:fgW, total:fgT, rate:fgT?fgW/fgT*100:0}, straight:{n:stW, rate:fgT?stW/fgT*100:0}, final:{n:finC, rate:fgT?finC/fgT*100:0}};
+  });
+  const best = trends.filter(function(x){ return x.count>=2 && x.rate>=50; }).sort(function(a,b){ return b.rate-a.rate; });
+  const worst = trends.filter(function(x){ return x.count>=2 && x.rate<50; }).sort(function(a,b){ return a.rate-b.rate; });
+  return {unlocked: trends.some(function(x){ return x.count>=2; }), best:best, worst:worst,
+    trends: trends.filter(function(x){ return x.count>=2; }).sort(function(a,b){ return b.count-a.count; }),
+    threshold:t('an_rival_threshold')};
+}
+
+function anScoreCard(ms){
+  const withSheet = ms.filter(function(m){
+    return anScores(m).some(function(s){ return s.pointSequence && s.pointSequence.length>0; });
+  });
+  if (!withSheet.length) return {unlocked:false, n:0};
+  let totalGames=0, totalPoints=0;
+  let myGpC=0, myGpF=0, opGpS=0, opGpF=0;
+  const maxWonList=[], maxLostList=[];
+  let bbC=0, totLossF=0, mrC=0, totWinF=0;
+  let stW=0, stT=0, mdW=0, mdT=0, enW=0, enT=0;
+  let leadT=0, leadW=0, cbT=0, cbW=0, leadingPts=0;
+  withSheet.forEach(function(m){
+    anScores(m).forEach(function(set){
+      const points = set.pointSequence||[];
+      if (!points.length) return;
+      totalGames++; totalPoints+=points.length;
+      const myF = points.filter(function(p){return p==='A';}).length;
+      const opF = points.filter(function(p){return p==='B';}).length;
+      const gameWon = myF>opF;
+      const target = Math.max(myF, opF);
+      let myS=0, opS=0, mxW=0, curW=0, mxL=0, curL=0;
+      let hadLead2=false, hadTrail2=false;
+      points.forEach(function(point, idx){
+        const pn = idx+1;
+        if (myS>opS) leadingPts++;
+        const isMyGp = (myS===target-1) && (myS>opS);
+        const isOpGp = (opS===target-1) && (opS>myS);
+        if (isMyGp){ myGpF++; if (point==='A') myGpC++; }
+        if (isOpGp){ opGpF++; if (point==='A') opGpS++; }
+        if (myS-opS>=2) hadLead2=true;
+        if (opS-myS>=2) hadTrail2=true;
+        if (idx>0){
+          const prev = points[idx-1];
+          if (prev==='B'){ totLossF++; if (point==='A') bbC++; }
+          else if (prev==='A'){ totWinF++; if (point==='A') mrC++; }
+        }
+        if (pn<=5){ stT++; if (point==='A') stW++; }
+        else if (pn<=15){ mdT++; if (point==='A') mdW++; }
+        else { enT++; if (point==='A') enW++; }
+        if (point==='A'){ myS++; curW++; mxW=Math.max(mxW,curW); curL=0; }
+        else { opS++; curL++; mxL=Math.max(mxL,curL); curW=0; }
+      });
+      maxWonList.push(mxW); maxLostList.push(mxL);
+      if (hadLead2){ leadT++; if (gameWon) leadW++; }
+      if (hadTrail2){ cbT++; if (gameWon) cbW++; }
+    });
+  });
+  const avg = function(a){ return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:0; };
+  const gpConv = myGpF?myGpC/myGpF:0, gpSave = opGpF?opGpS/opGpF:0;
+  const bb = totLossF?bbC/totLossF:0, mr = totWinF?mrC/totWinF:0;
+  const stR = stT?stW/stT:0, mdR = mdT?mdW/mdT:0, enR = enT?enW/enT:0;
+  const leadR = leadT?leadW/leadT:0, cbR = cbT?cbW/cbT:0;
+  const dom = totalPoints?leadingPts/totalPoints:0;
+  const advice = [];
+  if (bb>=0.55) advice.push(tf('an_sc_bounce_hi',{a:Math.round(bb*100)}));
+  else if (bb>0) advice.push(tf('an_sc_bounce_lo',{a:Math.round(bb*100)}));
+  if (gpConv>=0.60) advice.push(tf('an_sc_gp_hi',{a:Math.round(gpConv*100)}));
+  else if (myGpF>0) advice.push(tf('an_sc_gp_lo',{a:Math.round(gpConv*100)}));
+  if (stR < mdR-0.08 || stR < enR-0.08) advice.push(tf('an_sc_slow',{a:Math.round(stR*100)}));
+  else if (stR>=0.55) advice.push(tf('an_sc_fast',{a:Math.round(stR*100)}));
+  if (leadR>=0.80) advice.push(tf('an_sc_lead_hi',{a:Math.round(leadR*100)}));
+  else if (leadT>0) advice.push(tf('an_sc_lead_lo',{a:Math.round(leadR*100)}));
+  if (cbR>=0.35) advice.push(tf('an_sc_comeback',{a:Math.round(cbR*100)}));
+  if (!advice.length) advice.push(t('an_sc_empty'));
+  return {unlocked:true, n:withSheet.length, games:totalGames, points:totalPoints,
+    gp:{conv:gpConv, converted:myGpC, faced:myGpF, save:gpSave, saved:opGpS, oppFaced:opGpF},
+    avgMaxWon:avg(maxWonList), avgMaxLost:avg(maxLostList),
+    bounce:{rate:bb, n:bbC, total:totLossF}, momentum:{rate:mr, n:mrC, total:totWinF},
+    start:{rate:stR, total:stT}, mid:{rate:mdR, total:mdT}, end:{rate:enR, total:enT},
+    lead:{rate:leadR, won:leadW, total:leadT}, comeback:{rate:cbR, won:cbW, total:cbT},
+    dominance:dom, advice:advice};
+}
+
+function anPeriodBounds(){
+  const now = new Date();
+  if (state.analyticsPeriod==='month') return dateToEpochDay(new Date(now.getFullYear(), now.getMonth(), 1));
+  if (state.analyticsPeriod==='3m') return dateToEpochDay(new Date(now.getFullYear(), now.getMonth()-2, 1));
+  if (state.analyticsPeriod==='year') return dateToEpochDay(new Date(now.getFullYear(), 0, 1));
+  return null;
+}
+function anPeriodMatches(){
+  const ms = playerMatches();
+  const from = anPeriodBounds();
+  if (from==null) return ms;
+  return ms.filter(function(m){ return m.matchDateEpochDay>=from; });
+}
+function setAnPeriod(p){ state.analyticsPeriod=p; render(); }
+function setIgMode(m){ state.igMode=m; render(); }
+
+/* ---- 分析（Phase 3：レイヤーA〜E＋ライバル＋スコアカード） ---- */
 function analyticsHTML(){
   const p = currentPlayer();
   if (!p) return '<div class="card"><p>'+esc(t('no_player'))+'</p></div>';
-  const ms = playerMatches();
-  const wins = ms.filter(function(m){return m.isWin;}).length;
+  const ms = anPeriodMatches();
+  const A = anLayerA(ms), B = anLayerB(ms), C = anLayerC(ms, state.gears), D = anLayerD(ms), E = anLayerE(ms);
+  const R = anRivals(ms), SC = anScoreCard(ms);
+  const periodBtn = function(key, label){
+    return '<button type="button" class="'+(state.analyticsPeriod===key?'active':'')+'" onclick="setAnPeriod(\''+key+'\')">'+esc(label)+'</button>';
+  };
   let h = '<div class="card"><h2>'+esc(p.playerName)+'</h2><div class="stat-grid">'
-    + '<div class="stat"><div class="num">'+ms.length+'</div><div class="lbl">'+esc(t('total_matches'))+'</div></div>'
-    + '<div class="stat"><div class="num">'+wins+'</div><div class="lbl">'+esc(t('wins'))+'</div></div>'
-    + '<div class="stat"><div class="num">'+(ms.length?Math.round(wins/ms.length*100):0)+'%</div><div class="lbl">'+esc(t('win_rate'))+'</div></div></div></div>';
-  // 月別勝率（直近6か月）
-  const byMonth = {};
-  ms.forEach(function(m){
-    const d = epochDayToDate(m.matchDateEpochDay);
-    const key = d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0');
-    byMonth[key]=byMonth[key]||{total:0,wins:0};
-    byMonth[key].total++; if(m.isWin) byMonth[key].wins++;
-  });
-  const months = Object.keys(byMonth).sort().slice(-6);
-  h += '<div class="card"><h2>'+esc(t('monthly_win_rate'))+'</h2>';
-  if (!months.length) h += '<p class="muted">'+esc(t('no_matches'))+'</p>';
-  months.forEach(function(k){
-    const v=byMonth[k], rate=v.total?Math.round(v.wins/v.total*100):0;
-    h += '<div class="bar-row"><span class="bar-label">'+esc(k)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+rate+'%"></div></div><span class="bar-val">'+rate+'% ('+v.wins+'/'+v.total+')</span></div>';
-  });
+    + '<div class="stat"><div class="num">'+A.total+'</div><div class="lbl">'+esc(t('total_matches'))+'</div></div>'
+    + '<div class="stat"><div class="num">'+A.wins+'</div><div class="lbl">'+esc(t('wins'))+'</div></div>'
+    + '<div class="stat"><div class="num">'+pct0(A.winRate)+'</div><div class="lbl">'+esc(t('win_rate'))+'</div></div></div></div>';
+  h += '<div class="tabs-inline">'
+    + periodBtn('month', t('an_month')) + periodBtn('3m', t('an_3m')) + periodBtn('year', t('an_year')) + periodBtn('all', t('an_all'))
+    + '</div>';
+  /* A */
+  h += '<div class="card"><h2>'+esc(t('an_a'))+'</h2>';
+  if (!A.unlocked) h += noDataHTML();
+  else {
+    h += kvRow(t('an_recent5'), A.r5.wins+jaEn('勝',' W - ')+(A.r5.total-A.r5.wins)+jaEn('敗',' L')+jaEn('（',' (')+pct1(A.r5.rate)+jaEn('）',')'));
+    h += kvRow(t('an_recent10'), A.r10.wins+jaEn('勝',' W - ')+(A.r10.total-A.r10.wins)+jaEn('敗',' L')+jaEn('（',' (')+pct1(A.r10.rate)+jaEn('）',')'));
+    h += kvRow(t('an_avg_pd'), (A.avgPd>=0?'+':'')+A.avgPd.toFixed(1));
+    h += kvRow(t('an_streak_max'), A.maxWin+jaEn('連勝','-win streak')+' / '+t('an_streak_max_l')+' '+A.maxLoss+jaEn('連敗','-loss streak'));
+    h += kvRow(t('an_current_streak'), A.curStreak.type==='WIN'?A.curStreak.n+jaEn('連勝','-win streak'):A.curStreak.type==='LOSS'?A.curStreak.n+jaEn('連敗','-loss streak'):'—');
+    h += kvRow(t('an_weekday'), pct1(A.weekday.rate)+jaEn('（',' (')+A.weekday.wins+'/'+A.weekday.total+jaEn('）',')'));
+    h += kvRow(t('an_weekend'), pct1(A.weekend.rate)+jaEn('（',' (')+A.weekend.wins+'/'+A.weekend.total+jaEn('）',')'));
+    h += kvRow(t('an_team'), A.team.n+jaEn('試合 ',' matches ')+pct1(A.team.rate));
+    h += kvRow(t('an_indiv'), A.indiv.n+jaEn('試合 ',' matches ')+pct1(A.indiv.rate));
+    h += '<h3>'+esc(t('monthly_win_rate'))+'</h3>';
+    if (!A.monthly.length) h += noDataHTML();
+    A.monthly.slice(-6).forEach(function(m){ h += barRow(m.label, m.rate, pct0(m.rate)+' ('+m.wins+'/'+m.total+')'); });
+    h += '<h3>'+esc(t('year'))+'</h3>';
+    A.annual.forEach(function(y){ h += kvRow(String(y.year), y.wins+jaEn('勝 ',' W ')+y.losses+jaEn('敗',' L')+(y.draws?' '+y.draws+jaEn('分',' D'):'')); });
+  }
   h += '</div>';
-  // サーフェス別勝率
-  const bySurf = {};
-  ms.forEach(function(m){
-    const s=m.courtSurface||'UNKNOWN';
-    bySurf[s]=bySurf[s]||{total:0,wins:0};
-    bySurf[s].total++; if(m.isWin) bySurf[s].wins++;
-  });
-  h += '<div class="card"><h2>'+esc(t('surface_win_rate'))+'</h2>';
-  const surfs = Object.keys(bySurf).sort();
-  if (!surfs.length) h += '<p class="muted">'+esc(t('no_matches'))+'</p>';
-  surfs.forEach(function(k){
-    const v=bySurf[k], rate=v.total?Math.round(v.wins/v.total*100):0;
-    h += '<div class="bar-row"><span class="bar-label">'+esc(k)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+rate+'%"></div></div><span class="bar-val">'+rate+'% ('+v.wins+'/'+v.total+')</span></div>';
-  });
+  /* B */
+  h += '<div class="card"><h2>'+esc(t('an_b'))+'</h2>';
+  if (!B.unlocked) h += noDataHTML();
+  else {
+    h += kvRow(t('an_first_set'), pct1(B.fst.rate)+jaEn('（',' (')+B.fst.wins+'/'+B.fst.total+jaEn('）',')'));
+    h += kvRow(t('an_after_lose_first'), pct1(B.als.rate)+jaEn('（',' (')+B.als.wins+'/'+B.als.total+jaEn('）',')'));
+    h += kvRow(t('an_close'), pct1(B.close.rate)+jaEn('（',' (')+B.close.wins+'/'+B.close.total+jaEn('）',')'));
+    h += kvRow(t('an_tight'), pct1(B.tight.rate)+jaEn('（',' (')+B.tight.wins+'/'+B.tight.total+jaEn('）',')'));
+    h += kvRow(t('an_sets'), pct1(B.sets.rate)+jaEn('（',' (')+B.sets.won+'-'+B.sets.lost+jaEn('）',')'));
+    h += kvRow(t('an_points'), pct1(B.points.rate)+jaEn('（',' (')+B.points.won+'-'+B.points.lost+jaEn('）',')'));
+    h += kvRow(t('an_avg_scored'), B.avgScored.toFixed(1));
+    h += kvRow(t('an_avg_conceded'), B.avgConceded.toFixed(1));
+    h += kvRow(t('an_straight'), B.straight+jaEn('勝',' W')+jaEn('（',' (')+pct1(B.straightRate)+jaEn('）',')'));
+    h += kvRow(t('an_full_win'), B.fullWin+jaEn('勝',' W'));
+    h += kvRow(t('an_full_loss'), B.fullLoss+jaEn('敗',' L'));
+    h += kvRow(t('an_straight_loss'), B.straightLoss+jaEn('敗',' L'));
+    h += kvRow(t('an_fg'), pct1(B.fg.rate)+jaEn('（',' (')+B.fg.wins+'/'+B.fg.total+jaEn('）',')'));
+    h += kvRow(t('an_final'), B.finalCount+jaEn('試合',' matches')+jaEn('（',' (')+pct1(B.finalRate)+jaEn('）',')'));
+  }
   h += '</div>';
+  /* C */
+  h += '<div class="card"><h2>'+esc(t('an_c'))+'</h2>';
+  if (!C.unlocked) h += noDataHTML();
+  else {
+    h += '<h3>'+esc(t('an_gear_rate'))+'</h3>';
+    if (!C.gearRates.length) h += noDataHTML();
+    C.gearRates.forEach(function(g){ h += barRow(g.label, g.rate, pct0(g.rate)+' ('+g.wins+'/'+g.count+')'); });
+    h += '<h3>'+esc(t('an_string_rate'))+'</h3>';
+    if (!C.stringRates.length) h += noDataHTML();
+    C.stringRates.forEach(function(g){ h += barRow(g.stringName, g.rate, pct0(g.rate)+' ('+g.wins+'/'+g.count+')'); });
+    h += '<h3>'+esc(t('an_surf_rate'))+'</h3>';
+    C.surfRates.forEach(function(s){ h += barRow(s.surface, s.rate, pct0(s.rate)+' ('+s.count+')'); });
+    h += '<h3>'+esc(t('an_tension_rate'))+'</h3>';
+    if (!C.tenRates.length) h += noDataHTML();
+    C.tenRates.forEach(function(x){ h += barRow(x.tension+' '+(x.unit||''), x.rate, pct0(x.rate)+' ('+x.wins+'/'+x.count+')'); });
+    h += '<h3>'+esc(t('an_maint_rate'))+'</h3>';
+    C.maintRates.forEach(function(x){ h += barRow(x.label, x.rate, x.count?pct0(x.rate)+' ('+x.count+')':'—'); });
+    h += '<h3>'+esc(t('an_cum_rate'))+'</h3>';
+    C.cumRates.forEach(function(x){ h += barRow(x.label, x.rate, x.count?pct0(x.rate)+' ('+x.count+')':'—'); });
+    h += kvRow(t('an_final_set_loss'), pct1(C.finalLossRate)+jaEn('（',' (')+C.finalLossCount+jaEn('試合）',' matches)'));
+    h += '<h3>'+esc(t('an_wear'))+'</h3>';
+    C.wear.forEach(function(w){ h += '<p class="small">'+esc(w)+'</p>'; });
+    h += '<h3>'+esc(t('an_surface_rec'))+'</h3><p class="small">'+esc(C.surfRec).replace(/\n/g,'<br>')+'</p>';
+  }
+  h += '</div>';
+  /* D */
+  h += '<div class="card"><h2>'+esc(t('an_d'))+'</h2>';
+  if (!D.unlocked) h += noDataHTML();
+  else {
+    h += kvRow(t('an_straight'), D.straight.n+jaEn('勝',' W')+jaEn('（全勝利の ',' (')+pct1(D.straight.rate)+jaEn('',' of all wins')+jaEn('）',')'));
+    h += kvRow(t('an_comeback'), D.comeback.n+jaEn('勝 ',' W ')+pct1(D.comeback.trueRate));
+    h += kvRow(t('an_lead_slip'), D.leadSlip.n+jaEn('敗 ',' L ')+pct1(D.leadSlip.rate));
+    h += kvRow(t('an_round_first'), pct1(D.first.rate)+jaEn('（',' (')+D.first.wins+'/'+D.first.total+jaEn('）',')'));
+    h += kvRow(t('an_round_later'), pct1(D.later.rate)+jaEn('（',' (')+D.later.wins+'/'+D.later.total+jaEn('）',')'));
+    h += kvRow(t('an_round_medal'), pct1(D.medal.rate)+jaEn('（',' (')+D.medal.wins+'/'+D.medal.total+jaEn('）',')'));
+    h += kvRow(t('an_first_day'), pct1(D.firstDay.rate)+jaEn('（',' (')+D.firstDay.wins+'/'+D.firstDay.total+jaEn('）',')'));
+    h += kvRow(t('an_subseq_day'), pct1(D.subseqDay.rate)+jaEn('（',' (')+D.subseqDay.wins+'/'+D.subseqDay.total+jaEn('）',')'));
+    h += kvRow(t('an_tb'), pct1(D.tb.rate)+jaEn('（',' (')+D.tb.wins+'/'+D.tb.total+jaEn('）',')'));
+    h += kvRow(t('an_deciding'), pct1(D.dec.rate)+jaEn('（',' (')+D.dec.wins+'/'+D.dec.total+jaEn('）',')'));
+    h += kvRow(t('an_indoor'), D.indoor.n+jaEn('試合 ',' matches ')+pct1(D.indoor.rate));
+    h += kvRow(t('an_outdoor'), D.outdoor.n+jaEn('試合 ',' matches ')+pct1(D.outdoor.rate));
+    D.weatherRates.forEach(function(w){ h += barRow(w.label, w.rate, pct0(w.rate)+' ('+w.wins+'/'+w.count+')'); });
+    h += kvRow(t('an_day'), D.day.n+jaEn('試合 ',' matches ')+pct1(D.day.rate));
+    h += kvRow(t('an_night'), D.night.n+jaEn('試合 ',' matches ')+pct1(D.night.rate));
+    h += '<h3>'+esc(t('an_insights'))+'</h3>';
+    D.insights.forEach(function(s){ h += '<p class="small">'+esc(s)+'</p>'; });
+  }
+  h += '</div>';
+  /* E */
+  h += '<div class="card"><h2>'+esc(t('an_e'))+'</h2>';
+  if (!E.unlocked) h += noDataHTML();
+  else {
+    h += kvRow(t('an_singles'), E.singles.n+jaEn('試合 ',' matches ')+pct1(E.singles.rate));
+    h += kvRow(t('an_doubles'), E.doubles.n+jaEn('試合 ',' matches ')+pct1(E.doubles.rate));
+    h += '<h3>'+esc(t('an_club'))+'</h3>';
+    if (!E.clubs.length) h += '<p class="muted small">'+esc(E.threshold)+'</p>';
+    E.clubs.forEach(function(c){ h += barRow(c.club, c.rate, pct0(c.rate)+' ('+c.wins+'-'+c.losses+')'); });
+    h += '<h3>'+esc(t('an_partner'))+'</h3>';
+    if (!E.partners.length) h += noDataHTML();
+    E.partners.forEach(function(x){ h += barRow(x.partner, x.rate, pct0(x.rate)+' ('+x.wins+'/'+x.count+')'); });
+  }
+  h += '</div>';
+  /* Rivals */
+  h += '<div class="card"><h2>'+esc(t('an_rivals'))+'</h2>';
+  if (!R.unlocked) h += '<p class="muted small">'+esc(R.threshold)+'</p>';
+  else {
+    h += '<h3>'+esc(jaEn('得意な相手','Strong against'))+'</h3>';
+    if (!R.best.length) h += noDataHTML();
+    R.best.forEach(function(x){ h += barRow(x.name, x.rate, pct0(x.rate)+' ('+x.wins+'-'+x.losses+')'); });
+    h += '<h3>'+esc(jaEn('苦手な相手','Struggling against'))+'</h3>';
+    if (!R.worst.length) h += noDataHTML();
+    R.worst.forEach(function(x){ h += barRow(x.name, x.rate, pct0(x.rate)+' ('+x.wins+'-'+x.losses+')'); });
+    R.trends.forEach(function(x){
+      h += '<div class="kv"><span><b>'+esc(x.name)+'</b><br><span class="muted small">'+esc(x.msg)+'<br>'+esc(x.dates.join(' / '))+'<br>'+esc(x.gameScores.join('、'))+'</span></span><b>'+x.wins+'-'+x.losses+'</b></div>';
+    });
+  }
+  h += '</div>';
+  /* ScoreCard */
+  h += '<div class="card"><h2>'+esc(t('an_scorecard'))+'</h2>';
+  if (!SC.unlocked) h += '<p class="muted small">'+esc(t('an_scorecard_empty'))+'</p>';
+  else {
+    h += kvRow(t('an_gp_conv'), pct1(SC.gp.conv*100)+jaEn('（',' (')+SC.gp.converted+'/'+SC.gp.faced+jaEn('）',')'));
+    h += kvRow(t('an_gp_save'), pct1(SC.gp.save*100)+jaEn('（',' (')+SC.gp.saved+'/'+SC.gp.oppFaced+jaEn('）',')'));
+    h += kvRow(t('an_bounce'), pct1(SC.bounce.rate*100)+jaEn('（',' (')+SC.bounce.n+'/'+SC.bounce.total+jaEn('）',')'));
+    h += kvRow(t('an_momentum_keep'), pct1(SC.momentum.rate*100)+jaEn('（',' (')+SC.momentum.n+'/'+SC.momentum.total+jaEn('）',')'));
+    h += kvRow(t('an_phase'), pct1(SC.start.rate*100)+jaEn('（',' (')+SC.start.total+jaEn('点）',' pts)'));
+    h += kvRow(t('an_phase_mid'), pct1(SC.mid.rate*100)+jaEn('（',' (')+SC.mid.total+jaEn('点）',' pts)'));
+    h += kvRow(t('an_phase_end'), pct1(SC.end.rate*100)+jaEn('（',' (')+SC.end.total+jaEn('点）',' pts)'));
+    h += kvRow(t('an_lead_keep'), pct1(SC.lead.rate*100)+jaEn('（',' (')+SC.lead.won+'/'+SC.lead.total+jaEn('）',')'));
+    h += kvRow(t('an_comeback_game'), pct1(SC.comeback.rate*100)+jaEn('（',' (')+SC.comeback.won+'/'+SC.comeback.total+jaEn('）',')'));
+    h += kvRow(t('an_dominance'), pct1(SC.dominance*100));
+    h += kvRow(t('an_max_consec'), SC.avgMaxWon.toFixed(1));
+    h += kvRow(t('an_max_consec_l'), SC.avgMaxLost.toFixed(1));
+    SC.advice.forEach(function(s){ h += '<p class="small">'+esc(s)+'</p>'; });
+  }
+  h += '</div>';
+  /* Instagram */
+  h += '<div class="card"><h2>'+esc(t('ig_title'))+'</h2>'
+    + '<div class="tabs-inline"><button type="button" class="'+(state.igMode==='summary'?'active':'')+'" onclick="setIgMode(\'summary\')">'+esc(t('ig_summary'))+'</button>'
+    + '<button type="button" class="'+(state.igMode==='monthly'?'active':'')+'" onclick="setIgMode(\'monthly\')">'+esc(t('ig_monthly'))+'</button></div>'
+    + '<canvas id="ig-canvas" width="1080" height="1080" style="width:100%;max-width:360px;height:auto;border-radius:12px;background:#0C3E63"></canvas>'
+    + '<div style="height:10px"></div><button type="button" class="primary block" onclick="igDownload()">'+esc(t('ig_download'))+'</button>'
+    + '<p class="muted small">1080×1080 / '+esc(t('ig_note'))+'</p></div>';
+  /* AI prompt */
+  if (!state.aiText) state.aiText = aiBuild(state.aiKind||'issues');
+  h += '<div class="card"><h2>'+esc(t('ai_title'))+'</h2>'
+    + '<div class="tabs-inline">'
+    + '<button type="button" data-ai-kind="issues" class="'+(state.aiKind==='issues'?'active':'')+'" onclick="aiShow(\'issues\')">'+esc(t('ai_issues'))+'</button>'
+    + '<button type="button" data-ai-kind="tactics" class="'+(state.aiKind==='tactics'?'active':'')+'" onclick="aiShow(\'tactics\')">'+esc(t('ai_tactics'))+'</button>'
+    + '<button type="button" data-ai-kind="image" class="'+(state.aiKind==='image'?'active':'')+'" onclick="aiShow(\'image\')">'+esc(t('ai_image'))+'</button></div>'
+    + '<textarea id="ai-output" readonly style="min-height:180px">'+esc(state.aiText)+'</textarea>'
+    + '<div style="height:10px"></div><button type="button" class="primary block" onclick="aiCopy()">'+esc(t('ai_copy'))+'</button></div>';
   return h;
+}
+
+/* ---- Instagram画像（Canvas 1080×1080。選手名のみ表示） ---- */
+function igDraw(){
+  const cv = document.getElementById('ig-canvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  if (!ctx) return;
+  const W=1080, H=1080;
+  const p = currentPlayer();
+  const ms = anPeriodMatches();
+  const A = anLayerA(ms);
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#0C3E63'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = '#FABE0F'; ctx.fillRect(0,0,W,24); ctx.fillRect(0,H-24,W,24);
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  const font = '-apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '800 58px '+font;
+  ctx.fillText('SmashStats', 80, 120);
+  ctx.fillStyle = '#FABE0F';
+  ctx.font = '700 44px '+font;
+  ctx.fillText(p?p.playerName:'', 80, 200);
+  const periodLabel = {month:t('an_month'), '3m':t('an_3m'), year:t('an_year'), all:t('an_all')}[state.analyticsPeriod]||'';
+  ctx.fillStyle = '#CFE0EC';
+  ctx.font = '400 34px '+font;
+  ctx.fillText(periodLabel+' / '+(p?sportLabel(p.sportType):''), 80, 250);
+  if (!A.unlocked){
+    ctx.fillStyle = '#FFFFFF'; ctx.font = '700 52px '+font;
+    ctx.fillText(t('an_no_data'), 80, 560);
+  } else if (state.igMode==='monthly'){
+    ctx.fillStyle = '#FFFFFF'; ctx.font = '800 64px '+font;
+    ctx.fillText(t('monthly_win_rate'), 80, 380);
+    const months = A.monthly.slice(-6);
+    const barW = 120, gap = 46, baseY = 900, maxH = 380;
+    months.forEach(function(m, i){
+      const x = 80 + i*(barW+gap);
+      const hh = Math.round(maxH * m.rate/100);
+      ctx.fillStyle = '#FABE0F';
+      ctx.fillRect(x, baseY-hh, barW, hh);
+      ctx.fillStyle = '#FFFFFF'; ctx.textAlign='center';
+      ctx.font = '700 34px '+font;
+      ctx.fillText(Math.round(m.rate)+'%', x+barW/2, baseY-hh-16);
+      ctx.font = '400 30px '+font;
+      ctx.fillStyle = '#CFE0EC';
+      ctx.fillText(m.label, x+barW/2, baseY+48);
+      ctx.textAlign='left';
+    });
+  } else {
+    ctx.fillStyle = '#FFFFFF'; ctx.font = '800 200px '+font;
+    ctx.fillText(pct0(A.winRate), 80, 480);
+    ctx.font = '700 44px '+font;
+    ctx.fillStyle = '#FABE0F';
+    ctx.fillText(t('win_rate'), 80, 550);
+    ctx.fillStyle = '#FFFFFF'; ctx.font = '400 40px '+font;
+    ctx.fillText(t('total_matches')+': '+A.total+'  '+t('wins')+': '+A.wins+'  '+t('losses')+': '+A.losses, 80, 660);
+    const streak = A.curStreak.type==='WIN'?A.curStreak.n+jaEn('連勝','-win streak'):A.curStreak.type==='LOSS'?A.curStreak.n+jaEn('連敗','-loss streak'):'—';
+    ctx.fillText(jaEn('最大連勝 ','Longest win streak ')+A.maxWin+' / '+t('an_current_streak')+': '+streak, 80, 730);
+    ctx.fillText(jaEn('直近5試合 ','Last 5 matches: ')+A.r5.wins+jaEn('勝',' W - ')+(A.r5.total-A.r5.wins)+jaEn('敗',' L'), 80, 800);
+  }
+  ctx.fillStyle = '#8FB0C7'; ctx.font = '400 30px '+font;
+  ctx.fillText('SmashStats Web', 80, H-60);
+}
+function igDownload(){
+  const cv = document.getElementById('ig-canvas');
+  if (!cv) return;
+  const a = document.createElement('a');
+  const d = new Date();
+  a.href = cv.toDataURL('image/png');
+  a.download = 'smashstats_' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '.png';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ a.remove(); }, 500);
+}
+
+/* ---- AIプロンプト生成（外部AI向け。アプリ内生成AIなし） ---- */
+function aiBuild(kind){
+  const p = currentPlayer();
+  const ms = anPeriodMatches();
+  const A = anLayerA(ms), B = anLayerB(ms), C = anLayerC(ms, state.gears), D = anLayerD(ms), E = anLayerE(ms);
+  const periodLabel = {month:t('an_month'), '3m':t('an_3m'), year:t('an_year'), all:t('an_all')}[state.analyticsPeriod]||'';
+  const L = [];
+  const name = p?p.playerName:'';
+  if (kind==='issues'){
+    L.push(t('ai_p_issues_title'));
+    L.push(t('ai_p_issues_body'));
+  } else if (kind==='tactics'){
+    L.push(t('ai_p_tactics_title'));
+    L.push(t('ai_p_tactics_body'));
+  } else {
+    L.push(t('ai_p_image_title'));
+    L.push(t('ai_p_image_body'));
+  }
+  L.push('');
+  L.push(tf('ai_p_player',{name:name,sport:(p?sportLabel(p.sportType):''),period:periodLabel}));
+  if (!A.unlocked){ L.push(t('ai_p_no_data')); return L.join('\n'); }
+  L.push(tf('ai_p_total',{total:A.total,wins:A.wins,losses:A.losses,rate:pct1(A.winRate)}));
+  L.push(tf('ai_p_recent5',{w:A.r5.wins,l:(A.r5.total-A.r5.wins),rate:pct1(A.r5.rate)}));
+  const curStreakTxt = A.curStreak.type==='WIN'?A.curStreak.n+jaEn('連勝','-win streak'):A.curStreak.type==='LOSS'?A.curStreak.n+jaEn('連敗','-loss streak'):'—';
+  L.push(tf('ai_p_streak',{a:A.maxWin,b:A.maxLoss,c:curStreakTxt}));
+  L.push(t('ai_p_monthly')+A.monthly.map(function(m){ return m.label+' '+pct1(m.rate)+jaEn('（',' (')+m.wins+'/'+m.total+jaEn('）',')'); }).join(jaEn('、',', ')));
+  if (B.unlocked){
+    L.push(tf('ai_p_sets',{a:pct1(B.sets.rate),b:pct1(B.points.rate)}));
+    L.push(tf('ai_p_fst',{a:pct1(B.fst.rate),w:B.fst.wins,t:B.fst.total}));
+    L.push(tf('ai_p_als',{a:pct1(B.als.rate),w:B.als.wins,t:B.als.total}));
+  }
+  if (C.unlocked){
+    L.push(t('ai_p_surf')+C.surfRates.map(function(s){ return s.surface+' '+pct1(s.rate)+jaEn('（',' (')+s.count+jaEn('試合）',' matches)'); }).join(jaEn('、',', ')));
+    if (C.gearRates.length) L.push(t('ai_p_gear')+C.gearRates.map(function(g){ return g.label+' '+pct1(g.rate)+jaEn('（',' (')+g.count+jaEn('試合）',' matches)'); }).join(jaEn('、',', ')));
+  }
+  if (D.unlocked){
+    L.push(t('ai_p_insights'));
+    D.insights.forEach(function(s){ L.push('- '+s); });
+  }
+  if (E.clubs.length) L.push(t('ai_p_clubs')+E.clubs.slice(0,3).map(function(c){ return c.club+' '+pct1(c.rate)+jaEn('（',' (')+c.wins+jaEn('勝',' W - ')+c.losses+jaEn('敗',' L')+jaEn('）',')'); }).join(jaEn('、',', ')));
+  if (E.partners.length) L.push(t('ai_p_partners')+E.partners.map(function(x){ return x.partner+' '+pct1(x.rate)+jaEn('（',' (')+x.count+jaEn('試合）',' matches)'); }).join(jaEn('、',', ')));
+  const mom = [];
+  ms.forEach(function(m){ anScores(m).forEach(function(s){ if (s.lostInitiativeScore||s.gainedInitiativeScore) mom.push(s); }); });
+  if (mom.length) L.push(tf('ai_p_momentum',{n:mom.length}));
+  const recent = ms.slice().sort(function(a,b){ return (b.matchDateEpochDay-a.matchDateEpochDay)||(b.createdAt-a.createdAt); }).slice(0,5);
+  if (recent.length){
+    L.push(t('ai_p_recent'));
+    recent.forEach(function(m){ L.push('- '+fmtDate(m.matchDateEpochDay)+' vs '+m.opponentDisplayName+' '+scoreText(anScores(m))+' '+(anResult(m)==='WIN'?jaEn('勝ち','Win'):anResult(m)==='LOSS'?jaEn('負け','Loss'):jaEn('引き分け','Draw'))); });
+  }
+  return L.join('\n');
+}
+function aiShow(kind){
+  state.aiKind = kind;
+  state.aiText = aiBuild(kind);
+  const ta = document.getElementById('ai-output');
+  if (ta) ta.value = state.aiText;
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ai-kind]'), function(b){
+    b.classList.toggle('active', b.getAttribute('data-ai-kind')===kind);
+  });
+}
+function aiCopy(){
+  const ta = document.getElementById('ai-output');
+  const text = ta?ta.value:state.aiText;
+  if (!text) return;
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ toast(t('ai_copied')); }, function(){ aiCopyFallback(text); });
+  } else aiCopyFallback(text);
+}
+function aiCopyFallback(text){
+  const ta = document.getElementById('ai-output');
+  if (ta){ ta.focus(); ta.select(); try{ document.execCommand('copy'); toast(t('ai_copied')); }catch(e){ proNotice(text); } }
 }
 
 /* ---- 用具（最小限） ---- */
@@ -1511,14 +2909,18 @@ function gearHTML(){
   const gs = state.gears.filter(function(g){return g.playerId===p.playerId;})
     .sort(function(a,b){return b.lastMaintenanceAt-a.lastMaintenanceAt;});
   let h = '<div class="card"><h2>'+esc(t('gear_list'))+'</h2>';
+  const lc = anLayerC(playerMatches(), state.gears);
+  const gearRates = lc.gearRates||[];
   if (!gs.length) h += '<p class="muted">—</p>';
   gs.forEach(function(g){
     const days = daysBetween(g.lastMaintenanceAt, Date.now());
     const used = state.matches.filter(function(m){return m.gearId===g.gearId && m.createdAt>=g.lastMaintenanceAt;}).length;
+    const gr = gearRates.find(function(r){ return r.gearId===g.gearId; });
     h += '<div class="card" style="margin-bottom:8px"><div class="top" style="display:flex;justify-content:space-between;gap:8px">'
       + '<div><b>'+esc(g.racketName)+'</b><div class="sub muted">'+esc(g.stringName||'')+' ・ '+esc(String(g.tensionValue==null?'':g.tensionValue))+' '+esc(g.tensionUnit||'')+'</div>'
       + '<div class="sub muted">'+esc(t('last_maintenance'))+': '+esc(fmtDateTime(g.lastMaintenanceAt))+'</div>'
-      + '<div class="sub">'+esc(t('days_since'))+': <b>'+days+'</b> ・ '+esc(t('matches_since'))+': <b>'+used+'</b></div></div>'
+      + '<div class="sub">'+esc(t('days_since'))+': <b>'+days+'</b> ・ '+esc(t('matches_since'))+': <b>'+used+'</b></div>'
+      + (gr?'<div class="sub">'+esc(t('gear_win_rate'))+': <b>'+pct1(gr.rate)+'</b>'+jaEn('（',' (')+gr.count+jaEn('試合）',' matches)')+'</div>':'')+'</div>'
       + '<div><span class="badge '+(g.isActive?'win':'draw')+'">'+esc(g.isActive?t('active'):t('inactive'))+'</span></div></div>'
       + '<div class="row" style="margin-top:8px"><button type="button" onclick="showGearForm(\''+esc(g.gearId)+'\')">'+esc(t('edit'))+'</button>'
       + '<button type="button" onclick="recordMaintenance(\''+esc(g.gearId)+'\')">'+esc(t('record_maintenance'))+'</button></div></div>';
@@ -1639,14 +3041,238 @@ async function saveFocus(){
 }
 
 /* ---- 設定 ---- */
+/* ---- 会場（venues） ---- */
+function venueListHTML(){
+  const vs = (state.venues||[]).slice().sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+  if (!vs.length) return '<p class="muted">—</p>';
+  return vs.map(function(v){
+    return '<div class="kv"><span><b>'+esc(v.name)+'</b><br><span class="muted small">'+esc(v.address||'')+' ・ '+esc(v.indoorOutdoor||'')+'</span></span>'
+      + '<span><button type="button" onclick="showVenueForm('+v.id+')">'+esc(t('edit'))+'</button></span></div>';
+  }).join('');
+}
+function showVenueForm(id){
+  const v = id!=null ? (state.venues||[]).find(function(x){ return x.id===id; }) : null;
+  const slot = $('#venue-form-slot');
+  if (!slot) return;
+  slot.innerHTML = '<div class="card"><h3>'+esc(v?t('edit'):t('add_venue'))+'</h3>'
+    + '<label>'+esc(t('venue_name'))+'</label><input id="v-name" type="text" value="'+esc(v?v.name:'')+'">'
+    + '<label>'+esc(t('venue_address'))+'</label><input id="v-addr" type="text" value="'+esc(v?v.address||'':'')+'">'
+    + '<label>'+esc(t('venue_phone'))+'</label><input id="v-phone" type="text" value="'+esc(v?v.phone||'':'')+'">'
+    + '<div class="row"><div><label>'+esc(t('venue_indoor_outdoor'))+'</label><select id="v-env"><option value="">'+esc(t('unknown'))+'</option><option value="INDOOR"'+(v&&v.indoorOutdoor==='INDOOR'?' selected':'')+'>'+esc(t('indoor'))+'</option><option value="OUTDOOR"'+(v&&v.indoorOutdoor==='OUTDOOR'?' selected':'')+'>'+esc(t('outdoor'))+'</option></select></div>'
+    + '<div><label>'+esc(t('venue_surface'))+'</label><input id="v-surf" type="text" value="'+esc(v?v.surfaceType||'':'')+'"></div></div>'
+    + '<label>'+esc(t('venue_note'))+'</label><textarea id="v-note">'+esc(v?v.importantNote||'':'')+'</textarea>'
+    + '<div style="height:10px"></div><div class="row">'
+    + '<button type="button" class="primary" onclick="saveVenue('+(v?v.id:'null')+')">'+esc(t('save'))+'</button>'
+    + '<button type="button" onclick="render()">'+esc(t('cancel'))+'</button>'
+    + (v?'<button type="button" class="danger" onclick="deleteVenue('+v.id+')">'+esc(t('del'))+'</button>':'')
+    + '</div></div>';
+  const inp = $('#v-name'); if (inp) inp.focus();
+}
+async function saveVenue(id){
+  const name = $('#v-name').value.trim();
+  if (!name) return;
+  const now = Date.now();
+  const prev = id!=null ? (state.venues||[]).find(function(v){ return v.id===id; }) : null;
+  const row = {
+    name:name, address:$('#v-addr').value.trim()||null, latitude:prev?prev.latitude:null, longitude:prev?prev.longitude:null,
+    phone:$('#v-phone').value.trim()||null, websiteUrl:prev?prev.websiteUrl:'',
+    indoorOutdoor:$('#v-env').value||null, facilityCount:prev?prev.facilityCount:null,
+    courtColumns:prev?prev.courtColumns:null, courtRows:prev?prev.courtRows:null,
+    hasSubCourt:prev?prev.hasSubCourt:null, subCourtCount:prev?prev.subCourtCount:null,
+    subCourtNote:prev?prev.subCourtNote:'', parkingAvailable:prev?prev.parkingAvailable:null,
+    parkingNote:prev?prev.parkingNote:'', parkingFee:prev?prev.parkingFee:'',
+    parkingCrowdedLevel:prev?prev.parkingCrowdedLevel:'', bicycleParkingAvailable:prev?prev.bicycleParkingAvailable:null,
+    nearbyConvenienceStore:prev?prev.nearbyConvenienceStore:'', environmentLevel:prev?prev.environmentLevel:'',
+    lightingLevel:prev?prev.lightingLevel:'', airConditionLevel:prev?prev.airConditionLevel:'',
+    surfaceType:$('#v-surf').value.trim()||null, sportType:prev?prev.sportType:(currentPlayer()?currentPlayer().sportType:null),
+    shootingAllowed:prev?prev.shootingAllowed:null, tripodAllowed:prev?prev.tripodAllowed:null,
+    shootingNote:prev?prev.shootingNote:'', importantNote:$('#v-note').value.trim()||'',
+    photoUrisJson:prev?prev.photoUrisJson:'', createdAt:prev?prev.createdAt:now, updatedAt:now, isDeleted:false
+  };
+  if (prev) row.id = prev.id;
+  else { let mx=0; (state.venues||[]).forEach(function(v){ if (typeof v.id==='number' && v.id>mx) mx=v.id; }); row.id = mx+1; }
+  await idbPut('venues', row);
+  await loadAll(); toast(t('saved')); render();
+}
+async function deleteVenue(id){
+  if (!confirm(t('confirm_delete'))) return;
+  const v = (state.venues||[]).find(function(x){ return x.id===id; });
+  if (v){ v.isDeleted=true; v.updatedAt=Date.now(); await idbPut('venues', v); }
+  await loadAll(); toast(t('deleted')); render();
+}
+
+/* ---- 対戦相手（opponent_profiles） ---- */
+function oppListHTML(){
+  const list = (state.opponentProfiles||[]).slice().sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+  if (!list.length) return '<p class="muted">'+esc(t('opp_no_data'))+'</p>';
+  return list.map(function(o){
+    const ms = state.matches.filter(function(m){ return m.playerId===state.currentPlayerId && m.opponentDisplayName===o.name; });
+    const w = ms.filter(function(m){return m.isWin;}).length;
+    const rate = ms.length?Math.round(w/ms.length*100):null;
+    return '<div class="kv"><span><b>'+esc(o.name)+'</b><br><span class="muted small">'+esc(o.teamName||'')+' ・ '+esc(o.sportType?sportLabel(o.sportType):'')+'</span>'
+      + (ms.length?'<br><span class="small">'+ms.length+jaEn('試合 ',' matches, ')+w+jaEn('勝',' W')+(rate!=null?' '+rate+'%':'')+'</span>':'')
+      + '</span><span><button type="button" onclick="showOpponentForm(\''+esc(o.opponentId)+'\')">'+esc(t('edit'))+'</button></span></div>';
+  }).join('');
+}
+function csvList(s){ return s.split(/[,、]/).map(function(x){return x.trim();}).filter(function(x){return x;}); }
+function showOpponentForm(opponentId){
+  const o = opponentId ? (state.opponentProfiles||[]).find(function(x){ return x.opponentId===opponentId; }) : null;
+  const slot = $('#opponent-form-slot');
+  if (!slot) return;
+  const list = function(json){ try{ const a=JSON.parse(json||'[]'); return Array.isArray(a)?a.join('、'):''; }catch(e){ return ''; } };
+  slot.innerHTML = '<div class="card"><h3>'+esc(o?t('edit'):t('add_opponent'))+'</h3>'
+    + '<label>'+esc(t('opp_name'))+'</label><input id="o-name" type="text" value="'+esc(o?o.name:'')+'">'
+    + '<label>'+esc(t('opp_team'))+'</label><input id="o-team" type="text" value="'+esc(o?o.teamName||'':'')+'">'
+    + '<div class="row"><div><label>'+esc(t('sport'))+'</label><select id="o-sport">'
+    + SPORTS.map(function(s){ return '<option value="'+s+'"'+(o&&o.sportType===s?' selected':'')+'>'+esc(sportLabel(s))+'</option>'; }).join('')+'</select></div>'
+    + '<div><label>'+esc(t('opp_hand'))+'</label><select id="o-hand"><option value="">'+esc(t('unknown'))+'</option><option value="右"'+(o&&o.dominantHand==='右'?' selected':'')+'>'+esc(t('opp_hand_r'))+'</option><option value="左"'+(o&&o.dominantHand==='左'?' selected':'')+'>'+esc(t('opp_hand_l'))+'</option></select></div></div>'
+    + '<label>'+esc(t('opp_strong'))+'</label><input id="o-strong" type="text" value="'+esc(o?list(o.strongShotsJson):'')+'" placeholder="'+jaEn('スマッシュ、ドロップ','Smash, drop')+'">'
+    + '<label>'+esc(t('opp_weak'))+'</label><input id="o-weak" type="text" value="'+esc(o?list(o.weakShotsJson):'')+'" placeholder="'+jaEn('バックハンド','Backhand')+'">'
+    + '<label>'+esc(t('opp_strong_course'))+'</label><input id="o-strong-c" type="text" value="'+esc(o?list(o.strongCoursesJson):'')+'" placeholder="'+jaEn('フォア奥、ネット前','Deep forehand, net')+'">'
+    + '<label>'+esc(t('opp_weak_course'))+'</label><input id="o-weak-c" type="text" value="'+esc(o?list(o.weakCoursesJson):'')+'" placeholder="'+jaEn('バック奥','Deep backhand')+'">'
+    + '<label>'+esc(t('opp_memo'))+'</label><textarea id="o-memo">'+esc(o?o.tacticalMemo||'':'')+'</textarea>'
+    + '<div style="height:10px"></div><div class="row">'
+    + '<button type="button" class="primary" onclick="saveOpponent('+(o?'\''+esc(o.opponentId)+'\'':'null')+')">'+esc(t('save'))+'</button>'
+    + '<button type="button" onclick="render()">'+esc(t('cancel'))+'</button>'
+    + (o?'<button type="button" class="danger" onclick="deleteOpponent(\''+esc(o.opponentId)+'\')">'+esc(t('del'))+'</button>':'')
+    + '</div></div>';
+  const inp = $('#o-name'); if (inp) inp.focus();
+}
+async function saveOpponent(opponentId){
+  const name = $('#o-name').value.trim();
+  if (!name) return;
+  const now = Date.now();
+  const prev = opponentId ? (state.opponentProfiles||[]).find(function(o){ return o.opponentId===opponentId; }) : null;
+  const row = {
+    opponentId: prev?prev.opponentId:uuid(),
+    name:name, teamName:$('#o-team').value.trim()||null, sportType:$('#o-sport').value,
+    dominantHand:$('#o-hand').value||null,
+    strongShotsJson:JSON.stringify(csvList($('#o-strong').value)),
+    weakShotsJson:JSON.stringify(csvList($('#o-weak').value)),
+    strongCoursesJson:JSON.stringify(csvList($('#o-strong-c').value)),
+    weakCoursesJson:JSON.stringify(csvList($('#o-weak-c').value)),
+    tacticalMemo:$('#o-memo').value.trim()||'', memoHistoryJson:prev?prev.memoHistoryJson:'[]',
+    createdAt:prev?prev.createdAt:now, updatedAt:now, isDeleted:false
+  };
+  await idbPut('opponent_profiles', row);
+  await loadAll(); toast(t('saved')); render();
+}
+async function deleteOpponent(opponentId){
+  if (!confirm(t('confirm_delete'))) return;
+  const o = (state.opponentProfiles||[]).find(function(x){ return x.opponentId===opponentId; });
+  if (o){ o.isDeleted=true; o.updatedAt=Date.now(); await idbPut('opponent_profiles', o); }
+  await loadAll(); toast(t('deleted')); render();
+}
+
+/* ---- CSV取り込み（Android版と同じ10列） ---- */
+function zenToHan(s){
+  return String(s||'').replace(/[０-９Ａ-Ｚａ-ｚ]/g, function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); })
+    .replace(/，/g, ',').replace(/／/g, '/').replace(/－/g, '-').replace(/　/g, ' ').replace(/．/g, '.');
+}
+function csvParse(text){
+  const rows=[]; let row=[], field='', inQ=false;
+  for (let i=0;i<text.length;i++){
+    const c=text[i];
+    if (inQ){
+      if (c==='"'){
+        if (text[i+1]==='"'){ field+='"'; i++; }
+        else inQ=false;
+      } else field+=c;
+    } else if (c==='"'){ inQ=true; }
+    else if (c===','){ row.push(field); field=''; }
+    else if (c==='\n'){ row.push(field); field=''; rows.push(row); row=[]; }
+    else if (c==='\r'){ /* skip */ }
+    else field+=c;
+  }
+  if (field!=='' || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+function csvDateToEpoch(s){
+  s = zenToHan(s).trim();
+  let m = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
+  if (m) return dateInputToEpochDay(m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0'));
+  m = s.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/);
+  if (m) return dateInputToEpochDay(m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0'));
+  return null;
+}
+function csvSport(s){
+  const map = {'バドミントン':'BADMINTON','テニス':'TENNIS','ソフトテニス':'SOFT_TENNIS','卓球':'TABLE_TENNIS','ピックルボール':'PICKLEBALL'};
+  if (map[s]) return map[s];
+  if (SPORTS.indexOf(s)>=0) return s;
+  return null;
+}
+function csvScoreSets(s){
+  const sets = [];
+  if (!s) return sets;
+  s.split(/[,、]/).forEach(function(p){
+    const m = p.trim().match(/(\d+)\s*[-－]\s*(\d+)(?:\s*\((\d+)\s*[-－]\s*(\d+)\))?/);
+    if (m) sets.push({myScore:parseInt(m[1],10), opponentScore:parseInt(m[2],10),
+      tieBreakMy: m[3]!=null?parseInt(m[3],10):null, tieBreakOpponent: m[4]!=null?parseInt(m[4],10):null,
+      specialResult:null, lostInitiativeScore:null, gainedInitiativeScore:null, momentumDetail:null, pointSequence:null});
+  });
+  return sets;
+}
+async function csvImportFile(file){
+  try{
+    const text = await file.text();
+    const rows = csvParse(text);
+    if (rows.length<2) throw new Error('csv');
+    const p = currentPlayer();
+    if (!p){ proNotice(t('need_player')); return; }
+    const existing = playerMatches();
+    const seen = {};
+    existing.forEach(function(m){ seen[m.matchDateEpochDay+'|'+(m.opponentDisplayName||'')+'|'+m.scoresJson]=1; });
+    const parsed = [];
+    let dup=0, bad=0;
+    for (let i=1;i<rows.length;i++){
+      const r = rows[i];
+      if (!r || r.every(function(c){ return String(c||'').trim()===''; })) continue;
+      const get = function(k){ return zenToHan(r[k]||'').trim(); };
+      const ed = csvDateToEpoch(get(0));
+      if (ed==null || !get(3)){ bad++; continue; }
+      const sport = csvSport(get(1)) || p.sportType;
+      const sets = csvScoreSets(get(5));
+      const scoresJson = JSON.stringify(sets);
+      const key = ed+'|'+get(3)+'|'+scoresJson;
+      if (seen[key]){ dup++; continue; }
+      seen[key]=1;
+      let isWin = null;
+      const res = get(6);
+      if (/勝|WIN/i.test(res)) isWin=true; else if (/負|敗|LOSS/i.test(res)) isWin=false;
+      const m = { matchId:uuid(), playerId:p.playerId, sportType:sport,
+        matchType:(/ダブルス|DOUBLES/i.test(get(2))?'DOUBLES':'SINGLES'),
+        playerTeamNameSnapshot:p.defaultTeamName||null, partnerName:get(4)||null,
+        opponentDisplayName:get(3), opponentMembersJson:JSON.stringify([get(3)]),
+        opponentTeamNameSnapshot:null, courtSurface:'UNKNOWN', environmentType:'INDOOR',
+        gearId:null, tournamentName:get(7)||'', tournamentYear: new Date(ed*86400000).getUTCFullYear(),
+        matchDateEpochDay:ed, finalResultCode:'NORMAL', roundName:get(8)||null,
+        tournamentDivision:null, tournamentFormat:null, scoresJson:scoresJson, isWin:false,
+        videoPathOrUrl:null, matchNote:get(9)||null, photoPath:null, isTeamMatch:false,
+        teamMyScore:null, teamOpponentScore:null, weatherType:null, ballOrShuttle:null,
+        isNightMatch:false, venueId:null, elapsedDaysFromMaintenance:null,
+        cumulativeMatchesFromMaintenance:null, createdAt:Date.now(), updatedAt:Date.now(), isDeleted:false, deletedAt:null };
+      deriveMatch(m);
+      if (isWin!==null) m.isWin = isWin;
+      parsed.push(m);
+    }
+    if (!parsed.length){ proNotice(dup? (t('csv_imported')+' 0 / '+t('csv_dup')+' '+dup) : t('csv_error')); return; }
+    let allowed = parsed, limited = 0;
+    if (!state.isPro){
+      const room = Math.max(0, 5 - monthMatchCount(p.playerId));
+      if (parsed.length > room){ limited = parsed.length - room; allowed = parsed.slice(0, room); }
+    }
+    if (!allowed.length){ proNotice(t('free_limit_match')); return; }
+    for (const m of allowed) await idbPut('matches', m);
+    await loadAll();
+    toast(t('csv_imported')+' '+allowed.length+' / '+t('csv_dup')+' '+dup+(limited?' / '+t('csv_limit')+' '+limited:''));
+    render();
+  }catch(e){ proNotice(t('csv_error')); }
+}
+
 function settingsHTML(){
-  const planBadge = state.isPro?'<span class="badge pro">'+esc(t('pro_plan'))+'</span>':'<span class="badge free">'+esc(t('free_plan'))+'</span>';
   let h = '<div class="card"><button type="button" onclick="state.view=\'tab\'; render()">'+esc(t('back'))+'</button>'
     + '<h2 style="margin-top:10px">'+esc(t('settings'))+'</h2></div>';
-  h += '<div class="card"><h2>'+esc(t('plan'))+' '+planBadge+'</h2>'
-    + '<p class="muted">'+esc(t('pro_soon'))+'</p>'
-    + '<div class="kv"><span>'+esc(t('matches'))+' ('+esc(LANG==='ja'?'今月':'this month')+')</span><b>'+(currentPlayer()?monthMatchCount(state.currentPlayerId):0)+' / 5</b></div>'
-    + '<div class="kv"><span>'+esc(t('add_player'))+'</span><b>'+state.players.length+' / 1</b></div></div>';
+  h += licenseHTML();
   h += '<div class="card"><h2>'+esc(t('language'))+'</h2><div class="row">'
     + '<button type="button" class="'+(LANG==='ja'?'primary':'')+'" onclick="setLang(\'ja\')">日本語</button>'
     + '<button type="button" class="'+(LANG==='en'?'primary':'')+'" onclick="setLang(\'en\')">English</button></div>'
@@ -1669,17 +3295,27 @@ function settingsHTML(){
     + '<button type="button" onclick="syncRestoreUI()">'+esc(t('sync_restore'))+'</button></div>'
     + '<div id="sync-status" style="margin-top:10px">'+syncStatusHTML()+'</div>'
     + '<div class="kv"><span>'+esc(t('storage'))+'</span><b>'+esc(state.persisted===true?t('storage_persisted'):state.persisted===false?t('storage_not_persisted'):'—')+'</b></div></div>';
+  h += '<div class="card"><h2>'+esc(t('venue_list'))+'</h2>'+venueListHTML()
+    + '<div style="height:8px"></div><button type="button" class="primary block" onclick="showVenueForm(null)">＋ '+esc(t('add_venue'))+'</button>'
+    + '<div id="venue-form-slot"></div></div>';
+  h += '<div class="card"><h2>'+esc(t('opp_list'))+'</h2>'+oppListHTML()
+    + '<div style="height:8px"></div><button type="button" class="primary block" onclick="showOpponentForm(null)">＋ '+esc(t('add_opponent'))+'</button>'
+    + '<div id="opponent-form-slot"></div></div>';
   h += '<div class="card"><h2>JSON</h2>'
     + '<button type="button" class="block" onclick="exportJSON()">'+esc(t('export_json'))+'</button>'
     + '<div style="height:8px"></div>'
     + '<button type="button" class="block" onclick="document.getElementById(\'import-file\').click()">'+esc(t('import_json'))+'</button>'
     + '<input id="import-file" type="file" accept="application/json,.json" style="display:none"></div>';
+  h += '<div class="card"><h2>'+esc(t('csv_import'))+'</h2>'
+    + '<button type="button" class="block" onclick="document.getElementById(\'import-csv-file\').click()">'+esc(t('csv_import_btn'))+'</button>'
+    + '<input id="import-csv-file" type="file" accept=".csv,text/csv" style="display:none">'
+    + '<p class="muted small">'+jaEn('試合日・競技・種目・対戦相手・ペア名・スコア・勝敗・大会名・ラウンド・メモ（10列）','Date, sport, type, opponent, partner, score, result, tournament, round, memo (10 columns)')+'</p></div>';
   h += '<div class="card"><h2>'+esc(t('demo_badge'))+'</h2><p class="muted small">'+esc(t('demo_note'))+'</p>'
     + (state.demo
       ? '<button type="button" class="danger block" onclick="deleteDemo()">'+esc(t('demo_delete'))+'</button>'
       : '<button type="button" class="block" onclick="loadDemo()">'+esc(t('demo_load'))+'</button>')
     + '</div>';
-  h += '<div class="card"><p class="muted small">SmashStats Web 2.1.0 — Phase 2（スプレッドシート同期）<br>DB: smashstats-web（IndexedDB）・ schema v16相当<br>Phase 4: Pro（買い切り）</p></div>';
+  h += '<div class="card"><p class="muted small">SmashStats Web 2.3.0 — Phase 4'+jaEn('（Pro・ライセンス）',' (Pro & license)')+'<br>DB: smashstats-web'+jaEn('（IndexedDB）',' (IndexedDB)')+jaEn('・ schema v16相当',' · schema v16 equivalent')+'</p></div>';
   return h;
 }
 function setLang(l){ LANG=l; localStorage.setItem('ss-lang', l); render(); }
@@ -1778,6 +3414,9 @@ function bindGlobal(){
     if (e.target && e.target.id==='import-file') return;
     const f = $('#import-file');
     if (f) f.onchange = function(){ if(f.files && f.files[0]) importJSONFile(f.files[0]); f.value=''; };
+    if (e.target && e.target.id==='import-csv-file') return;
+    const cf = $('#import-csv-file');
+    if (cf) cf.onchange = function(){ if(cf.files && cf.files[0]) csvImportFile(cf.files[0]); cf.value=''; };
   });
   // キーボード表示時は下部タブを隠す（入力欄にフォーカスしている間だけ）
   document.addEventListener('focusin', function(e){
@@ -1802,6 +3441,10 @@ async function init(){
   await metaSet('schemaVersion', 16);
   if (!await metaGet('deviceId')) await metaSet('deviceId', uuid());
   render();
+  // 決済完了後のライセンス発行（Stripe からの戻り ?license_session=...）
+  licenseClaimFromUrl().catch(function(){ /* 失敗は画面の通知に残る */ });
+  // Pro の定期的な再確認（7日以上たっていたら。失敗しても Pro のまま）
+  licenseReverifySilent().catch(function(){});
   // 起動時の自動同期（設定済み・オンラインのときだけ。失敗しても黙って残す）。
   if (syncConfigured() && navigator.onLine !== false){
     syncNow({auto:true, silent:true}).catch(function(){ /* 状態は設定画面に残る */ });
